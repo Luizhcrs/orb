@@ -38,7 +38,7 @@ export class LLMManager {
     }
   }
 
-  async processMessage(message: string): Promise<LLMResponse> {
+  async processMessage(message: string, imageData?: string): Promise<LLMResponse> {
     try {
       // Adicionar mensagem do usuário ao histórico
       this.conversationHistory.push({
@@ -49,7 +49,7 @@ export class LLMManager {
       let response: LLMResponse;
 
       if (this.provider) {
-        response = await this.provider.sendMessage(message, this.conversationHistory);
+        response = await this.provider.sendMessage(message, this.conversationHistory, imageData);
         
         // Adicionar resposta do assistente ao histórico
         this.conversationHistory.push({

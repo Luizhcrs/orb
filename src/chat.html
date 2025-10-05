@@ -438,6 +438,86 @@
                 box-shadow: 0 0 20px rgba(0, 255, 255, 0.2);
             }
         }
+
+        .captured-image-container {
+            margin: 16px;
+            animation: imageAppear 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .image-preview {
+            position: relative;
+            border-radius: 12px;
+            overflow: hidden;
+            background: 
+                linear-gradient(135deg, 
+                    rgba(255, 255, 255, 0.1) 0%, 
+                    rgba(255, 255, 255, 0.05) 100%);
+            backdrop-filter: blur(20px) saturate(150%);
+            -webkit-backdrop-filter: blur(20px) saturate(150%);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 
+                0 4px 16px rgba(0, 0, 0, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        }
+
+        .image-preview img {
+            width: 100%;
+            height: auto;
+            max-height: 200px;
+            object-fit: contain;
+            display: block;
+        }
+
+        .image-actions {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            display: flex;
+            gap: 4px;
+        }
+
+        .image-action-btn {
+            background: 
+                linear-gradient(135deg, 
+                    rgba(255, 100, 100, 0.2) 0%, 
+                    rgba(255, 100, 100, 0.1) 100%);
+            border: 1px solid rgba(255, 100, 100, 0.3);
+            color: rgba(255, 150, 150, 0.9);
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            backdrop-filter: blur(20px) saturate(150%);
+            -webkit-backdrop-filter: blur(20px) saturate(150%);
+            font-size: 12px;
+        }
+
+        .image-action-btn:hover {
+            background: 
+                linear-gradient(135deg, 
+                    rgba(255, 100, 100, 0.3) 0%, 
+                    rgba(255, 100, 100, 0.2) 100%);
+            border-color: rgba(255, 100, 100, 0.4);
+            transform: scale(1.05);
+            box-shadow: 
+                0 4px 16px rgba(255, 100, 100, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.3);
+        }
+
+        @keyframes imageAppear {
+            0% {
+                opacity: 0;
+                transform: scale(0.9) translateY(-10px);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
     </style>
 </head>
 <body>
@@ -448,6 +528,14 @@
         </div>
 
         <div class="chat-content">
+            <div class="captured-image-container" id="capturedImageContainer" style="display: none;">
+                <div class="image-preview">
+                    <img id="capturedImage" src="" alt="Screenshot capturado">
+                    <div class="image-actions">
+                        <button class="image-action-btn" id="removeImageBtn">🗑️</button>
+                    </div>
+                </div>
+            </div>
             <div class="chat-messages" id="chatMessages">
             </div>
 
@@ -483,9 +571,15 @@
                 this.sendBtn = document.getElementById('sendBtn');
                 this.closeBtn = document.getElementById('closeBtn');
                 this.typingIndicator = document.getElementById('typingIndicator');
+                this.capturedImageContainer = document.getElementById('capturedImageContainer');
+                this.capturedImage = document.getElementById('capturedImage');
+                this.removeImageBtn = document.getElementById('removeImageBtn');
+                
+                this.capturedImageData = null;
                 
                 this.initializeEventListeners();
                 this.initializeInput();
+                this.initializeImageHandlers();
             }
 
             initializeEventListeners() {
@@ -513,13 +607,25 @@
                 });
             }
 
+            initializeImageHandlers() {
+                // Listener para receber imagem capturada do main process
+                ipcRenderer.on('image-captured', (event, imageData) => {
+                    this.showCapturedImage(imageData);
+                });
+
+                // Botão para remover imagem
+                this.removeImageBtn.addEventListener('click', () => {
+                    this.removeCapturedImage();
+                });
+            }
+
             initializeInput() {
                 this.chatInput.focus();
             }
 
             async sendMessage() {
                 const message = this.chatInput.value.trim();
-                if (!message) return;
+                if (!message && !this.capturedImageData) return;
 
                 this.addMessage(message, 'user');
                 this.chatInput.value = '';
@@ -529,9 +635,14 @@
                 this.sendBtn.disabled = true;
 
                 try {
-                    const response = await ipcRenderer.invoke('send-message', message);
+                    const response = await ipcRenderer.invoke('send-message', message, this.capturedImageData);
                     this.hideTyping();
                     this.addMessage(response.response, 'assistant', response.timestamp);
+                    
+                    // Limpar imagem após envio
+                    if (this.capturedImageData) {
+                        this.removeCapturedImage();
+                    }
                 } catch (error) {
                     this.hideTyping();
                     this.addMessage('Desculpe, ocorreu um erro ao processar sua mensagem.', 'assistant');
@@ -583,6 +694,22 @@
 
             closeChat() {
                 ipcRenderer.invoke('close-chat');
+            }
+
+            showCapturedImage(imageData) {
+                this.capturedImageData = imageData;
+                this.capturedImage.src = imageData;
+                this.capturedImageContainer.style.display = 'block';
+                this.scrollToBottom();
+                console.log('📸 Imagem capturada exibida no chat');
+            }
+
+            removeCapturedImage() {
+                this.capturedImageData = null;
+                this.capturedImageContainer.style.display = 'none';
+                this.capturedImage.src = '';
+                ipcRenderer.invoke('clear-captured-image');
+                console.log('🗑️ Imagem capturada removida');
             }
 
             initExpandButton() {

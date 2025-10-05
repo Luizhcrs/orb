@@ -17,7 +17,7 @@ export class OpenAIProvider extends LLMProvider {
     });
   }
 
-  async sendMessage(message: string, conversationHistory: Array<{role: 'user' | 'assistant' | 'system', content: string}> = []): Promise<LLMResponse> {
+  async sendMessage(message: string, conversationHistory: Array<{role: 'user' | 'assistant' | 'system', content: string}> = [], imageData?: string): Promise<LLMResponse> {
     try {
       const messages = [
         {
@@ -30,7 +30,18 @@ export class OpenAIProvider extends LLMProvider {
         })), // Manter apenas as últimas 10 mensagens para não exceder limites
         {
           role: 'user' as const,
-          content: message
+          content: imageData ? [
+            {
+              type: 'text' as const,
+              text: message
+            },
+            {
+              type: 'image_url' as const,
+              image_url: {
+                url: imageData
+              }
+            }
+          ] : message
         }
       ];
 

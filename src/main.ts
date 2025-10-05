@@ -1,5 +1,6 @@
-import { app, BrowserWindow, ipcMain, globalShortcut, screen } from 'electron';
+import { app, BrowserWindow, ipcMain, globalShortcut, screen, nativeImage } from 'electron';
 import * as path from 'path';
+import * as fs from 'fs';
 import { LLMManager } from './llm/LLMManager';
 
 class OrbApp {
@@ -11,6 +12,7 @@ class OrbApp {
   private isOrbVisible = false;
   private mouseCheckInterval: NodeJS.Timeout | null = null;
   private hideTimeout: NodeJS.Timeout | null = null;
+  private capturedImage: string | null = null;
 
   constructor() {
     this.llmManager = new LLMManager();
@@ -200,17 +202,101 @@ class OrbApp {
       }
     });
 
+    // Ctrl+Shift+S para captura de tela
+    globalShortcut.register('CommandOrControl+Shift+S', () => {
+      this.captureScreen();
+    });
+
     // Ctrl+Shift+C para toggle do chat
     globalShortcut.register('CommandOrControl+Shift+C', () => {
       this.toggleChat();
     });
   }
 
+  private async captureScreenArea(x: number, y: number, width: number, height: number): Promise<Electron.NativeImage> {
+    // Usar uma abordagem mais simples para capturar a tela
+    // Por enquanto, vamos usar um método básico que funciona
+    const { desktopCapturer } = require('electron');
+    
+    try {
+      const sources = await desktopCapturer.getSources({
+        types: ['screen'],
+        thumbnailSize: { width, height }
+      });
+      
+      if (sources.length > 0) {
+        return nativeImage.createFromBuffer(sources[0].thumbnail.toPNG());
+      } else {
+        throw new Error('Nenhuma fonte de captura encontrada');
+      }
+    } catch (error) {
+      console.error('Erro ao capturar tela:', error);
+      // Fallback: criar uma imagem vazia
+      return nativeImage.createEmpty();
+    }
+  }
+
+  private async captureScreen() {
+    try {
+      console.log('📸 Capturando tela...');
+      
+      // Obter informações da tela principal
+      const primaryDisplay = screen.getPrimaryDisplay();
+      const { width, height } = primaryDisplay.bounds;
+      
+      // Capturar screenshot da tela inteira usando desktopCapturer
+      const screenshot = await this.captureScreenArea(0, 0, width, height);
+      
+      // Converter para buffer e salvar temporariamente
+      const buffer = screenshot.toPNG();
+      const tempPath = path.join(__dirname, 'temp-screenshot.png');
+      
+      fs.writeFileSync(tempPath, buffer);
+      
+      // Converter para base64 para enviar ao chat
+      this.capturedImage = screenshot.toDataURL();
+      
+      console.log('✅ Screenshot capturado com sucesso');
+      
+      // Abrir chat automaticamente com a imagem
+      this.openChatWithImage();
+      
+    } catch (error) {
+      console.error('❌ Erro ao capturar tela:', error);
+    }
+  }
+
+  private openChatWithImage() {
+    console.log('🔵 Abrindo chat com imagem capturada...');
+    
+    if (this.chatWindow && !this.chatWindow.isDestroyed()) {
+      // Se o chat já existe, apenas mostrar e enviar a imagem
+      this.chatWindow.show();
+      this.chatWindow.focus();
+      
+      // Enviar a imagem para o chat
+      this.chatWindow.webContents.send('image-captured', this.capturedImage);
+    } else {
+      // Se o chat não existe, criar e abrir
+      this.openChat();
+      
+      // Aguardar o chat carregar e então enviar a imagem
+      if (this.chatWindow) {
+        this.chatWindow.webContents.once('did-finish-load', () => {
+          this.chatWindow?.webContents.send('image-captured', this.capturedImage);
+        });
+      }
+    }
+    
+    // Manter o orb visível
+    this.showOrb();
+  }
+
   private setupIpcHandlers() {
-    ipcMain.handle('send-message', async (event, message: string) => {
+    ipcMain.handle('send-message', async (event, message: string, imageData?: string) => {
       try {
         // Aqui será implementada a integração com LLM
-        return await this.processMessage(message);
+        return await this.processMessage(message, imageData);
       } catch (error) {
         console.error('Erro ao processar mensagem:', error);
         return { error: 'Erro ao processar mensagem' };
@@ -225,6 +311,11 @@ class OrbApp {
       this.expandChat();
     });
 
+    ipcMain.handle('clear-captured-image', () => {
+      this.capturedImage = null;
+      console.log('🗑️ Imagem capturada removida');
+    });
+
     ipcMain.on('orb-clicked', () => {
       const now = Date.now();
       if (now - this.lastClickTime < 500) {
@@ -237,8 +328,8 @@ class OrbApp {
     });
   }
 
-  private async processMessage(message: string): Promise<any> {
-    return await this.llmManager.processMessage(message);
+  private async processMessage(message: string, imageData?: string): Promise<any> {
+    return await this.llmManager.processMessage(message, imageData);
   }
 
   private startMouseDetection() {
