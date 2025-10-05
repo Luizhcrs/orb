@@ -1,8 +1,8 @@
 # 🌟 Orb - Assistente AI Flutuante
 
-[![CI/CD](https://github.com/SEU_USUARIO/orb/actions/workflows/ci.yml/badge.svg)](https://github.com/SEU_USUARIO/orb/actions/workflows/ci.yml)
-[![GitHub issues](https://img.shields.io/github/issues/SEU_USUARIO/orb)](https://github.com/SEU_USUARIO/orb/issues)
-[![GitHub stars](https://img.shields.io/github/stars/SEU_USUARIO/orb)](https://github.com/SEU_USUARIO/orb/stargazers)
+[![CI/CD](https://github.com/luizhcrs/orb/actions/workflows/ci.yml/badge.svg)](https://github.com/luizhcrs/orb/actions/workflows/ci.yml)
+[![GitHub issues](https://img.shields.io/github/issues/luizhcrs/orb)](https://github.com/luizhcrs/orb/issues)
+[![GitHub stars](https://img.shields.io/github/stars/luizhcrs/orb)](https://github.com/luizhcrs/orb/stargazers)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
 Um assistente de inteligência artificial flutuante e minimalista para desktop, construído com Electron e TypeScript.
@@ -150,9 +150,9 @@ Use nosso [template de feature request](.github/ISSUE_TEMPLATE/feature_request.m
 ## 📞 Suporte
 
 Para dúvidas, sugestões ou problemas:
-- 📋 [Issues](https://github.com/SEU_USUARIO/orb/issues)
-- 💬 [Discussions](https://github.com/SEU_USUARIO/orb/discussions)
-- 📧 Email: [seu-email@exemplo.com]
+- 📋 [Issues](https://github.com/luizhcrs/orb/issues)
+- 💬 [Discussions](https://github.com/luizhcrs/orb/discussions)
+- 📧 Email: [luizhcrs@exemplo.com]
 
 ## 📄 Licença
 
