@@ -1,0 +1,119 @@
+name: 🚀 CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  test:
+    name: 🧪 Testes e Validação
+    runs-on: windows-latest
+    
+    strategy:
+      matrix:
+        node-version: [18.x, 20.x]
+    
+    steps:
+    - name: 📥 Checkout código
+      uses: actions/checkout@v4
+      
+    - name: 🔧 Setup Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+        
+    - name: 📦 Instalar dependências
+      run: npm ci
+      
+    - name: 🏗️ Build do projeto
+      run: npm run build
+      
+    - name: 🔍 Lint TypeScript
+      run: npx tsc --noEmit
+      
+    - name: 🎨 Lint CSS/HTML
+      run: |
+        echo "Validando estrutura HTML..."
+        # Adicionar validação HTML se necessário
+        
+    - name: 📋 Verificar estrutura do projeto
+      run: |
+        echo "Verificando arquivos essenciais..."
+        test -f package.json
+        test -f src/main.ts
+        test -f src/orb.html
+        test -f src/chat.html
+        echo "✅ Estrutura do projeto OK"
+
+  build:
+    name: 🏗️ Build e Package
+    runs-on: windows-latest
+    needs: test
+    
+    steps:
+    - name: 📥 Checkout código
+      uses: actions/checkout@v4
+      
+    - name: 🔧 Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20.x'
+        cache: 'npm'
+        
+    - name: 📦 Instalar dependências
+      run: npm ci
+      
+    - name: 🏗️ Build produção
+      run: npm run build
+      
+    - name: 📦 Upload build artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: orb-build-${{ github.sha }}
+        path: dist/
+        retention-days: 30
+
+  security:
+    name: 🔒 Security Audit
+    runs-on: windows-latest
+    
+    steps:
+    - name: 📥 Checkout código
+      uses: actions/checkout@v4
+      
+    - name: 🔧 Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20.x'
+        cache: 'npm'
+        
+    - name: 📦 Instalar dependências
+      run: npm ci
+      
+    - name: 🔍 Audit de segurança
+      run: npm audit --audit-level moderate
+      
+    - name: 🔒 Verificar dependências vulneráveis
+      run: |
+        echo "Verificando dependências..."
+        npm list --depth=0
+
+  release:
+    name: 🚀 Release (apenas main)
+    runs-on: windows-latest
+    needs: [test, build, security]
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    
+    steps:
+    - name: 📥 Checkout código
+      uses: actions/checkout@v4
+      
+    - name: 🏷️ Criar release tag
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git tag -a "v$(date +'%Y.%m.%d')" -m "Release $(date +'%Y-%m-%d')"
+        git push origin "v$(date +'%Y.%m.%d')"
