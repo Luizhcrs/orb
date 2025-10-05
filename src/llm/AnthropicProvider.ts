@@ -17,7 +17,7 @@ export class AnthropicProvider extends LLMProvider {
     });
   }
 
-  async sendMessage(message: string, conversationHistory: Array<{role: 'user' | 'assistant' | 'system', content: string}> = []): Promise<LLMResponse> {
+  async sendMessage(message: string, conversationHistory: Array<{role: 'user' | 'assistant' | 'system', content: string}> = [], imageData?: string): Promise<LLMResponse> {
     try {
       // Construir contexto da conversa
       let context = 'Você é um assistente AI útil e amigável. Responda sempre em português brasileiro de forma concisa e clara.\n\n';
@@ -39,7 +39,20 @@ export class AnthropicProvider extends LLMProvider {
         messages: [
           {
             role: 'user',
-            content: message
+            content: imageData ? [
+              {
+                type: 'text',
+                text: message
+              },
+              {
+                type: 'image',
+                source: {
+                  type: 'base64',
+                  media_type: 'image/png',
+                  data: imageData.split(',')[1] // Remove o prefixo data:image/png;base64,
+                }
+              }
+            ] : message
           }
         ]
       });

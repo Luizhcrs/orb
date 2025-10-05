@@ -19,7 +19,7 @@ export abstract class LLMProvider {
     this.config = config;
   }
 
-  abstract sendMessage(message: string, conversationHistory?: Array<{role: 'user' | 'assistant' | 'system', content: string}>): Promise<LLMResponse>;
+  abstract sendMessage(message: string, conversationHistory?: Array<{role: 'user' | 'assistant' | 'system', content: string}>, imageData?: string): Promise<LLMResponse>;
 
   protected formatResponse(response: string, model?: string, tokens?: number): LLMResponse {
     return {
