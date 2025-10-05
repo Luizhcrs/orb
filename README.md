@@ -1,6 +1,11 @@
-# Orb Agent 🪐
+# 🌟 Orb - Assistente AI Flutuante
 
-Um orb flutuante inteligente para desktop que funciona como assistente AI, sempre disponível sobre qualquer aplicação.
+[![CI/CD](https://github.com/SEU_USUARIO/orb/actions/workflows/ci.yml/badge.svg)](https://github.com/SEU_USUARIO/orb/actions/workflows/ci.yml)
+[![GitHub issues](https://img.shields.io/github/issues/SEU_USUARIO/orb)](https://github.com/SEU_USUARIO/orb/issues)
+[![GitHub stars](https://img.shields.io/github/stars/SEU_USUARIO/orb)](https://github.com/SEU_USUARIO/orb/stargazers)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+
+Um assistente de inteligência artificial flutuante e minimalista para desktop, construído com Electron e TypeScript.
 
 ## ✨ Características
 
@@ -115,9 +120,47 @@ Os executáveis serão gerados na pasta `release/`.
 4. Push para a branch (`git push origin feature/nova-feature`)
 5. Abra um Pull Request
 
-## 📝 Licença
+## 🤝 Contribuindo
+
+Contribuições são bem-vindas! Por favor:
+
+1. **Fork** o projeto
+2. **Crie** uma branch para sua feature (`git checkout -b feature/nova-funcionalidade`)
+3. **Commit** suas mudanças (`git commit -m 'feat: adicionar nova funcionalidade'`)
+4. **Push** para a branch (`git push origin feature/nova-funcionalidade`)
+5. **Abra** um Pull Request
+
+Veja nosso [Guia de Contribuição](.github/CONTRIBUTING.md) para mais detalhes.
+
+### 🏷️ Labels Disponíveis
+- `bug`: Problemas no código
+- `enhancement`: Novas funcionalidades  
+- `question`: Perguntas e dúvidas
+- `help-wanted`: Precisa de ajuda
+- `good-first-issue`: Boa para iniciantes
+
+## 🐛 Reportar Bugs
+
+Use nosso [template de bug report](.github/ISSUE_TEMPLATE/bug_report.md) para reportar problemas.
+
+## ✨ Sugerir Features
+
+Use nosso [template de feature request](.github/ISSUE_TEMPLATE/feature_request.md) para sugerir novas funcionalidades.
+
+## 📞 Suporte
+
+Para dúvidas, sugestões ou problemas:
+- 📋 [Issues](https://github.com/SEU_USUARIO/orb/issues)
+- 💬 [Discussions](https://github.com/SEU_USUARIO/orb/discussions)
+- 📧 Email: [seu-email@exemplo.com]
+
+## 📄 Licença
 
 Este projeto está sob a licença MIT. Veja o arquivo `LICENSE` para mais detalhes.
+
+---
+
+**Feito com ❤️ para a comunidade de desenvolvedores**
 
 ## 🐛 Problemas Conhecidos
 
