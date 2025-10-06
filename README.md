@@ -1,177 +1,214 @@
-# 🌟 Orb - Assistente AI Flutuante
+# 🌟 ORB - Desktop AI Assistant
 
-[![CI/CD](https://github.com/luizhcrs/orb/actions/workflows/ci.yml/badge.svg)](https://github.com/luizhcrs/orb/actions/workflows/ci.yml)
-[![GitHub issues](https://img.shields.io/github/issues/luizhcrs/orb)](https://github.com/luizhcrs/orb/issues)
-[![GitHub stars](https://img.shields.io/github/stars/luizhcrs/orb)](https://github.com/luizhcrs/orb/stargazers)
-[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+> **Desktop AI Assistant** com interface Electron e backend Python/FastAPI
 
-Um assistente de inteligência artificial flutuante e minimalista para desktop, construído com Electron e TypeScript.
+## 📁 Estrutura do Projeto
 
-## ✨ Características
+```
+orb/
+├── frontend/                 # Node.js/Electron (Interface Desktop)
+│   ├── src/
+│   │   ├── main.ts          # Processo principal do Electron
+│   │   ├── managers/        # Gerenciadores (Window, Mouse, Shortcuts)
+│   │   ├── services/        # Serviços (Screenshot, LLM)
+│   │   ├── components/      # Componentes da UI
+│   │   └── types/           # Tipos TypeScript
+│   ├── package.json
+│   └── tsconfig.json
+├── backend/                  # Python/FastAPI (Backend API)
+│   ├── src/
+│   │   ├── api/            # Rotas da API
+│   │   ├── agentes/        # Agente ORB com LLM
+│   │   ├── services/       # Serviços do sistema
+│   │   └── utils/          # Utilitários
+│   ├── requirements.txt
+│   └── Dockerfile
+├── shared/                   # Tipos e configurações compartilhadas
+│   ├── types/              # Tipos TypeScript compartilhados
+│   └── config/             # Configurações comuns
+├── scripts/                 # Scripts de build e deploy
+├── docker-compose.yml       # Orquestração dos serviços
+└── package.json            # Gerenciamento do monorepo
+```
 
-- **Orb Flutuante**: Interface minimalista que flutua sobre todas as janelas
-- **Sempre Visível**: Permanece no topo de todas as aplicações
-- **Chat Intuitivo**: Interface de chat moderna que aparece ao clicar no orb
-- **Integração LLM**: Suporte para OpenAI GPT e Anthropic Claude
-- **Atalhos Globais**: Acesso rápido via teclado
-- **Multiplataforma**: Windows, macOS e Linux
-
-## 🚀 Instalação
+## 🚀 Início Rápido
 
 ### Pré-requisitos
-- Node.js 18+ 
-- npm ou yarn
 
-### Setup
+- **Node.js** >= 18.0.0
+- **Python** >= 3.11.0
+- **Docker** (opcional, para desenvolvimento com containers)
+
+### Instalação
+
 ```bash
-# Clone o repositório
-git clone <seu-repo>
+# 1. Clonar o repositório
+git clone https://github.com/luizrocha/orb.git
 cd orb
 
-# Instale as dependências
-npm install
+# 2. Instalar todas as dependências
+npm run install:all
 
-# Configure as variáveis de ambiente
-cp env.example .env
-# Edite o .env com suas chaves de API
+# 3. Configurar variáveis de ambiente
+cp backend/env.example backend/.env
+# Editar backend/.env com suas chaves de API
 ```
+
+### Desenvolvimento
+
+```bash
+# Desenvolvimento completo (frontend + backend)
+npm run dev
+
+# Ou executar separadamente:
+npm run dev:frontend    # Apenas frontend
+npm run dev:backend     # Apenas backend
+```
+
+### Docker (Desenvolvimento)
+
+```bash
+# Subir todos os serviços
+npm run docker:up
+
+# Parar serviços
+npm run docker:down
+
+# Rebuild containers
+npm run docker:build
+```
+
+## 🧪 Testes
+
+```bash
+# Todos os testes
+npm run test
+
+# Testes específicos
+npm run test:frontend
+npm run test:backend
+```
+
+## 🏗️ Build e Deploy
+
+```bash
+# Build completo
+npm run build
+
+# Build específico
+npm run build:frontend
+npm run build:backend
+```
+
+## 🛠️ Serviços Windows
+
+```bash
+# Instalar como serviço Windows
+npm run service:install
+
+# Gerenciar serviço
+npm run service:start
+npm run service:stop
+npm run service:uninstall
+```
+
+## 📡 API Endpoints
+
+### Health Check
+- `GET /health` - Status do serviço
+
+### Agente AI
+- `POST /agent/message` - Enviar mensagem para o agente
+- `WS /ws` - WebSocket para comunicação em tempo real
+
+### Sistema
+- `POST /system/screenshot` - Capturar tela
+- `POST /system/toggle-orb` - Alternar visibilidade do orb
+- `POST /system/hot-corner` - Configurar hot corner
+
+### Documentação
+- `GET /docs` - Swagger UI
+- `GET /openapi.json` - Especificação OpenAPI
 
 ## 🔧 Configuração
 
-Edite o arquivo `.env` com suas configurações:
+### Variáveis de Ambiente (Backend)
 
 ```env
-# OpenAI
-OPENAI_API_KEY=sua_chave_openai_aqui
+# LLM Configuration
+OPENAI_API_KEY=your_openai_key
+ANTHROPIC_API_KEY=your_anthropic_key
+DEFAULT_MODEL=gpt-4o-mini
 
-# Anthropic Claude  
-ANTHROPIC_API_KEY=sua_chave_anthropic_aqui
+# API Configuration
+ENVIRONMENT=development
+API_HOST=0.0.0.0
+API_PORT=8000
 
-# Modelo padrão
-DEFAULT_MODEL=gpt-3.5-turbo
+# Logging
+LOG_LEVEL=INFO
 ```
 
-## 🎮 Como Usar
+### Configuração do Frontend
 
-### Desenvolvimento
-```bash
-npm run dev
+O frontend se conecta automaticamente ao backend em `http://localhost:8000` por padrão. Para alterar:
+
+```typescript
+// shared/config/backend.ts
+export const BACKEND_CONFIG = {
+  url: process.env.ORB_BACKEND_URL || 'http://localhost:8000',
+  // ...
+};
 ```
-
-### Produção
-```bash
-npm run build
-npm start
-```
-
-### Atalhos Globais
-- `Ctrl+Shift+O`: Mostrar/ocultar orb
-- `Ctrl+Shift+C`: Abrir/fechar chat
-- **Clique no orb**: Abrir chat
 
 ## 🏗️ Arquitetura
 
-### Estrutura do Projeto
-```
-src/
-├── main.ts          # Processo principal do Electron
-├── orb.html         # Interface do orb flutuante
-└── chat.html        # Interface do chat
-```
+### Frontend (Electron)
+- **WindowManager**: Gerencia janelas do orb e chat
+- **MouseDetector**: Detecta hot corner para mostrar/ocultar orb
+- **ShortcutManager**: Gerencia atalhos de teclado globais
+- **ScreenshotService**: Captura tela para análise do LLM
+- **LLMManager**: Interface com APIs de LLM (OpenAI/Anthropic)
 
-### Componentes Principais
-- **OrbApp**: Classe principal que gerencia as janelas
-- **Orb Window**: Janela flutuante transparente
-- **Chat Window**: Interface de conversação
-- **LLM Integration**: Processamento de mensagens via API
+### Backend (Python/FastAPI)
+- **AgenteORB**: Agente principal com pipeline de processamento
+- **LLMProvider**: Abstração para diferentes provedores de LLM
+- **ToolSelector**: Seleciona ferramentas baseado no contexto
+- **SystemAPI**: Endpoints para interação com o sistema
 
-## 🎨 Personalização
+### Comunicação
+- **HTTP/REST**: Comunicação principal frontend ↔ backend
+- **WebSocket**: Comunicação em tempo real
+- **Tipos Compartilhados**: TypeScript types compartilhados via `shared/`
 
-### Posição do Orb
-Edite `src/main.ts` para alterar a posição padrão:
-```typescript
-x: width - 100,  // Posição X
-y: 50,           // Posição Y
-```
+## 🔄 Fluxo de Desenvolvimento
 
-### Cores e Estilo
-Modifique `src/orb.html` para personalizar a aparência do orb:
-```css
-background: radial-gradient(circle at 30% 30%, #290060, #1a0038);
-```
+1. **Desenvolvimento**: `npm run dev`
+2. **Testes**: `npm run test`
+3. **Build**: `npm run build`
+4. **Deploy**: `npm run docker:up` ou instalar como serviço Windows
 
-## 📦 Build e Distribuição
+## 📚 Documentação
 
-```bash
-# Build para produção
-npm run build
-
-# Criar executável
-npm run electron:pack
-```
-
-Os executáveis serão gerados na pasta `release/`.
+- [API Documentation](backend/docs/API_DOCUMENTATION.md)
+- [Windows Service Guide](backend/docs/WINDOWS_SERVICE.md)
+- [Development Guide](docs/DEVELOPMENT.md)
 
 ## 🤝 Contribuição
 
 1. Fork o projeto
-2. Crie uma branch para sua feature (`git checkout -b feature/nova-feature`)
-3. Commit suas mudanças (`git commit -m 'feat: adiciona nova feature'`)
-4. Push para a branch (`git push origin feature/nova-feature`)
+2. Crie uma branch para sua feature (`git checkout -b feature/AmazingFeature`)
+3. Commit suas mudanças (`git commit -m 'Add some AmazingFeature'`)
+4. Push para a branch (`git push origin feature/AmazingFeature`)
 5. Abra um Pull Request
-
-## 🤝 Contribuindo
-
-Contribuições são bem-vindas! Por favor:
-
-1. **Fork** o projeto
-2. **Crie** uma branch para sua feature (`git checkout -b feature/nova-funcionalidade`)
-3. **Commit** suas mudanças (`git commit -m 'feat: adicionar nova funcionalidade'`)
-4. **Push** para a branch (`git push origin feature/nova-funcionalidade`)
-5. **Abra** um Pull Request
-
-Veja nosso [Guia de Contribuição](.github/CONTRIBUTING.md) para mais detalhes.
-
-### 🏷️ Labels Disponíveis
-- `bug`: Problemas no código
-- `enhancement`: Novas funcionalidades  
-- `question`: Perguntas e dúvidas
-- `help-wanted`: Precisa de ajuda
-- `good-first-issue`: Boa para iniciantes
-
-## 🐛 Reportar Bugs
-
-Use nosso [template de bug report](.github/ISSUE_TEMPLATE/bug_report.md) para reportar problemas.
-
-## ✨ Sugerir Features
-
-Use nosso [template de feature request](.github/ISSUE_TEMPLATE/feature_request.md) para sugerir novas funcionalidades.
-
-## 📞 Suporte
-
-Para dúvidas, sugestões ou problemas:
-- 📋 [Issues](https://github.com/luizhcrs/orb/issues)
-- 💬 [Discussions](https://github.com/luizhcrs/orb/discussions)
-- 📧 Email: [luizhcrs@exemplo.com]
 
 ## 📄 Licença
 
-Este projeto está sob a licença MIT. Veja o arquivo `LICENSE` para mais detalhes.
+Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para detalhes.
 
----
+## 🙏 Agradecimentos
 
-**Feito com ❤️ para a comunidade de desenvolvedores**
-
-## 🐛 Problemas Conhecidos
-
-- Em alguns sistemas, o orb pode não aparecer sobre jogos em tela cheia
-- Transparência pode não funcionar em todas as configurações de GPU
-
-## 🔮 Roadmap
-
-- [ ] Integração com mais provedores de LLM
-- [ ] Temas personalizáveis
-- [ ] Comandos de voz
-- [ ] Plugins e extensões
-- [ ] Integração com calendário e tarefas
-- [ ] Modo escuro/claro automático
+- [Electron](https://electronjs.org/) - Framework para aplicações desktop
+- [FastAPI](https://fastapi.tiangolo.com/) - Framework web Python
+- [OpenAI](https://openai.com/) - API de linguagem
+- [Anthropic](https://anthropic.com/) - Claude API

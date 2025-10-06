@@ -1,5 +1,5 @@
 import { app, ipcMain } from 'electron';
-import { LLMManager } from './llm/LLMManager';
+import { BackendLLMManager } from './llm/BackendLLMManager';
 import { WindowManager } from './managers/WindowManager';
 import { ShortcutManager } from './managers/ShortcutManager';
 import { MouseDetector } from './managers/MouseDetector';
@@ -11,11 +11,11 @@ class OrbApp {
   private shortcutManager: ShortcutManager;
   private mouseDetector: MouseDetector;
   private screenshotService: ScreenshotService;
-  private llmManager: LLMManager;
+  private llmManager: BackendLLMManager;
   private lastClickTime = 0;
 
   constructor() {
-    this.llmManager = new LLMManager();
+    this.llmManager = new BackendLLMManager();
     this.screenshotService = new ScreenshotService();
     
     // Criar window manager com callbacks
@@ -84,10 +84,15 @@ class OrbApp {
   private setupIpcHandlers() {
     ipcMain.handle('send-message', async (event, message: string, imageData?: string) => {
       try {
-        return await this.llmManager.processMessage(message, imageData);
+        const result = await this.llmManager.processMessage(message, imageData);
+        return result;
       } catch (error) {
         console.error('Erro ao processar mensagem:', error);
-        return { error: 'Erro ao processar mensagem' };
+        return { 
+          error: 'Erro ao processar mensagem',
+          content: 'Desculpe, ocorreu um erro. Tente novamente.',
+          timestamp: new Date().toISOString()
+        };
       }
     });
 

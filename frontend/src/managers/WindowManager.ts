@@ -67,7 +67,7 @@ export class WindowManager {
       }
     });
 
-    this.state.orbWindow.loadFile(path.join(__dirname, '..', 'orb.html'));
+    this.state.orbWindow.loadFile(path.join(__dirname, '..', 'src', 'orb.html'));
     this.state.isOrbVisible = false;
 
     this.state.orbWindow.on('closed', () => {
@@ -115,7 +115,7 @@ export class WindowManager {
       }
     });
 
-    this.state.chatWindow.loadFile(path.join(__dirname, '..', 'chat.html'));
+    this.state.chatWindow.loadFile(path.join(__dirname, '..', 'src', 'chat.html'));
 
     this.state.chatWindow.on('closed', () => {
       this.state.chatWindow = null;
