@@ -118,12 +118,20 @@ class ChatInterface {
 
         messageDiv.appendChild(contentDiv);
         messageDiv.appendChild(timeDiv);
-        this.elements.chatMessages.appendChild(messageDiv);
+        
+        // Inserir antes do typing indicator se ele estiver visível
+        if (this.elements.typingIndicator.classList.contains('active')) {
+            this.elements.chatMessages.insertBefore(messageDiv, this.elements.typingIndicator);
+        } else {
+            this.elements.chatMessages.appendChild(messageDiv);
+        }
 
         this.scrollToBottom();
     }
 
     showTyping() {
+        // Mover o typing indicator para o final da lista de mensagens
+        this.elements.chatMessages.appendChild(this.elements.typingIndicator);
         this.elements.typingIndicator.classList.add('active');
         this.scrollToBottom();
     }
