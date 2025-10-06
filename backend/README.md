@@ -2,6 +2,8 @@
 
 Backend Python para o assistente ORB - Assistente de IA flutuante.
 
+> **Desenvolvido por [Luiz Henrique](https://github.com/luizhcrs)** - Projeto open source para a comunidade
+
 ## 🚀 Características
 
 - **FastAPI**: Framework web moderno e rápido
@@ -245,11 +247,23 @@ pytest tests/test_agent.py
 
 ## 🤝 Contribuição
 
-1. Fork o projeto
-2. Crie uma branch para sua feature (`git checkout -b feature/AmazingFeature`)
-3. Commit suas mudanças (`git commit -m 'Add some AmazingFeature'`)
-4. Push para a branch (`git push origin feature/AmazingFeature`)
-5. Abra um Pull Request
+Este é um projeto open source desenvolvido por **Luiz Henrique**. Contribuições da comunidade são muito bem-vindas!
+
+### Como Contribuir
+
+1. **Fork** o projeto
+2. **Crie** uma branch para sua feature (`git checkout -b feature/nova-funcionalidade`)
+3. **Commit** suas mudanças (`git commit -m 'feat: adicionar nova funcionalidade'`)
+4. **Push** para a branch (`git push origin feature/nova-funcionalidade`)
+5. **Abra** um Pull Request
+
+### Diretrizes de Contribuição
+
+- 🐛 **Bugs**: Use a label `bug` para reportar problemas
+- ✨ **Features**: Use a label `enhancement` para novas funcionalidades
+- 📚 **Documentação**: Melhorias na documentação são sempre bem-vindas
+- 🧪 **Testes**: Ajude a melhorar a cobertura de testes
+- 💡 **Ideias**: Sugestões são apreciadas via Issues
 
 ## 📄 Licença
 
@@ -257,4 +271,12 @@ Este projeto está sob a licença MIT. Veja o arquivo `LICENSE` para mais detalh
 
 ## 🆘 Suporte
 
-Para suporte, abra uma issue no repositório ou entre em contato com a equipe.
+Para suporte, abra uma issue no repositório ou entre em contato com o desenvolvedor:
+
+- 📋 [GitHub Issues](https://github.com/luizhcrs/orb/issues)
+- 💬 [GitHub Discussions](https://github.com/luizhcrs/orb/discussions)
+- 👨‍💻 **Desenvolvedor**: [Luiz Henrique](https://github.com/luizhcrs)
+
+---
+
+**Desenvolvido com ❤️ por [Luiz Henrique](https://github.com/luizhcrs) para a comunidade**

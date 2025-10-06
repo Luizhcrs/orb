@@ -7,6 +7,8 @@
 
 Um assistente de inteligência artificial flutuante e minimalista para desktop, construído com Electron e TypeScript.
 
+> **Desenvolvido por [Luiz Henrique](https://github.com/luizhcrs)** - Projeto open source para a comunidade
+
 ## ✨ Características
 
 - **Orb Flutuante**: Interface minimalista que flutua sobre todas as janelas
@@ -114,15 +116,9 @@ Os executáveis serão gerados na pasta `release/`.
 
 ## 🤝 Contribuição
 
-1. Fork o projeto
-2. Crie uma branch para sua feature (`git checkout -b feature/nova-feature`)
-3. Commit suas mudanças (`git commit -m 'feat: adiciona nova feature'`)
-4. Push para a branch (`git push origin feature/nova-feature`)
-5. Abra um Pull Request
+Este é um projeto open source desenvolvido por **Luiz Henrique**. Contribuições da comunidade são muito bem-vindas!
 
-## 🤝 Contribuindo
-
-Contribuições são bem-vindas! Por favor:
+### Como Contribuir
 
 1. **Fork** o projeto
 2. **Crie** uma branch para sua feature (`git checkout -b feature/nova-funcionalidade`)
@@ -130,7 +126,13 @@ Contribuições são bem-vindas! Por favor:
 4. **Push** para a branch (`git push origin feature/nova-funcionalidade`)
 5. **Abra** um Pull Request
 
-Veja nosso [Guia de Contribuição](.github/CONTRIBUTING.md) para mais detalhes.
+### Diretrizes de Contribuição
+
+- 🐛 **Bugs**: Use a label `bug` para reportar problemas
+- ✨ **Features**: Use a label `enhancement` para novas funcionalidades
+- 📚 **Documentação**: Melhorias na documentação são sempre bem-vindas
+- 🧪 **Testes**: Ajude a melhorar a cobertura de testes
+- 💡 **Ideias**: Sugestões são apreciadas via Issues
 
 ### 🏷️ Labels Disponíveis
 - `bug`: Problemas no código
@@ -152,7 +154,7 @@ Use nosso [template de feature request](.github/ISSUE_TEMPLATE/feature_request.m
 Para dúvidas, sugestões ou problemas:
 - 📋 [Issues](https://github.com/luizhcrs/orb/issues)
 - 💬 [Discussions](https://github.com/luizhcrs/orb/discussions)
-- 📧 Email: [luizhcrs@exemplo.com]
+- 👨‍💻 **Desenvolvedor**: [Luiz Henrique](https://github.com/luizhcrs)
 
 ## 📄 Licença
 
@@ -160,7 +162,7 @@ Este projeto está sob a licença MIT. Veja o arquivo `LICENSE` para mais detalh
 
 ---
 
-**Feito com ❤️ para a comunidade de desenvolvedores**
+**Desenvolvido com ❤️ por [Luiz Henrique](https://github.com/luizhcrs) para a comunidade**
 
 ## 🐛 Problemas Conhecidos
 

@@ -1,6 +1,7 @@
 # 🌟 ORB - Desktop AI Assistant
 
-> **Desktop AI Assistant** com interface Electron e backend Python/FastAPI
+> **Desktop AI Assistant** com interface Electron e backend Python/FastAPI  
+> **Desenvolvido por [Luiz Henrique](https://github.com/luizhcrs)** - Projeto open source para a comunidade
 
 ## 📁 Estrutura do Projeto
 
@@ -196,11 +197,29 @@ export const BACKEND_CONFIG = {
 
 ## 🤝 Contribuição
 
-1. Fork o projeto
-2. Crie uma branch para sua feature (`git checkout -b feature/AmazingFeature`)
-3. Commit suas mudanças (`git commit -m 'Add some AmazingFeature'`)
-4. Push para a branch (`git push origin feature/AmazingFeature`)
-5. Abra um Pull Request
+Este é um projeto open source desenvolvido por **Luiz Henrique**. Contribuições da comunidade são muito bem-vindas!
+
+### Como Contribuir
+
+1. **Fork** o projeto
+2. **Crie** uma branch para sua feature (`git checkout -b feature/nova-funcionalidade`)
+3. **Commit** suas mudanças (`git commit -m 'feat: adiciona nova funcionalidade'`)
+4. **Push** para a branch (`git push origin feature/nova-funcionalidade`)
+5. **Abra** um Pull Request
+
+### Diretrizes de Contribuição
+
+- 🐛 **Bugs**: Use a label `bug` para reportar problemas
+- ✨ **Features**: Use a label `enhancement` para novas funcionalidades
+- 📚 **Documentação**: Melhorias na documentação são sempre bem-vindas
+- 🧪 **Testes**: Ajude a melhorar a cobertura de testes
+- 💡 **Ideias**: Sugestões são apreciadas via Issues
+
+### Contato
+
+- 👨‍💻 **Desenvolvedor**: [Luiz Henrique](https://github.com/luizhcrs)
+- 📧 **Issues**: [GitHub Issues](https://github.com/luizhcrs/orb/issues)
+- 💬 **Discussões**: [GitHub Discussions](https://github.com/luizhcrs/orb/discussions)
 
 ## 📄 Licença
 
@@ -212,3 +231,8 @@ Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para de
 - [FastAPI](https://fastapi.tiangolo.com/) - Framework web Python
 - [OpenAI](https://openai.com/) - API de linguagem
 - [Anthropic](https://anthropic.com/) - Claude API
+- **Comunidade open source** - Por todas as bibliotecas e ferramentas incríveis
+
+---
+
+**Desenvolvido com ❤️ por [Luiz Henrique](https://github.com/luizhcrs)**
