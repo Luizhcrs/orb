@@ -1,0 +1,70 @@
+{
+  "name": "orb-agent",
+  "version": "1.0.0",
+  "description": "Orb flutuante com agente LLM para desktop",
+  "main": "dist/frontend/src/main.js",
+  "scripts": {
+    "dev": "concurrently \"npm run build:watch\" \"npm run copy:watch\" \"npm run electron:dev\"",
+    "build": "tsc && npm run copy:assets",
+    "build:watch": "tsc --watch",
+    "copy:assets": "npm run copy:html && npm run copy:components",
+    "copy:html": "copyfiles src\\*.html dist\\frontend\\src\\",
+    "copy:components": "copyfiles src\\components\\* dist\\frontend\\src\\",
+    "copy:watch": "nodemon --watch src --ext html --exec \"npm run copy:html\"",
+    "electron:dev": "wait-on dist/main.js && electron .",
+    "electron:pack": "electron-builder",
+    "start": "npm run build && electron .",
+    "clean": "rimraf dist"
+  },
+  "keywords": [
+    "orb",
+    "ai",
+    "agent",
+    "desktop",
+    "floating"
+  ],
+  "author": "Luiz",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "@types/ws": "^8.18.1",
+    "concurrently": "^8.2.2",
+    "copyfiles": "^2.4.1",
+    "electron": "^28.1.0",
+    "electron-builder": "^24.9.1",
+    "nodemon": "^3.0.2",
+    "rimraf": "^5.0.5",
+    "typescript": "^5.3.3",
+    "wait-on": "^7.2.0"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.17.1",
+    "axios": "^1.6.2",
+    "dotenv": "^16.3.1",
+    "openai": "^4.24.1",
+    "ws": "^8.14.2"
+  },
+  "build": {
+    "appId": "com.orbagent.app",
+    "productName": "Orb Agent",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/**/*",
+      "assets/**/*"
+    ],
+    "win": {
+      "target": "nsis",
+      "icon": "assets/icon.ico"
+    },
+    "mac": {
+      "target": "dmg",
+      "icon": "assets/icon.icns"
+    },
+    "linux": {
+      "target": "AppImage",
+      "icon": "assets/icon.png"
+    }
+  }
+}

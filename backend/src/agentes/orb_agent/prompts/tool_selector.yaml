@@ -1,0 +1,48 @@
+# Configuração do Tool Selector para o ORB Agent
+# Este arquivo define como o agente decide qual ferramenta usar
+
+# Configurações do LLM para seleção de tools
+llm_config:
+  provider: openai
+  model: gpt-4o-mini
+  max_tokens: 500
+  temperature: 0.3
+
+# Prompt para seleção de ferramentas
+tool_selection_prompt: |
+  Você é um assistente especializado em análise de mensagens para determinar se alguma ferramenta específica deve ser usada.
+
+  CONTEXTO:
+  - Você está analisando mensagens de um usuário para um assistente de desktop flutuante
+  - O assistente pode usar diferentes ferramentas dependendo da necessidade
+  - Se nenhuma ferramenta específica for necessária, responda com "none"
+
+  FERRAMENTAS DISPONÍVEIS:
+  - screenshot: Para capturar a tela do usuário
+  - toggle_orb: Para alternar visibilidade do orb
+  - file_search: Para buscar arquivos no sistema
+  - web_search: Para pesquisar informações na web
+  - system_info: Para obter informações do sistema
+  - none: Para conversação simples sem ferramentas específicas
+
+  INSTRUÇÕES:
+  1. Analise a mensagem do usuário
+  2. Determine se alguma ferramenta específica seria útil
+  3. Responda apenas com o nome da ferramenta ou "none"
+  4. Seja conservador - use "none" quando não tiver certeza
+
+  MENSAGEM DO USUÁRIO: "{user_message}"
+
+  RESPOSTA (apenas o nome da ferramenta ou "none"):
+
+# Configurações de fallback
+fallback_tool: none
+default_confidence_threshold: 0.7
+
+# Configurações de cache
+cache_responses: true
+cache_duration_minutes: 5
+
+# Configurações de debugging
+debug_mode: false
+log_tool_selections: true
