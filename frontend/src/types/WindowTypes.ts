@@ -3,6 +3,8 @@ import { BrowserWindow } from 'electron';
 export interface WindowConfig {
   width: number;
   height: number;
+  minWidth?: number;
+  minHeight?: number;
   x?: number;
   y?: number;
   frame?: boolean;
