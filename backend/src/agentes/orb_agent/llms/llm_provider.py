@@ -54,8 +54,33 @@ class OpenAIProvider(BaseLLMProvider):
                     elif line.startswith('Assistente: '):
                         messages.append({"role": "assistant", "content": line[12:]})
             
-            # Adiciona mensagem atual do usuário
-            messages.append({"role": "user", "content": context.get('user_input', '')})
+            # Prepara mensagem atual do usuário
+            user_input = context.get('user_input', '')
+            image_data = context.get('image_data')
+            
+            if image_data:
+                # Se há imagem, prepara mensagem multimodal
+                # Log para debug do formato da imagem
+                self.logger.info(f"Processando imagem - Tamanho base64: {len(image_data)} caracteres")
+                self.logger.info(f"Primeiros 50 caracteres: {image_data[:50]}...")
+                
+                user_message = {
+                    "role": "user",
+                    "content": [
+                        {"type": "text", "text": user_input},
+                        {
+                            "type": "image_url",
+                            "image_url": {
+                                "url": f"data:image/jpeg;base64,{image_data}"
+                            }
+                        }
+                    ]
+                }
+            else:
+                # Mensagem apenas texto
+                user_message = {"role": "user", "content": user_input}
+            
+            messages.append(user_message)
             
             # Chama a API
             response = await self.client.chat.completions.create(
@@ -98,9 +123,27 @@ class AnthropicProvider(BaseLLMProvider):
             system_prompt = context.get('system_prompt', 'Você é um assistente útil.')
             conversation_history = context.get('conversation_history', '')
             user_input = context.get('user_input', '')
+            image_data = context.get('image_data')
             
-            # Constrói o prompt completo
-            full_prompt = f"{system_prompt}\n\n"
+            # Prepara conteúdo da mensagem
+            message_content = []
+            
+            # Adiciona texto da mensagem
+            message_content.append({"type": "text", "text": user_input})
+            
+            # Adiciona imagem se disponível
+            if image_data:
+                message_content.append({
+                    "type": "image",
+                    "source": {
+                        "type": "base64",
+                        "media_type": "image/jpeg",
+                        "data": image_data
+                    }
+                })
+            
+            # Constrói o prompt completo para contexto
+            full_prompt = ""
             if conversation_history:
                 full_prompt += f"Histórico da conversa:\n{conversation_history}\n\n"
             full_prompt += f"Usuário: {user_input}"
@@ -112,7 +155,7 @@ class AnthropicProvider(BaseLLMProvider):
                 temperature=self.config.get('temperature', 0.7),
                 system=system_prompt,
                 messages=[
-                    {"role": "user", "content": full_prompt}
+                    {"role": "user", "content": message_content}
                 ]
             )
             
@@ -177,13 +220,18 @@ class DemoProvider(BaseLLMProvider):
         import random
         
         user_input = context.get('user_input', '').lower()
+        image_data = context.get('image_data')
+        
+        # Verifica se há imagem
+        if image_data:
+            return "📸 Imagem recebida! No modo demonstração, não posso analisar imagens. Configure suas chaves de API para análise completa de imagens com OpenAI GPT-4V ou Claude 3."
         
         # Respostas específicas baseadas no input
         if any(word in user_input for word in ['olá', 'oi', 'hello', 'hi']):
             return "Olá! Eu sou o Agente ORB, seu assistente de IA flutuante. Como posso ajudá-lo hoje?"
         
         elif any(word in user_input for word in ['ajuda', 'help', 'como']):
-            return "Posso ajudá-lo com várias tarefas! Configure suas chaves de API (OpenAI ou Anthropic) no arquivo .env para funcionalidade completa."
+            return "Posso ajudá-lo com várias tarefas! Configure suas chaves de API (OpenAI ou Anthropic) no arquivo .env para funcionalidade completa, incluindo análise de imagens."
         
         elif any(word in user_input for word in ['configurar', 'config', 'api', 'chave']):
             return "Para configurar: 1) Copie env.example para .env, 2) Adicione suas chaves de API (OPENAI_API_KEY ou ANTHROPIC_API_KEY), 3) Reinicie o servidor."

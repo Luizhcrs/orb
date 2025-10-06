@@ -106,6 +106,14 @@ class OrbApp {
       console.log('🔵 Evento orb-clicked recebido!');
       this.windowManager.toggleChat();
     });
+
+    ipcMain.handle('clear-chat-messages', () => {
+      // Enviar comando para limpar mensagens da interface
+      const state = this.windowManager.getState();
+      if (state.chatWindow && !state.chatWindow.isDestroyed()) {
+        state.chatWindow.webContents.send('clear-messages');
+      }
+    });
   }
 
   private handleToggleOrb() {
@@ -141,6 +149,16 @@ class OrbApp {
   }
 
   private handleChatOpen() {
+    // Criar nova sessão a cada abertura do chat
+    this.llmManager.clearHistory();
+    console.log('🔄 Nova sessão criada para o chat');
+    
+    // Limpar mensagens da interface visual
+    const state = this.windowManager.getState();
+    if (state.chatWindow && !state.chatWindow.isDestroyed()) {
+      state.chatWindow.webContents.send('clear-messages');
+    }
+    
     this.mouseDetector.forceShowOrb();
   }
 
