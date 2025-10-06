@@ -57,6 +57,11 @@ class ChatInterface {
             this.showCapturedImage(imageData);
         });
 
+        // Listener para limpar mensagens
+        ipcRenderer.on('clear-messages', () => {
+            this.clearMessages();
+        });
+
         // Botão para remover imagem
         this.elements.removeImageBtn.addEventListener('click', () => {
             this.removeCapturedImage();
@@ -71,7 +76,6 @@ class ChatInterface {
         const message = this.elements.chatInput.value.trim();
         if (!message && !this.capturedImageData) return;
 
-        this.addMessage(message, 'user');
         this.elements.chatInput.value = '';
         this.elements.chatInput.style.height = 'auto';
         
@@ -79,14 +83,22 @@ class ChatInterface {
         this.elements.sendBtn.disabled = true;
 
         try {
-            const response = await ipcRenderer.invoke('send-message', message, this.capturedImageData);
-            this.hideTyping();
-            this.addMessage(response.response, 'assistant', response.timestamp);
+            // Salvar imagem antes de limpar o preview
+            const imageToSend = this.capturedImageData;
             
-            // Limpar imagem após envio
+            // Adicionar mensagem do usuário com imagem (se houver) ANTES de enviar
+            this.addMessage(message, 'user', new Date().toISOString(), imageToSend);
+            
+            // Limpar imagem capturada após adicionar à mensagem
             if (this.capturedImageData) {
                 this.removeCapturedImage();
             }
+            
+            const response = await ipcRenderer.invoke('send-message', message, imageToSend);
+            
+            this.hideTyping();
+            this.addMessage(response.response, 'assistant', response.timestamp);
+            
         } catch (error) {
             this.hideTyping();
             this.addMessage('Desculpe, ocorreu um erro ao processar sua mensagem.', 'assistant');
@@ -96,13 +108,41 @@ class ChatInterface {
         this.elements.chatInput.focus();
     }
 
-    addMessage(content, sender, timestamp = null) {
+    addMessage(content, sender, timestamp = null, imageData = null) {
         const messageDiv = document.createElement('div');
         messageDiv.className = `message ${sender}`;
 
         const contentDiv = document.createElement('div');
         contentDiv.className = 'message-content';
-        contentDiv.textContent = content;
+        
+        // Adicionar texto da mensagem
+        if (content) {
+            const textDiv = document.createElement('div');
+            textDiv.textContent = content;
+            contentDiv.appendChild(textDiv);
+        }
+        
+        // Adicionar imagem se disponível
+        if (imageData) {
+            const imageContainer = document.createElement('div');
+            imageContainer.className = 'message-image-container';
+            
+            const img = document.createElement('img');
+            img.src = `data:image/png;base64,${imageData}`;
+            img.className = 'message-image';
+            img.alt = 'Imagem da mensagem';
+            
+            // Adicionar botão para expandir imagem
+            const expandBtn = document.createElement('button');
+            expandBtn.className = 'expand-image-btn';
+            expandBtn.innerHTML = '🔍';
+            expandBtn.title = 'Expandir imagem';
+            expandBtn.onclick = () => this.expandImage(imageData);
+            
+            imageContainer.appendChild(img);
+            imageContainer.appendChild(expandBtn);
+            contentDiv.appendChild(imageContainer);
+        }
 
         const timeDiv = document.createElement('div');
         timeDiv.className = 'message-time';
@@ -140,6 +180,36 @@ class ChatInterface {
         this.elements.typingIndicator.classList.remove('active');
     }
 
+    clearMessages() {
+        // Limpa todas as mensagens da interface, exceto o typing indicator
+        const messages = this.elements.chatMessages.querySelectorAll('.message');
+        messages.forEach(message => message.remove());
+        console.log('🧹 Mensagens da interface limpas');
+    }
+
+    expandImage(imageData) {
+        // Criar modal para expandir imagem
+        const modal = document.createElement('div');
+        modal.className = 'image-modal';
+        modal.innerHTML = `
+            <div class="modal-content">
+                <span class="close-modal">&times;</span>
+                <img src="data:image/png;base64,${imageData}" alt="Imagem expandida" class="expanded-image">
+            </div>
+        `;
+        
+        document.body.appendChild(modal);
+        
+        // Fechar modal ao clicar no X ou fora da imagem
+        const closeBtn = modal.querySelector('.close-modal');
+        closeBtn.onclick = () => modal.remove();
+        modal.onclick = (e) => {
+            if (e.target === modal) modal.remove();
+        };
+        
+        console.log('🔍 Imagem expandida');
+    }
+
     scrollToBottom() {
         this.elements.chatMessages.scrollTop = this.elements.chatMessages.scrollHeight;
     }
@@ -150,7 +220,7 @@ class ChatInterface {
 
     showCapturedImage(imageData) {
         this.capturedImageData = imageData;
-        this.elements.capturedImage.src = imageData;
+        this.elements.capturedImage.src = `data:image/png;base64,${imageData}`;
         this.elements.capturedImageContainer.style.display = 'block';
         this.scrollToBottom();
         console.log('📸 Imagem capturada exibida no chat');

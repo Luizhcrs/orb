@@ -51,13 +51,16 @@ export class ScreenshotService {
       }
       
       const thumbnail = sources[0].thumbnail;
-      const imageData = thumbnail.toDataURL();
+      const dataURL = thumbnail.toDataURL();
+      
+      // Extrair apenas o base64 puro (remover data:image/png;base64,)
+      const base64Data = dataURL.split(',')[1];
       
       console.log('✅ Screenshot capturado com sucesso');
       
       return {
         success: true,
-        imageData,
+        imageData: base64Data,
         timestamp: Date.now()
       };
     } catch (error) {

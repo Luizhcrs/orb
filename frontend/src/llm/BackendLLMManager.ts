@@ -28,16 +28,15 @@ export class BackendLLMManager {
 
   async processMessage(message: string, imageData?: string): Promise<LLMResponse> {
     try {
-      // Adicionar mensagem do usuário ao histórico
-      this.conversationHistory.push({
+      // Preparar contexto da conversa incluindo a mensagem atual do usuário
+      const currentUserMessage: ConversationMessage = {
         role: 'user',
         content: message,
         timestamp: new Date().toISOString()
-      });
-
-      // Preparar contexto da conversa
+      };
+      
       const conversationContext: ConversationContext = {
-        messages: this.conversationHistory,
+        messages: [...this.conversationHistory, currentUserMessage],
         session_data: {
           session_id: this.sessionId,
           frontend_version: '1.0.0'
@@ -57,7 +56,7 @@ export class BackendLLMManager {
       const response: AgentMessageResponse = await backendService.sendMessage(request);
       console.log('📥 Resposta recebida do backend:', response);
 
-      // Adicionar resposta do assistente ao histórico
+      // Adicionar apenas a resposta do assistente ao histórico
       this.conversationHistory.push({
         role: 'assistant',
         content: response.content || response.response || 'Sem resposta',
@@ -85,9 +84,6 @@ export class BackendLLMManager {
 
     } catch (error) {
       console.error('Erro ao processar mensagem:', error);
-      
-      // Remover a última mensagem do histórico em caso de erro
-      this.conversationHistory.pop();
       
       return {
         response: 'Desculpe, ocorreu um erro ao processar sua mensagem. Verifique se o backend está funcionando.',
