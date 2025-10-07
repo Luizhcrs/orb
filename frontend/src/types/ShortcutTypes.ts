@@ -8,11 +8,12 @@ export interface GlobalShortcuts {
   toggleOrb: ShortcutConfig;
   toggleChat: ShortcutConfig;
   captureScreen: ShortcutConfig;
+  openConfig: ShortcutConfig;
 }
 
 export const DEFAULT_SHORTCUTS: GlobalShortcuts = {
   toggleOrb: {
-    key: 'CommandOrControl+Shift+O',
+    key: 'CommandOrControl+Shift+Space',
     description: 'Toggle orb visibility'
   },
   toggleChat: {
@@ -22,5 +23,9 @@ export const DEFAULT_SHORTCUTS: GlobalShortcuts = {
   captureScreen: {
     key: 'CommandOrControl+Shift+S',
     description: 'Capture screen and open chat'
+  },
+  openConfig: {
+    key: 'CommandOrControl+Shift+O',
+    description: 'Open configuration window'
   }
 };

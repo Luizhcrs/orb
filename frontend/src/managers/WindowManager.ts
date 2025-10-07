@@ -23,6 +23,7 @@ export class WindowManager {
     this.state = {
       orbWindow: null,
       chatWindow: null,
+      configWindow: null,
       isChatOpen: false,
       isOrbVisible: false,
       capturedImage: null
@@ -61,6 +62,7 @@ export class WindowManager {
 
     this.state.orbWindow = new BrowserWindow({
       ...orbConfig,
+      icon: path.join(__dirname, '../../assets/icon.svg'),
       webPreferences: {
         nodeIntegration: true,
         contextIsolation: false
@@ -269,6 +271,81 @@ export class WindowManager {
   }
 
   /**
+   * Cria janela de configuração
+   */
+  createConfigWindow(): void {
+    if (this.state.configWindow && !this.state.configWindow.isDestroyed()) {
+      this.state.configWindow.focus();
+      return;
+    }
+
+    const configPath = path.join(__dirname, '..', '..', 'src', 'src', 'config.html');
+    console.log('🔧 Caminho do config:', configPath);
+    
+    this.state.configWindow = new BrowserWindow({
+      width: 900,
+      height: 600,
+      minWidth: 700,
+      minHeight: 500,
+      resizable: true,
+      movable: true,
+      frame: false,
+      transparent: true,
+      alwaysOnTop: true,
+      skipTaskbar: true,
+      show: true,
+      webPreferences: {
+        nodeIntegration: true,
+        contextIsolation: false
+      }
+    });
+
+    this.state.configWindow.loadFile(configPath);
+
+    this.state.configWindow.once('ready-to-show', () => {
+      this.state.configWindow?.center();
+      this.state.configWindow?.focus();
+    });
+
+    this.state.configWindow.on('closed', () => {
+      this.state.configWindow = null;
+    });
+
+    // Garantir que a janela seja focada e visível
+    this.state.configWindow.focus();
+  }
+
+  /**
+   * Abre janela de configuração
+   */
+  openConfig(): void {
+    console.log('🔧 Abrindo janela de configuração...');
+    this.createConfigWindow();
+  }
+
+  /**
+   * Fecha janela de configuração
+   */
+  closeConfig(): void {
+    console.log('🔧 WindowManager.closeConfig() chamado');
+    if (this.state.configWindow && !this.state.configWindow.isDestroyed()) {
+      console.log('🔧 Fechando configWindow...');
+      this.state.configWindow.close();
+    } else {
+      console.log('🔧 configWindow não existe ou já foi destruída');
+    }
+  }
+
+  /**
+   * Minimiza janela de configuração
+   */
+  minimizeConfig(): void {
+    if (this.state.configWindow && !this.state.configWindow.isDestroyed()) {
+      this.state.configWindow.minimize();
+    }
+  }
+
+  /**
    * Limpa recursos (chamado no cleanup)
    */
   cleanup(): void {
@@ -278,6 +355,10 @@ export class WindowManager {
     
     if (this.state.chatWindow && !this.state.chatWindow.isDestroyed()) {
       this.state.chatWindow.close();
+    }
+
+    if (this.state.configWindow && !this.state.configWindow.isDestroyed()) {
+      this.state.configWindow.close();
     }
   }
 }

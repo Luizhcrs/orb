@@ -1,0 +1,419 @@
+/* ===== CONFIGURAÇÕES - ESTILO ORB ===== */
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #E0E0E0;
+    background: transparent;
+    overflow: hidden;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+/* ===== CONTAINER PRINCIPAL ===== */
+.config-container {
+    width: 100vw;
+    height: 100vh;
+    background: linear-gradient(135deg, 
+        rgba(0, 0, 0, 0.75) 0%, 
+        rgba(20, 20, 30, 0.85) 50%, 
+        rgba(0, 0, 0, 0.75) 100%);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.config-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(45deg, 
+        rgba(255, 255, 255, 0.05) 0%, 
+        rgba(255, 255, 255, 0.03) 50%, 
+        rgba(255, 255, 255, 0.05) 100%);
+    pointer-events: none;
+}
+
+/* ===== ÁREA DE ARRASTAR ===== */
+.drag-area {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 50px;
+    -webkit-app-region: drag;
+    cursor: move;
+    z-index: 100;
+}
+
+/* ===== CONTROLES DA JANELA ===== */
+.config-controls {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    z-index: 200;
+    display: flex;
+    gap: 8px;
+    pointer-events: auto;
+    -webkit-app-region: no-drag;
+}
+
+.close-btn {
+    width: 28px;
+    height: 28px;
+    border: none;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    color: #E0E0E0;
+    font-size: 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    pointer-events: auto;
+    -webkit-app-region: no-drag;
+    z-index: 1000;
+    position: relative;
+}
+
+.close-btn:hover {
+    background: rgba(255, 0, 0, 0.2);
+    color: #FF6B6B;
+    transform: scale(1.05);
+    box-shadow: 0 2px 8px rgba(255, 0, 0, 0.3);
+}
+
+/* ===== LAYOUT PRINCIPAL ===== */
+.config-layout {
+    flex: 1;
+    display: flex;
+    margin-top: 50px;
+    height: calc(100vh - 50px);
+    pointer-events: auto;
+    -webkit-app-region: no-drag;
+}
+
+/* ===== NAVEGAÇÃO LATERAL ===== */
+.config-nav {
+    width: 200px;
+    background: rgba(0, 0, 0, 0.3);
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 20px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    pointer-events: auto;
+    -webkit-app-region: no-drag;
+}
+
+.nav-item {
+    padding: 12px 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: #B0B0B0;
+    border-left: 3px solid transparent;
+    pointer-events: auto;
+    -webkit-app-region: no-drag;
+}
+
+.nav-item:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: #E0E0E0;
+}
+
+.nav-item.active {
+    background: rgba(255, 255, 255, 0.1);
+    color: #FFFFFF;
+    border-left-color: rgba(255, 255, 255, 0.3);
+}
+
+.nav-icon {
+    font-size: 16px;
+    width: 20px;
+    text-align: center;
+}
+
+.nav-text {
+    font-size: 14px;
+    font-weight: 500;
+}
+
+/* ===== CONTEÚDO PRINCIPAL ===== */
+.config-main {
+    flex: 1;
+    padding: 30px 40px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
+    pointer-events: auto;
+    -webkit-app-region: no-drag;
+}
+
+.config-main::-webkit-scrollbar {
+    width: 8px;
+}
+
+.config-main::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.config-main::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+    border: 2px solid transparent;
+}
+
+/* ===== SEÇÕES ===== */
+.config-section {
+    display: none;
+}
+
+.config-section.active {
+    display: block;
+}
+
+.config-section h1 {
+    font-size: 2em;
+    margin: 0 0 30px 0;
+    color: #FFFFFF;
+    font-weight: 600;
+}
+
+/* ===== LINHAS DE CONFIGURAÇÃO ===== */
+.setting-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.setting-row:last-child {
+    border-bottom: none;
+}
+
+.setting-label {
+    font-size: 14px;
+    color: #C0C0C0;
+    font-weight: 500;
+    min-width: 200px;
+}
+
+.value-display {
+    font-weight: bold;
+    color: #FFFFFF;
+    margin-left: 8px;
+}
+
+.setting-control {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 200px;
+    justify-content: flex-end;
+}
+
+/* ===== SELECTS ===== */
+.setting-control select {
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    color: #E0E0E0;
+    padding: 8px 12px;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s ease;
+    min-width: 150px;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
+
+.setting-control select:focus {
+    border-color: rgba(255, 255, 255, 0.4);
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.2);
+}
+
+.dropdown-arrow {
+    color: #B0B0B0;
+    font-size: 12px;
+    pointer-events: none;
+}
+
+/* ===== SWITCHES ===== */
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 44px;
+    height: 24px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.2);
+    transition: 0.3s;
+    border-radius: 24px;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 3px;
+    bottom: 3px;
+    background: white;
+    transition: 0.3s;
+    border-radius: 50%;
+}
+
+input:checked + .slider {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+input:checked + .slider:before {
+    transform: translateX(20px);
+}
+
+/* ===== SLIDERS ===== */
+.setting-control input[type="range"] {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 6px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 3px;
+    outline: none;
+    transition: opacity 0.2s;
+}
+
+.setting-control input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.8);
+    cursor: pointer;
+    box-shadow: 0 0 4px rgba(255, 255, 255, 0.3);
+    transition: background 0.2s ease, box-shadow 0.2s ease;
+}
+
+.setting-control input[type="range"]::-webkit-slider-thumb:hover {
+    background: rgba(255, 255, 255, 1);
+    box-shadow: 0 0 6px rgba(255, 255, 255, 0.5);
+}
+
+/* ===== BOTÕES DE AÇÃO ===== */
+.action-btn {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    color: #C0C0C0;
+    padding: 8px 16px;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-left: 8px;
+}
+
+.action-btn:hover {
+    background: rgba(255, 255, 255, 0.15);
+    color: #FFFFFF;
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+/* ===== FOOTER ===== */
+.config-footer {
+    padding: 20px 40px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    background: rgba(0, 0, 0, 0.2);
+}
+
+.primary-btn, .secondary-btn {
+    padding: 10px 24px;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.primary-btn {
+    background: linear-gradient(90deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0.15) 100%);
+    color: white;
+    box-shadow: 0 4px 15px rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.primary-btn:hover {
+    background: linear-gradient(90deg, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0.2) 100%);
+    box-shadow: 0 6px 20px rgba(255, 255, 255, 0.3);
+    transform: translateY(-2px);
+}
+
+.secondary-btn {
+    background: rgba(255, 255, 255, 0.1);
+    color: #C0C0C0;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.secondary-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    color: #FFFFFF;
+    transform: translateY(-2px);
+}
+
+/* ===== RESPONSIVIDADE ===== */
+@media (max-width: 768px) {
+    .config-nav {
+        width: 160px;
+    }
+    
+    .config-main {
+        padding: 20px 30px;
+    }
+    
+    .setting-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+    
+    .setting-control {
+        justify-content: flex-start;
+        min-width: auto;
+        width: 100%;
+    }
+}

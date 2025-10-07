@@ -42,6 +42,7 @@
             -webkit-backdrop-filter: blur(20px) saturate(180%);
         }
 
+
         .orb::before {
             content: '';
             position: absolute;
@@ -87,31 +88,32 @@
         }
     </style>
 </head>
-<body>
-    <div class="orb"></div>
+    <body>
+        <div class="orb"></div>
 
-    <script>
-        // Garantir que o evento de clique funcione
-        document.addEventListener('DOMContentLoaded', () => {
-            console.log('🔵 Orb HTML carregado');
-            
-            document.addEventListener('click', (e) => {
-                console.log('🔵 Clique no HTML do orb detectado!');
-                if (typeof require !== 'undefined') {
-                    console.log('🔵 Enviando evento orb-clicked via IPC');
-                    require('electron').ipcRenderer.send('orb-clicked');
-                } else {
-                    console.log('🔵 require não disponível');
-                }
+        <script>
+            // Garantir que o evento de clique funcione
+            document.addEventListener('DOMContentLoaded', () => {
+                console.log('🔵 Orb HTML carregado');
+                
+                // Clique no orb principal
+                document.querySelector('.orb').addEventListener('click', (e) => {
+                    console.log('🔵 Clique no orb principal detectado!');
+                    if (typeof require !== 'undefined') {
+                        console.log('🔵 Enviando evento orb-clicked via IPC');
+                        require('electron').ipcRenderer.send('orb-clicked');
+                    } else {
+                        console.log('🔵 require não disponível');
+                    }
+                });
+                
+                document.addEventListener('mousedown', (e) => {
+                    console.log('🔵 Mouse down no HTML do orb detectado!');
+                    if (typeof require !== 'undefined') {
+                        require('electron').ipcRenderer.send('orb-clicked');
+                    }
+                });
             });
-            
-            document.addEventListener('mousedown', (e) => {
-                console.log('🔵 Mouse down no HTML do orb detectado!');
-                if (typeof require !== 'undefined') {
-                    require('electron').ipcRenderer.send('orb-clicked');
-                }
-            });
-        });
-    </script>
+        </script>
 </body>
 </html>
