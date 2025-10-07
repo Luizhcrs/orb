@@ -18,6 +18,7 @@ export class ShortcutManager {
     this.registerShortcut('toggleOrb', this.shortcuts.toggleOrb);
     this.registerShortcut('toggleChat', this.shortcuts.toggleChat);
     this.registerShortcut('captureScreen', this.shortcuts.captureScreen);
+    this.registerShortcut('openConfig', this.shortcuts.openConfig);
     
     console.log('✅ Atalhos globais registrados');
   }

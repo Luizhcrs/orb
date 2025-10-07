@@ -1,4 +1,5 @@
 import { app, ipcMain } from 'electron';
+import * as path from 'path';
 import { BackendLLMManager } from './llm/BackendLLMManager';
 import { WindowManager } from './managers/WindowManager';
 import { ShortcutManager } from './managers/ShortcutManager';
@@ -15,6 +16,10 @@ class OrbApp {
   private lastClickTime = 0;
 
   constructor() {
+    // Configurar ícone da aplicação
+    const iconPath = path.join(__dirname, '../../assets/icon.svg');
+    app.setAppUserModelId('com.orb.agent');
+    
     this.llmManager = new BackendLLMManager();
     this.screenshotService = new ScreenshotService();
     
@@ -35,6 +40,7 @@ class OrbApp {
 
     // Criar shortcut manager
     this.shortcutManager = new ShortcutManager(this.createShortcutConfig());
+
 
     this.initializeApp();
   }
@@ -64,7 +70,7 @@ class OrbApp {
   private createShortcutConfig(): GlobalShortcuts {
     return {
       toggleOrb: {
-        key: 'CommandOrControl+Shift+O',
+        key: 'CommandOrControl+Shift+Space',
         callback: () => this.handleToggleOrb(),
         description: 'Toggle orb visibility'
       },
@@ -77,6 +83,14 @@ class OrbApp {
         key: 'CommandOrControl+Shift+S',
         callback: () => this.handleCaptureScreen(),
         description: 'Capture screen and open chat'
+      },
+      openConfig: {
+        key: 'CommandOrControl+Shift+O',
+        callback: () => {
+          console.log('🔧 Atalho Ctrl+Shift+O pressionado!');
+          this.windowManager.openConfig();
+        },
+        description: 'Open configuration window'
       }
     };
   }
@@ -113,6 +127,11 @@ class OrbApp {
       if (state.chatWindow && !state.chatWindow.isDestroyed()) {
         state.chatWindow.webContents.send('clear-messages');
       }
+    });
+
+    ipcMain.on('close-config', () => {
+      console.log('🔧 IPC close-config recebido no main process');
+      this.windowManager.closeConfig();
     });
   }
 
@@ -173,6 +192,7 @@ class OrbApp {
   private handleOrbHide() {
     // Callback quando orb é escondido
   }
+
 
   private cleanup() {
     console.log('🧹 Limpando recursos...');

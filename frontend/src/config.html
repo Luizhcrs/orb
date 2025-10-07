@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configurações - ORB</title>
+    <link rel="stylesheet" href="components/config-styles.css">
+</head>
+<body>
+    <div class="config-container">
+        <!-- Área de arrastar -->
+        <div class="drag-area"></div>
+        
+        <!-- Controles da janela -->
+        <div class="config-controls">
+            <button class="close-btn" title="Fechar">×</button>
+        </div>
+
+        <!-- Layout principal -->
+        <div class="config-layout">
+            <!-- Navegação lateral -->
+            <div class="config-nav">
+                <div class="nav-item active" data-section="general">
+                    <span class="nav-icon">⚙️</span>
+                    <span class="nav-text">Geral</span>
+                </div>
+                <div class="nav-item" data-section="agent">
+                    <span class="nav-icon">🤖</span>
+                    <span class="nav-text">Agente</span>
+                </div>
+                <div class="nav-item" data-section="interface">
+                    <span class="nav-icon">🎨</span>
+                    <span class="nav-text">Interface</span>
+                </div>
+                <div class="nav-item" data-section="history">
+                    <span class="nav-icon">📚</span>
+                    <span class="nav-text">Histórico</span>
+                </div>
+            </div>
+
+            <!-- Conteúdo principal -->
+            <div class="config-main">
+                <!-- Seção Geral -->
+                <div class="config-section active" id="general-section">
+                    <h1>Geral</h1>
+                    
+                    <div class="setting-row">
+                        <span class="setting-label">Tema</span>
+                        <div class="setting-control">
+                            <select id="theme-select">
+                                <option value="system">Sistema</option>
+                                <option value="dark">Escuro</option>
+                                <option value="light">Claro</option>
+                            </select>
+                            <span class="dropdown-arrow">▼</span>
+                        </div>
+                    </div>
+
+                    <div class="setting-row">
+                        <span class="setting-label">Idioma</span>
+                        <div class="setting-control">
+                            <select id="language-select">
+                                <option value="pt-BR">Português (Brasil)</option>
+                                <option value="en-US">English (US)</option>
+                                <option value="es-ES">Español</option>
+                            </select>
+                            <span class="dropdown-arrow">▼</span>
+                        </div>
+                    </div>
+
+                    <div class="setting-row">
+                        <span class="setting-label">Iniciar com Windows</span>
+                        <div class="setting-control">
+                            <label class="switch">
+                                <input type="checkbox" id="startup-checkbox">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="setting-row">
+                        <span class="setting-label">Permitir notificações</span>
+                        <div class="setting-control">
+                            <label class="switch">
+                                <input type="checkbox" id="notifications-checkbox" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Seção Agente -->
+                <div class="config-section" id="agent-section">
+                    <h1>Agente</h1>
+                    
+                    <div class="setting-row">
+                        <span class="setting-label">Provedor LLM</span>
+                        <div class="setting-control">
+                            <select id="provider-select">
+                                <option value="openai">OpenAI</option>
+                                <option value="anthropic">Anthropic</option>
+                                <option value="demo">Demo</option>
+                            </select>
+                            <span class="dropdown-arrow">▼</span>
+                        </div>
+                    </div>
+
+                    <div class="setting-row">
+                        <span class="setting-label">Modelo</span>
+                        <div class="setting-control">
+                            <select id="model-select">
+                                <option value="gpt-4o-mini">GPT-4o Mini</option>
+                                <option value="gpt-4o">GPT-4o</option>
+                                <option value="gpt-3.5-turbo">GPT-3.5 Turbo</option>
+                            </select>
+                            <span class="dropdown-arrow">▼</span>
+                        </div>
+                    </div>
+
+                    <div class="setting-row">
+                        <span class="setting-label">Criatividade <span class="value-display" id="temperature-value">0.7</span></span>
+                        <div class="setting-control">
+                            <input type="range" id="temperature-slider" min="0" max="1" step="0.1" value="0.7">
+                        </div>
+                    </div>
+
+                    <div class="setting-row">
+                        <span class="setting-label">Máx. Tokens <span class="value-display" id="max-tokens-value">1000</span></span>
+                        <div class="setting-control">
+                            <input type="range" id="max-tokens-slider" min="100" max="4000" step="100" value="1000">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Seção Interface -->
+                <div class="config-section" id="interface-section">
+                    <h1>Interface</h1>
+                    
+                    <div class="setting-row">
+                        <span class="setting-label">Tamanho do Orb <span class="value-display" id="orb-size-value">50px</span></span>
+                        <div class="setting-control">
+                            <input type="range" id="orb-size-slider" min="30" max="100" step="5" value="50">
+                        </div>
+                    </div>
+
+                    <div class="setting-row">
+                        <span class="setting-label">Opacidade do Chat <span class="value-display" id="chat-opacity-value">90%</span></span>
+                        <div class="setting-control">
+                            <input type="range" id="chat-opacity-slider" min="50" max="100" step="5" value="90">
+                        </div>
+                    </div>
+
+                    <div class="setting-row">
+                        <span class="setting-label">Sempre no topo</span>
+                        <div class="setting-control">
+                            <label class="switch">
+                                <input type="checkbox" id="always-on-top-checkbox">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="setting-row">
+                        <span class="setting-label">Auto-ocultar Orb</span>
+                        <div class="setting-control">
+                            <label class="switch">
+                                <input type="checkbox" id="auto-hide-orb-checkbox" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Seção Histórico -->
+                <div class="config-section" id="history-section">
+                    <h1>Histórico</h1>
+                    
+                    <div class="setting-row">
+                        <span class="setting-label">Salvar histórico</span>
+                        <div class="setting-control">
+                            <label class="switch">
+                                <input type="checkbox" id="save-history-checkbox" checked>
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="setting-row">
+                        <span class="setting-label">Manter histórico por</span>
+                        <div class="setting-control">
+                            <select id="history-days-select">
+                                <option value="7">7 dias</option>
+                                <option value="30" selected>30 dias</option>
+                                <option value="90">90 dias</option>
+                                <option value="always">Sempre</option>
+                            </select>
+                            <span class="dropdown-arrow">▼</span>
+                        </div>
+                    </div>
+
+                    <div class="setting-row">
+                        <span class="setting-label"></span>
+                        <div class="setting-control">
+                            <button id="clear-history-btn" class="action-btn">Limpar Histórico</button>
+                            <button id="export-history-btn" class="action-btn">Exportar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer com botões -->
+        <div class="config-footer">
+            <button id="reset-btn" class="secondary-btn">Redefinir</button>
+            <button id="save-btn" class="primary-btn">Salvar</button>
+        </div>
+    </div>
+</body>
+<script src="components/ConfigInterface.js"></script>
+</html>

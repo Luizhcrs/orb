@@ -54,9 +54,28 @@ export interface ChatWindowConfig extends WindowConfig {
   show: false;
 }
 
+export interface ConfigWindowConfig extends WindowConfig {
+  width: 800;
+  height: 700;
+  minWidth: 600;
+  minHeight: 500;
+  frame: false;
+  transparent: true;
+  alwaysOnTop: true;
+  skipTaskbar: false;
+  resizable: true;
+  movable: true;
+  minimizable: true;
+  maximizable: true;
+  closable: true;
+  focusable: true;
+  show: false;
+}
+
 export interface WindowManagerState {
   orbWindow: BrowserWindow | null;
   chatWindow: BrowserWindow | null;
+  configWindow: BrowserWindow | null;
   isChatOpen: boolean;
   isOrbVisible: boolean;
   capturedImage: string | null;
