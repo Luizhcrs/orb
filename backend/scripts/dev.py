@@ -7,12 +7,13 @@ import sys
 import os
 import uvicorn
 
-# Configura logging limpo
-from logging_config import setup_clean_logging
-setup_clean_logging()
+# Adiciona src ao path para importações (ajustar para subir um nível)
+backend_dir = os.path.dirname(os.path.dirname(__file__))
+sys.path.insert(0, os.path.join(backend_dir, 'src'))
 
-# Adiciona src ao path para importações
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'src'))
+# Configura logging limpo
+from config.logging_config import setup_clean_logging
+setup_clean_logging()
 
 from api.main import app
 
