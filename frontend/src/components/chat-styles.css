@@ -1,8 +1,10 @@
 /* ===== CHAT CONTAINER ===== */
 .chat-container {
-    width: 100%;
-    height: 100%;
-    flex: 1;
+    position: absolute; /* Absoluto para cobrir tudo */
+    top: 0;
+    left: 0;
+    width: 100vw; /* Largura total da viewport */
+    height: 100vh; /* Altura total da viewport */
     background: rgba(20, 20, 22, 0.85);
     backdrop-filter: blur(40px) saturate(180%);
     -webkit-backdrop-filter: blur(40px) saturate(180%);
@@ -12,7 +14,6 @@
         0 8px 24px rgba(0, 0, 0, 0.4),
         0 0 1px rgba(255, 255, 255, 0.1) inset;
     animation: chatAppear 0.8s cubic-bezier(0.16, 1, 0.3, 1);
-    position: relative;
     overflow: hidden;
     display: flex;
     flex-direction: column;
@@ -135,7 +136,7 @@
     display: flex;
     flex-direction: column;
     min-height: 0;
-    margin-top: 50px;
+    padding-top: 32px; /* Espaço para custom title bar */
 }
 
 .chat-messages {

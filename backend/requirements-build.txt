@@ -1,0 +1,3 @@
+# Dependências para build do executável standalone
+pyinstaller>=6.0.0
+

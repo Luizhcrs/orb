@@ -4,6 +4,7 @@ import { BackendLLMManager } from './llm/BackendLLMManager';
 import { WindowManager } from './managers/WindowManager';
 import { ShortcutManager } from './managers/ShortcutManager';
 import { MouseDetector } from './managers/MouseDetector';
+import { BackendProcessManager } from './managers/BackendProcessManager';
 import { ScreenshotService } from './services/ScreenshotService';
 import { GlobalShortcuts } from './types/ShortcutTypes';
 
@@ -11,6 +12,7 @@ class OrbApp {
   private windowManager: WindowManager;
   private shortcutManager: ShortcutManager;
   private mouseDetector: MouseDetector;
+  private backendProcess: BackendProcessManager;
   private _screenshotService: ScreenshotService | null = null;
   private _llmManager: BackendLLMManager | null = null;
   private lastClickTime = 0;
@@ -23,6 +25,9 @@ class OrbApp {
     
     // ⚡ OTIMIZAÇÃO: Lazy load - só instanciar quando necessário
     // this.llmManager e this.screenshotService agora são getters
+    
+    // Criar gerenciador de processo do backend
+    this.backendProcess = new BackendProcessManager();
     
     // Criar window manager com callbacks
     this.windowManager = new WindowManager(
@@ -64,7 +69,16 @@ class OrbApp {
   }
 
   private initializeApp() {
-    app.whenReady().then(() => {
+    app.whenReady().then(async () => {
+      // Iniciar backend primeiro
+      try {
+        await this.backendProcess.start();
+        console.log('✅ Backend iniciado com sucesso');
+      } catch (error) {
+        console.error('❌ Falha ao iniciar backend:', error);
+        // Continuar mesmo se backend falhar (pode estar rodando separadamente em dev)
+      }
+      
       this.windowManager.createOrbWindow();
       this.shortcutManager.registerAll();
       this.mouseDetector.startDetection();
@@ -312,6 +326,7 @@ class OrbApp {
     this.shortcutManager.cleanup();
     this.mouseDetector.cleanup();
     this.windowManager.cleanup();
+    this.backendProcess.stop();
     
     console.log('✅ Limpeza concluída');
   }

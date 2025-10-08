@@ -1,0 +1,9 @@
+﻿<Application x:Class="OrbAgent.Frontend.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:OrbAgent.Frontend">
+    <!-- StartupUri removido - usamos OnStartup em App.xaml.cs -->
+    <Application.Resources>
+         
+    </Application.Resources>
+</Application>

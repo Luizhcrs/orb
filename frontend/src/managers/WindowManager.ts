@@ -62,7 +62,24 @@ export class WindowManager {
     };
 
     this.state.orbWindow = new BrowserWindow({
-      ...orbConfig,
+      width: orbConfig.width,
+      height: orbConfig.height,
+      x: orbConfig.x,
+      y: orbConfig.y,
+      frame: false,
+      transparent: true,
+      titleBarStyle: 'hidden', // 🔥 CRÍTICO: Remove completamente a barra nativa
+      autoHideMenuBar: true, // CRÍTICO: Esconder menu bar automaticamente
+      alwaysOnTop: true,
+      skipTaskbar: true,
+      resizable: false,
+      movable: false,
+      minimizable: false,
+      maximizable: false,
+      closable: false,
+      focusable: true,
+      show: false,
+      hasShadow: false,
       icon: path.join(__dirname, '../../assets/icon.svg'),
       webPreferences: {
         nodeIntegration: true,
@@ -70,6 +87,11 @@ export class WindowManager {
       }
     });
 
+    // CRÍTICO: Forçar remoção completa do menu
+    this.state.orbWindow.setMenu(null);
+    this.state.orbWindow.setMenuBarVisibility(false);
+    this.state.orbWindow.removeMenu(); // Última linha de defesa
+    
     this.state.orbWindow.loadFile(path.join(__dirname, '..', 'src', 'orb.html'));
     
     // ⚡ OTIMIZAÇÃO: Não mostrar o Orb imediatamente
@@ -102,7 +124,7 @@ export class WindowManager {
     const { width: screenWidth, height: screenHeight } = screen.getPrimaryDisplay().workAreaSize;
     const chatConfig: ChatWindowConfig = {
       width: 380,
-      height: 480,
+      height: 512, // 480 (conteúdo) + 32px (title bar)
       x: Math.floor((screenWidth - 380) / 2),
       y: Math.floor((screenHeight - 480) / 2),
       frame: false,
@@ -119,13 +141,33 @@ export class WindowManager {
     };
 
     this.state.chatWindow = new BrowserWindow({
-      ...chatConfig,
-      hasShadow: false, // Remove sombra nativa do Electron
+      width: chatConfig.width,
+      height: chatConfig.height,
+      x: chatConfig.x,
+      y: chatConfig.y,
+      frame: false,
+      transparent: true, // ✅ Transparente para liquid glass funcionar
+      titleBarStyle: 'hidden', // 🔥 CRÍTICO: Remove completamente a barra nativa
+      alwaysOnTop: true,
+      skipTaskbar: true,
+      resizable: false,
+      movable: true,
+      minimizable: false,
+      maximizable: false,
+      closable: false,
+      focusable: true,
+      show: false,
+      hasShadow: false,
+      autoHideMenuBar: true, // CRÍTICO: Esconder menu bar
       webPreferences: {
         nodeIntegration: true,
         contextIsolation: false
       }
     });
+
+    // CRÍTICO: Remover TUDO relacionado a menu/frame
+    this.state.chatWindow.setMenu(null);
+    this.state.chatWindow.setMenuBarVisibility(false);
 
     this.state.chatWindow.loadFile(path.join(__dirname, '..', 'src', 'chat.html'));
 
@@ -148,6 +190,12 @@ export class WindowManager {
    * Abre o chat
    */
   openChat(): void {
+    // IMPORTANTE: Esconder o ORB ANTES de abrir o chat
+    // Isso evita que o Windows mostre a barra de título agrupando as janelas
+    if (this.state.orbWindow && !this.state.orbWindow.isDestroyed()) {
+      this.state.orbWindow.hide();
+    }
+
     if (!this.state.chatWindow || this.state.chatWindow.isDestroyed()) {
       this.createChatWindow();
     }
@@ -171,6 +219,11 @@ export class WindowManager {
       this.state.isChatExpanded = false; // 🔥 FIX: Resetar flag ao fechar (sempre abrir compacto)
       this.onChatClose();
       console.log('🔵 Chat fechado');
+    }
+
+    // Mostrar o ORB novamente quando o chat fechar
+    if (this.state.orbWindow && !this.state.orbWindow.isDestroyed()) {
+      this.state.orbWindow.show();
     }
   }
 
@@ -197,7 +250,7 @@ export class WindowManager {
     
     // 🔥 FIX: Usar flag de estado ao invés de detectar pelo tamanho
     const newWidth = this.state.isChatExpanded ? 380 : 660;
-    const newHeight = this.state.isChatExpanded ? 480 : 760;
+    const newHeight = this.state.isChatExpanded ? 512 : 792; // +32px da title bar customizada
     const newX = Math.floor((screenWidth - newWidth) / 2);
     const newY = Math.floor((screenHeight - newHeight) / 2);
 
@@ -307,16 +360,23 @@ export class WindowManager {
       movable: true,
       frame: false,
       transparent: true,
+      titleBarStyle: 'hidden', // 🔥 CRÍTICO: Remove completamente a barra nativa
+      autoHideMenuBar: true, // CRÍTICO: Esconder menu bar automaticamente
       alwaysOnTop: true,
       skipTaskbar: true,
       center: true,
       show: true,
-      hasShadow: false, // Remove sombra nativa do Electron
+      hasShadow: false,
       webPreferences: {
         nodeIntegration: true,
         contextIsolation: false
       }
     });
+
+    // CRÍTICO: Forçar remoção completa do menu
+    this.state.configWindow.setMenu(null);
+    this.state.configWindow.setMenuBarVisibility(false);
+    this.state.configWindow.removeMenu(); // Última linha de defesa
 
     this.state.configWindow.loadFile(configPath);
 

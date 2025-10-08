@@ -4,6 +4,7 @@ Implementa o padrão de memória do LangChain usando SQLite
 """
 import sqlite3
 import json
+import os
 from pathlib import Path
 from typing import List, Dict, Any, Optional
 from datetime import datetime
@@ -68,8 +69,14 @@ class ChatMemoryManager:
             db_path: Caminho para o banco SQLite. Se None, usa orb.db na raiz
         """
         if db_path is None:
-            project_root = Path(__file__).parent.parent.parent.parent
-            db_path = project_root / "orb.db"
+            # Verificar se há DATABASE_PATH nas variáveis de ambiente (modo produção)
+            env_db_path = os.getenv('DATABASE_PATH')
+            if env_db_path:
+                db_path = env_db_path
+            else:
+                # Modo desenvolvimento - usar raiz do projeto
+                project_root = Path(__file__).parent.parent.parent.parent
+                db_path = project_root / "orb.db"
         
         self.db_path = str(db_path)
         self._connection = None  # Connection persistente para performance

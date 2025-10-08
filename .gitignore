@@ -69,3 +69,30 @@ htmlcov/
 *.sqlite
 *.sqlite3
 orb.db
+
+# PyInstaller
+backend/build/
+backend/dist/*.exe
+*.spec
+
+# Temporary files
+query
+qc
+delete
+stop
+fix-*.bat
+test_*.bat
+*-original.*
+*-refactored.*
+temp-*
+
+# Backend logs
+orb-backend.log
+backend/orb-backend.log
+
+# WPF Frontend
+frontend-wpf/bin/
+frontend-wpf/obj/
+frontend-wpf/.vs/
+frontend-wpf/*.user
+frontend-wpf/*.suo

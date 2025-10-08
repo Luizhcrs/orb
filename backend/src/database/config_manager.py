@@ -26,9 +26,14 @@ class ConfigManager:
         """
         # Definir caminho do banco
         if db_path is None:
-            # Usar raiz do projeto (4 níveis acima: database -> src -> backend -> orb)
-            project_root = Path(__file__).parent.parent.parent.parent
-            db_path = project_root / "orb.db"
+            # Verificar se há DATABASE_PATH nas variáveis de ambiente (modo produção)
+            env_db_path = os.getenv('DATABASE_PATH')
+            if env_db_path:
+                db_path = env_db_path
+            else:
+                # Modo desenvolvimento - usar raiz do projeto
+                project_root = Path(__file__).parent.parent.parent.parent
+                db_path = project_root / "orb.db"
         
         self.db_path = str(db_path)
         
