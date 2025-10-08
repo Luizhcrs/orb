@@ -56,11 +56,19 @@ export class BackendService {
    * Envia mensagem para o agente AI
    */
   async sendMessage(request: AgentMessageRequest): Promise<AgentMessageResponse> {
-    const response = await this.httpClient.post<AgentMessageResponse>(
-      API_ENDPOINTS.AGENT_MESSAGE,
-      request
-    );
-    return response.data;
+    try {
+      const response = await this.httpClient.post<AgentMessageResponse>(
+        API_ENDPOINTS.AGENT_MESSAGE,
+        request
+      );
+      return response.data;
+    } catch (error: any) {
+      // Extrair mensagem de erro do backend se disponível
+      if (error.response && error.response.data && error.response.data.detail) {
+        throw new Error(error.response.data.detail);
+      }
+      throw error;
+    }
   }
 
   /**

@@ -22,8 +22,21 @@ def get_agente():
     """Dependency para obter instância do agente (singleton pattern)"""
     global _agente_instance
     if _agente_instance is None:
-        from agentes.orb_agent.agente import AgenteORB
-        _agente_instance = AgenteORB()
+        try:
+            from agentes.orb_agent.agente import AgenteORB
+            _agente_instance = AgenteORB()
+        except ValueError as e:
+            # Erro de configuração (ex: API key não configurada)
+            raise HTTPException(
+                status_code=400,
+                detail=str(e)
+            )
+        except Exception as e:
+            # Outros erros
+            raise HTTPException(
+                status_code=500,
+                detail=f"Erro ao inicializar agente: {str(e)}"
+            )
     return _agente_instance
 
 # Modelos Pydantic

@@ -11,28 +11,51 @@ body {
     background: transparent;
     overflow: hidden;
     -webkit-font-smoothing: antialiased;
+    padding: 20px; /* Espaço maior para a sombra CSS */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100vw;
+    height: 100vh;
 }
 
 /* Container Principal */
 .config-container {
-    width: 700px;
-    height: 550px;
+    width: 660px; /* 700 - 40px (20px de cada lado) */
+    height: 510px; /* 550 - 40px */
     background: rgba(20, 20, 22, 0.85);
     backdrop-filter: blur(40px) saturate(180%);
     -webkit-backdrop-filter: blur(40px) saturate(180%);
     border-radius: 16px;
     border: 1px solid rgba(255, 255, 255, 0.08);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), 
-                0 0 1px rgba(255, 255, 255, 0.1) inset;
+    box-shadow: 
+        0 8px 24px rgba(0, 0, 0, 0.4), 
+        0 0 1px rgba(255, 255, 255, 0.1) inset;
     display: flex;
     flex-direction: column;
     overflow: hidden;
+    position: relative;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+/* Máscara para forçar cantos arredondados */
+.config-container::before {
+    content: '';
+    position: absolute;
+    top: -1px;
+    left: -1px;
+    right: -1px;
+    bottom: -1px;
+    border-radius: 16px;
+    pointer-events: none;
+    z-index: -1;
 }
 
 /* Área de Arrastar */
 .drag-area {
     width: 100%;
-    height: 40px;
+    height: 48px;
     -webkit-app-region: drag;
     background: rgba(255, 255, 255, 0.02);
     border-bottom: 1px solid rgba(255, 255, 255, 0.06);
@@ -49,25 +72,44 @@ body {
 }
 
 .close-btn {
-    width: 26px;
-    height: 26px;
+    background: 
+        linear-gradient(135deg, 
+            rgba(255, 100, 100, 0.3) 0%, 
+            rgba(255, 100, 100, 0.2) 100%);
+    border: 1px solid rgba(255, 100, 100, 0.4);
+    color: rgba(255, 150, 150, 1);
+    width: 32px;
+    height: 32px;
     border-radius: 50%;
-    border: none;
-    background: rgba(255, 255, 255, 0.08);
-    color: rgba(255, 255, 255, 0.6);
-    font-size: 20px;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.2s ease;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    backdrop-filter: blur(20px) saturate(150%);
+    -webkit-backdrop-filter: blur(20px) saturate(150%);
+    box-shadow: 
+        0 4px 12px rgba(0, 0, 0, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    font-size: 18px;
     line-height: 1;
 }
 
 .close-btn:hover {
-    background: rgba(255, 59, 48, 0.8);
-    color: white;
-    transform: scale(1.1);
+    background: 
+        linear-gradient(135deg, 
+            rgba(255, 100, 100, 0.4) 0%, 
+            rgba(255, 100, 100, 0.3) 100%);
+    border-color: rgba(255, 100, 100, 0.5);
+    transform: scale(1.05);
+    box-shadow: 
+        0 6px 20px rgba(255, 100, 100, 0.4),
+        inset 0 1px 0 rgba(255, 255, 255, 0.4);
+}
+
+.close-btn:active {
+    transform: scale(0.9);
+    transition: transform 0.1s ease;
 }
 
 /* Layout Principal */
@@ -214,35 +256,66 @@ body {
 select {
     width: 100%;
     padding: 10px 36px 10px 14px;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 8px;
-    color: white;
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 10px;
+    color: rgba(255, 255, 255, 0.95);
     font-size: 14px;
     cursor: pointer;
     appearance: none;
     transition: all 0.2s ease;
+    box-shadow: 
+        0 2px 8px rgba(0, 0, 0, 0.2),
+        0 0 1px rgba(255, 255, 255, 0.1) inset;
 }
 
 select:hover {
-    background: rgba(255, 255, 255, 0.08);
-    border-color: rgba(255, 255, 255, 0.18);
+    background: rgba(255, 255, 255, 0.12);
+    border-color: rgba(255, 255, 255, 0.2);
+    box-shadow: 
+        0 4px 12px rgba(0, 0, 0, 0.25),
+        0 0 1px rgba(255, 255, 255, 0.15) inset;
 }
 
 select:focus {
     outline: none;
     border-color: rgba(255, 255, 255, 0.25);
-    background: rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.12);
+    box-shadow: 
+        0 4px 16px rgba(0, 0, 0, 0.3),
+        0 0 1px rgba(255, 255, 255, 0.2) inset;
+}
+
+select:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.08);
+}
+
+select:disabled:hover {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.08);
+    box-shadow: 
+        0 2px 8px rgba(0, 0, 0, 0.2),
+        0 0 1px rgba(255, 255, 255, 0.1) inset;
 }
 
 .dropdown-arrow {
     position: absolute;
-    right: 12px;
+    right: 14px;
     top: 50%;
     transform: translateY(-50%);
-    color: rgba(255, 255, 255, 0.5);
+    color: rgba(255, 255, 255, 0.6);
     pointer-events: none;
     font-size: 10px;
+    transition: all 0.2s ease;
+}
+
+.setting-control:hover .dropdown-arrow {
+    color: rgba(255, 255, 255, 0.8);
 }
 
 /* Input */
@@ -250,29 +323,79 @@ input[type="password"],
 input[type="text"] {
     width: 100%;
     padding: 10px 14px;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 8px;
-    color: white;
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 10px;
+    color: rgba(255, 255, 255, 0.95);
     font-size: 14px;
     transition: all 0.2s ease;
+    user-select: text;
+    -webkit-user-select: text;
+    box-shadow: 
+        0 2px 8px rgba(0, 0, 0, 0.2),
+        0 0 1px rgba(255, 255, 255, 0.1) inset;
 }
 
 input[type="password"]:hover,
 input[type="text"]:hover {
-    background: rgba(255, 255, 255, 0.08);
-    border-color: rgba(255, 255, 255, 0.18);
+    background: rgba(255, 255, 255, 0.12);
+    border-color: rgba(255, 255, 255, 0.2);
+    box-shadow: 
+        0 4px 12px rgba(0, 0, 0, 0.25),
+        0 0 1px rgba(255, 255, 255, 0.15) inset;
 }
 
 input[type="password"]:focus,
 input[type="text"]:focus {
     outline: none;
     border-color: rgba(255, 255, 255, 0.25);
-    background: rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.12);
+    box-shadow: 
+        0 4px 16px rgba(0, 0, 0, 0.3),
+        0 0 1px rgba(255, 255, 255, 0.2) inset;
 }
 
 input::placeholder {
     color: rgba(255, 255, 255, 0.3);
+}
+
+/* Estilização das opções do select (Chromium/Electron) */
+select option {
+    background-color: #1c1c1e;
+    color: #ffffff;
+    padding: 12px;
+}
+
+select option:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+select option:checked,
+select option:focus {
+    background: linear-gradient(135deg, 
+        rgba(255, 255, 255, 0.15) 0%, 
+        rgba(255, 255, 255, 0.1) 100%);
+    color: #ffffff;
+}
+
+/* Para navegadores baseados em Chromium (Electron) */
+select::-webkit-scrollbar {
+    width: 8px;
+}
+
+select::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.2);
+}
+
+select::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+}
+
+select::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.3);
 }
 
 /* Toggle Switch */
@@ -477,4 +600,131 @@ input:checked + .slider:before {
 .secondary-btn:hover {
     background: rgba(255, 255, 255, 0.08);
     border-color: rgba(255, 255, 255, 0.2);
+}
+
+/* ===== MODAL ===== */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    animation: modalFadeIn 0.2s ease;
+}
+
+@keyframes modalFadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+.modal-content {
+    background: rgba(28, 28, 30, 0.95);
+    backdrop-filter: blur(40px) saturate(180%);
+    -webkit-backdrop-filter: blur(40px) saturate(180%);
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 
+        0 16px 48px rgba(0, 0, 0, 0.5),
+        0 0 1px rgba(255, 255, 255, 0.15) inset;
+    width: 380px;
+    max-width: 90%;
+    animation: modalSlideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    overflow: hidden;
+}
+
+@keyframes modalSlideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.modal-header {
+    padding: 20px 24px 16px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.modal-title {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.95);
+}
+
+.modal-body {
+    padding: 24px;
+}
+
+.modal-body p {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.6;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.modal-footer {
+    padding: 16px 24px 20px;
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+}
+
+.modal-btn {
+    padding: 10px 20px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: 1px solid transparent;
+}
+
+.modal-btn-cancel {
+    background: rgba(255, 255, 255, 0.08);
+    color: rgba(255, 255, 255, 0.8);
+    border-color: rgba(255, 255, 255, 0.12);
+}
+
+.modal-btn-cancel:hover {
+    background: rgba(255, 255, 255, 0.12);
+    border-color: rgba(255, 255, 255, 0.2);
+    transform: translateY(-1px);
+}
+
+.modal-btn-confirm {
+    background: linear-gradient(135deg, 
+        rgba(255, 100, 100, 0.3) 0%, 
+        rgba(255, 100, 100, 0.2) 100%);
+    border-color: rgba(255, 100, 100, 0.4);
+    color: rgba(255, 150, 150, 1);
+}
+
+.modal-btn-confirm:hover {
+    background: linear-gradient(135deg, 
+        rgba(255, 100, 100, 0.4) 0%, 
+        rgba(255, 100, 100, 0.3) 100%);
+    border-color: rgba(255, 100, 100, 0.5);
+    transform: translateY(-1px);
+    box-shadow: 
+        0 4px 12px rgba(255, 100, 100, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.modal-btn:active {
+    transform: scale(0.95);
 }

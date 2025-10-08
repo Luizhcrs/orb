@@ -217,11 +217,27 @@ class ChatInterface {
             const response = await ipcRenderer.invoke('send-message', message, imageToSend);
             
             this.hideTyping();
-            this.addMessage(response.response, 'assistant', response.timestamp);
+            
+            // Verificar se a resposta é um erro
+            if (response.error) {
+                let errorMessage = response.message || 'Desculpe, ocorreu um erro ao processar sua mensagem.';
+                
+                // Simplificar mensagens de API key
+                if (errorMessage.includes('API key') || errorMessage.includes('api_key')) {
+                    if (!errorMessage.includes('Pressione')) {
+                        errorMessage = 'API key não configurada. Pressione Ctrl+Shift+O para abrir as configurações e adicione sua API key do OpenAI.';
+                    }
+                }
+                
+                this.addMessage(errorMessage, 'assistant');
+            } else {
+                this.addMessage(response.response, 'assistant', response.timestamp);
+            }
             
         } catch (error) {
             this.hideTyping();
-            this.addMessage('Desculpe, ocorreu um erro ao processar sua mensagem.', 'assistant');
+            console.error('Erro ao enviar mensagem:', error);
+            this.addMessage('Erro de conexão com o backend. Verifique se o servidor está em execução.', 'assistant');
         }
 
         // ✨ UX: Restaurar estado do botão

@@ -140,11 +140,14 @@ export class BackendLLMManager {
         processing_time: response.processing_time || 0
       };
 
-    } catch (error) {
+    } catch (error: any) {
       console.error('Erro ao processar mensagem:', error);
       
+      // Propagar mensagem de erro específica se disponível
+      const errorMessage = error.message || 'Desculpe, ocorreu um erro ao processar sua mensagem. Verifique se o backend está funcionando.';
+      
       return {
-        response: 'Desculpe, ocorreu um erro ao processar sua mensagem. Verifique se o backend está funcionando.',
+        response: errorMessage,
         timestamp: new Date().toISOString(),
         model: 'error',
         provider: 'backend'

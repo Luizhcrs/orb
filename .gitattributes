@@ -1,0 +1,40 @@
+# Auto detect text files and perform LF normalization
+* text=auto
+
+# Shell scripts should always use LF
+*.sh text eol=lf
+
+# Windows batch files should always use CRLF
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# Python files
+*.py text eol=lf
+
+# TypeScript/JavaScript
+*.ts text eol=lf
+*.js text eol=lf
+*.json text eol=lf
+
+# HTML/CSS
+*.html text eol=lf
+*.css text eol=lf
+
+# Markdown
+*.md text eol=lf
+
+# YAML
+*.yml text eol=lf
+*.yaml text eol=lf
+
+# Binary files
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.svg binary
+*.db binary
+*.sqlite binary
+*.sqlite3 binary
+

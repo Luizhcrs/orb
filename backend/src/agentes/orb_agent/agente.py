@@ -160,8 +160,8 @@ class AgenteORB:
                 if not llm_config.get('api_key'):
                     self.logger.error("API key não configurada no banco de dados!")
                     raise ValueError(
-                        "Configure a API key na tela de configuração (CommandOrControl+Shift+O). "
-                        "Não é permitido usar .env quando o banco de dados está disponível."
+                        "Configure a API key na tela de configuracao (Ctrl+Shift+O). "
+                        "Nao e permitido usar .env quando o banco de dados esta disponivel."
                     )
                 
                 self.logger.info(f"Configuração do LLM carregada do database: {llm_config.get('provider')}/{llm_config.get('model')}")

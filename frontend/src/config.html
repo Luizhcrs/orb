@@ -43,9 +43,8 @@
                     <div class="setting-row">
                         <span class="setting-label">Tema</span>
                         <div class="setting-control">
-                            <select id="theme-select">
+                            <select id="theme-select" disabled>
                                 <option value="dark">Escuro</option>
-                                <option value="light">Claro</option>
                             </select>
                             <span class="dropdown-arrow">▼</span>
                         </div>
@@ -89,9 +88,8 @@
                     <div class="setting-row">
                         <span class="setting-label">Provedor LLM</span>
                         <div class="setting-control">
-                            <select id="provider-select">
+                            <select id="provider-select" disabled>
                                 <option value="openai">OpenAI</option>
-                                <option value="anthropic">Anthropic</option>
                             </select>
                             <span class="dropdown-arrow">▼</span>
                         </div>
@@ -153,6 +151,22 @@
         <div class="config-footer">
             <button id="reset-btn" class="secondary-btn">Redefinir</button>
             <button id="save-btn" class="primary-btn">Salvar</button>
+        </div>
+    </div>
+
+    <!-- Modal de Confirmação -->
+    <div id="confirm-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Confirmação</h3>
+            </div>
+            <div class="modal-body">
+                <p id="modal-message"></p>
+            </div>
+            <div class="modal-footer">
+                <button id="modal-cancel" class="modal-btn modal-btn-cancel">Cancelar</button>
+                <button id="modal-confirm" class="modal-btn modal-btn-confirm">Confirmar</button>
+            </div>
         </div>
     </div>
 </body>

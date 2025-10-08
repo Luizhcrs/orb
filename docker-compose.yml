@@ -1,56 +1,35 @@
 version: '3.8'
 
 services:
-  # Backend Python/FastAPI
-  orb-backend:
+  # Backend FastAPI
+  backend:
     build:
       context: ./backend
       dockerfile: Dockerfile
+    container_name: orb-backend
     ports:
       - "8000:8000"
     environment:
-      - PYTHONPATH=/app/src
       - ENVIRONMENT=development
-      - DEFAULT_MODEL=gpt-4o-mini
-    env_file:
-      - ./backend/.env
+      - DATABASE_PATH=/app/data/orb.db
     volumes:
-      - ./backend/src:/app/src
-      - ./shared:/app/shared
+      - ./backend:/app
+      - backend-data:/app/data
+      - backend-venv:/app/venv
+    command: python scripts/dev.py
+    restart: unless-stopped
     networks:
       - orb-network
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s
 
-  # Frontend Node.js/Electron (para desenvolvimento)
-  orb-frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
-    ports:
-      - "3000:3000"
-    environment:
-      - NODE_ENV=development
-      - ORB_BACKEND_URL=http://orb-backend:8000
-    volumes:
-      - ./frontend/src:/app/src
-      - ./shared:/app/shared
-    networks:
-      - orb-network
-    depends_on:
-      orb-backend:
-        condition: service_healthy
-    restart: unless-stopped
+  # Frontend Electron (apenas para desenvolvimento do backend)
+  # Nota: Electron precisa rodar localmente, este é apenas o backend
+  
+volumes:
+  backend-data:
+    driver: local
+  backend-venv:
+    driver: local
 
 networks:
   orb-network:
     driver: bridge
-
-volumes:
-  orb-data:
-    driver: local
