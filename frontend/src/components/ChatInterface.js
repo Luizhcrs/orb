@@ -165,7 +165,7 @@ class ChatInterface {
             
             const expandBtn = document.createElement('button');
             expandBtn.className = 'expand-image-btn';
-            expandBtn.innerHTML = '🔍';
+            expandBtn.innerHTML = '⛶';
             expandBtn.title = 'Expandir imagem';
             expandBtn.onclick = () => this.expandImage(imageData);
             
@@ -200,7 +200,7 @@ class ChatInterface {
         this.showTyping();
         this.elements.sendBtn.disabled = true;
         this.elements.sendBtn.classList.add('loading');
-        this.elements.sendBtn.textContent = '⏳';
+        this.elements.sendBtn.textContent = '...';
 
         try {
             // Salvar imagem antes de limpar o preview
