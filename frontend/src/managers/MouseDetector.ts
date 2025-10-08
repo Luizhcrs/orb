@@ -67,6 +67,29 @@ export class MouseDetector {
   }
 
   /**
+   * ⚡ OTIMIZAÇÃO: Pausa a detecção temporariamente (sem resetar estado)
+   */
+  pauseDetection(): void {
+    if (this.state.mouseCheckInterval) {
+      console.log('⏸️ Pausando detecção de mouse (Orb visível)...');
+      clearInterval(this.state.mouseCheckInterval);
+      this.state.mouseCheckInterval = null;
+    }
+  }
+
+  /**
+   * ⚡ OTIMIZAÇÃO: Retoma a detecção após pausa
+   */
+  resumeDetection(): void {
+    if (!this.state.mouseCheckInterval && this.state.isDetecting) {
+      console.log('▶️ Retomando detecção de mouse...');
+      this.state.mouseCheckInterval = setInterval(() => {
+        this.checkMousePosition();
+      }, 100);
+    }
+  }
+
+  /**
    * Verifica a posição do mouse e gerencia visibilidade do orb
    */
   private checkMousePosition(): void {

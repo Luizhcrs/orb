@@ -25,6 +25,7 @@ pyautogui>=0.9.54
 # Configuração e utilitários
 pyyaml>=6.0
 python-dotenv>=1.0.0
+cryptography>=41.0.0
 
 # Logging estruturado
 structlog>=23.0.0

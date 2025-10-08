@@ -79,4 +79,5 @@ export interface WindowManagerState {
   isChatOpen: boolean;
   isOrbVisible: boolean;
   capturedImage: string | null;
+  isChatExpanded: boolean; // 🔥 FIX: Rastrear estado de expansão
 }

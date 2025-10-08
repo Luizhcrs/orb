@@ -9,9 +9,25 @@ import yaml
 from typing import Dict, List, Any, Optional
 from datetime import datetime
 from dotenv import load_dotenv
+from pathlib import Path
+import sys
 
 # Carrega variáveis de ambiente do arquivo .env
 load_dotenv()
+
+# Adicionar database ao path
+database_path = Path(__file__).parent.parent.parent / "database"
+if str(database_path) not in sys.path:
+    sys.path.insert(0, str(database_path))
+
+# Importações do database
+try:
+    from database.config_manager import ConfigManager
+    from database.chat_memory import ChatMemoryManager
+    DATABASE_AVAILABLE = True
+except ImportError:
+    DATABASE_AVAILABLE = False
+    print("AVISO:  Database modules não disponíveis, usando apenas .env")
 
 # Importações dos módulos do agente
 from .tools.tool_selector import ToolSelector
@@ -21,15 +37,30 @@ from .utils.logging_config import get_utf8_logger
 class AgenteORB:
     """Classe principal do Agente ORB - Pipeline: input → contexto → tools → salva → responde"""
     
-    def __init__(self, config_path: Optional[str] = None):
+    def __init__(self, config_path: Optional[str] = None, session_id: Optional[str] = None):
         """
         Inicializa o Agente ORB com Lazy Loading
         
         Args:
             config_path: Caminho para arquivo de configuração (opcional)
+            session_id: ID da sessão para histórico de chat (opcional)
         """
         self.logger = self._setup_logging()
         self.logger.info("Inicializando Agente ORB com Lazy Loading...")
+        
+        # Inicializar database managers (com fallback)
+        if DATABASE_AVAILABLE:
+            try:
+                self.config_manager = ConfigManager()
+                self.chat_memory = ChatMemoryManager()
+                self.logger.info("OK: Database managers inicializados")
+            except Exception as e:
+                self.logger.warning(f"AVISO: Erro ao inicializar database: {e}, usando .env")
+                self.config_manager = None
+                self.chat_memory = None
+        else:
+            self.config_manager = None
+            self.chat_memory = None
         
         # Carrega apenas configurações essenciais
         self.config = self._load_config(config_path)
@@ -44,7 +75,10 @@ class AgenteORB:
         # Flag para controlar inicialização
         self._initialized = False
         
-        # Histórico de conversação (simples, sem banco por enquanto)
+        # Sessão atual de chat
+        self.session_id = session_id
+        
+        # Histórico de conversação (em memória para compatibilidade)
         self.conversation_history = {}
         
         self.logger.info("Agente ORB configurado - componentes serão carregados sob demanda")
@@ -241,21 +275,19 @@ class AgenteORB:
     
     def _validate_session_id(self, session_id: str) -> str:
         """
-        Valida se session_id é um UUID válido, gera um novo se necessário
+        Valida e normaliza session_id
+        Aceita qualquer string não vazia, gera UUID apenas se vazio
         """
         import uuid
-        import re
         
-        # Padrão para UUID v4
-        uuid_pattern = r'^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$'
-        
-        if re.match(uuid_pattern, session_id, re.IGNORECASE):
-            return session_id
-        else:
-            # Gera um novo UUID válido
+        # Se session_id é vazio ou None, gera um novo UUID
+        if not session_id or session_id.strip() == "":
             new_session_id = str(uuid.uuid4())
-            self.logger.warning(f"Session ID inválido '{session_id}', gerando novo UUID: {new_session_id}")
+            self.logger.info(f"Session ID vazio, gerando novo UUID: {new_session_id}")
             return new_session_id
+        
+        # Aceita qualquer session_id não vazio (para testes e uso real)
+        return session_id.strip()
     
     async def process_message(self, message: str, session_id: str, image_data: Optional[str] = None) -> Dict[str, Any]:
         """
@@ -283,8 +315,8 @@ class AgenteORB:
             # Gera resposta usando LLM
             response = await self._generate_response(message, conversation_context, tool_result, image_data)
             
-            # Salva contexto da conversação
-            self._save_context(session_id, message, response, tool_result)
+            # Salva contexto da conversação (incluindo image_data se houver)
+            self._save_context(session_id, message, response, tool_result, image_data)
             
             self.logger.info("Pipeline concluída com sucesso")
             return response
@@ -299,9 +331,32 @@ class AgenteORB:
             }
     
     async def _verify_context_async(self, session_id: str, message: str) -> Dict[str, Any]:
-        """Verificação de contexto assíncrona"""
-        # Por enquanto, implementação simples sem banco de dados
-        conversation_history = self.conversation_history.get(session_id, [])
+        """Verificação de contexto assíncrona com suporte a banco de dados"""
+        conversation_history = []
+        
+        # Tentar carregar do banco primeiro
+        if self.chat_memory:
+            try:
+                db_messages = self.chat_memory.get_messages(session_id, limit=20)
+                # Converter ChatMessage para dict
+                conversation_history = [
+                    {
+                        'role': msg.role,
+                        'content': msg.content,
+                        'timestamp': msg.created_at,
+                        'additional_kwargs': msg.additional_kwargs
+                    }
+                    for msg in db_messages
+                ]
+                self.logger.info(f"Historico carregado do banco: {len(conversation_history)} mensagens")
+            except Exception as e:
+                self.logger.warning(f"Erro ao carregar historico do banco: {e}")
+        
+        # Fallback para memória RAM se banco não disponível
+        if not conversation_history:
+            conversation_history = self.conversation_history.get(session_id, [])
+            if conversation_history:
+                self.logger.info(f"Usando historico da memoria RAM: {len(conversation_history)} mensagens")
         
         context_analysis = {
             'session_id': session_id,
@@ -372,12 +427,47 @@ class AgenteORB:
                 'timestamp': datetime.now().isoformat()
             }
     
-    def _save_context(self, session_id: str, message: str, response: Dict[str, Any], tool_result: Dict[str, Any]) -> bool:
+    def _save_context(self, session_id: str, message: str, response: Dict[str, Any], tool_result: Dict[str, Any], image_data: Optional[str] = None) -> bool:
         """
         ETAPA 4: Salva contexto
-        Armazena conversa no histórico local
+        Armazena conversa no banco de dados E no histórico local (fallback)
         """
         try:
+            # Salvar no banco de dados (se disponível)
+            if self.chat_memory:
+                try:
+                    # Criar sessão se não existir
+                    session_created = self.chat_memory.create_session(session_id)
+                    self.logger.info(f"Sessao criada/verificada: {session_id}")
+                    
+                    # Verificar se é a primeira mensagem da sessão
+                    session_info = self.chat_memory.get_session_info(session_id)
+                    if session_info and session_info.get('message_count', 0) == 0:
+                        # Primeira mensagem - usar como título (limitar a 50 caracteres)
+                        title = message[:50] + '...' if len(message) > 50 else message
+                        self.chat_memory.update_session_title(session_id, title)
+                        self.logger.info(f"Titulo da sessao atualizado: {title}")
+                    
+                    # Salvar mensagem do usuário
+                    user_saved = self.chat_memory.add_user_message(session_id, message, image_data)
+                    self.logger.info(f"Mensagem do usuario salva: {user_saved}")
+                    
+                    # Salvar resposta do assistente
+                    assistant_saved = self.chat_memory.add_assistant_message(
+                        session_id, 
+                        response.get('content', '')
+                    )
+                    self.logger.info(f"Resposta do assistente salva: {assistant_saved}")
+                    
+                    self.logger.info(f"Mensagens salvas no banco para sessao {session_id}")
+                except Exception as e:
+                    self.logger.error(f"Erro ao salvar no banco: {e}", exc_info=True)
+                    import traceback
+                    traceback.print_exc()
+            else:
+                self.logger.warning("ChatMemory nao disponivel, usando apenas memoria")
+            
+            # Fallback: Salvar em memória também (compatibilidade)
             # Recupera histórico atual
             if session_id not in self.conversation_history:
                 self.conversation_history[session_id] = []
@@ -385,11 +475,14 @@ class AgenteORB:
             conversation_history = self.conversation_history[session_id]
             
             # Adiciona mensagem do usuário
-            conversation_history.append({
+            user_message = {
                 'role': 'user',
                 'content': message,
                 'timestamp': datetime.now().isoformat()
-            })
+            }
+            if image_data:
+                user_message['image_data'] = image_data
+            conversation_history.append(user_message)
             
             # Adiciona resposta do assistente
             conversation_history.append({
@@ -438,21 +531,16 @@ class AgenteORB:
     
     def _prepare_llm_context(self, message: str, context: Dict[str, Any], tool_result: Dict[str, Any], image_data: Optional[str] = None) -> Dict[str, Any]:
         """Prepara contexto para o LLM Provider"""
-        # Prepara histórico da conversa
-        conversation_context = ""
+        # Prepara histórico da conversa (enviar como array de dicts)
         conversation_history = context.get('conversation_history', [])
         
+        # Pegar apenas as últimas 10 mensagens para não exceder limites
         if conversation_history:
-            recent_history = conversation_history[-5:]  # Últimas 5 mensagens
-            for msg in recent_history:
-                if isinstance(msg, dict):
-                    role = "Usuário" if msg.get('role') == 'user' else "Assistente"
-                    content = msg.get('content', '')
-                    conversation_context += f"{role}: {content}\n"
+            conversation_history = conversation_history[-10:]
         
         return {
             'user_input': message,
-            'conversation_history': conversation_context,
+            'conversation_history': conversation_history,  # Enviar array diretamente
             'system_prompt': self.system_prompt,
             'image_data': image_data,
             'context_analysis': f"Tipo: {context.get('context_type', 'unknown')}, Palavras-chave: {context.get('has_keywords', [])}"

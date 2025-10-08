@@ -24,9 +24,10 @@
             background: transparent;
             color: rgba(255, 255, 255, 0.95);
             height: 100vh;
+            width: 100vw;
+            margin: 0;
+            padding: 0;
             display: flex;
-            align-items: center;
-            justify-content: center;
             overflow: hidden;
         }
     </style>
@@ -38,8 +39,8 @@
         
         <!-- Chat Controls -->
         <div class="chat-controls">
-            <button class="expand-btn" id="expandBtn">⛶</button>
-            <button class="close-btn" id="closeBtn">×</button>
+            <button class="expand-btn" id="expandBtn" title="Expandir chat">⛶</button>
+            <button class="close-btn" id="closeBtn" title="Fechar (ESC)">×</button>
         </div>
 
         <!-- Chat Content -->
@@ -75,8 +76,9 @@
                     id="chatInput" 
                     placeholder="Digite sua mensagem..."
                     rows="1"
+                    title="Digite sua mensagem (Enter para enviar, Shift+Enter para nova linha)"
                 ></textarea>
-                <button class="send-btn" id="sendBtn">→</button>
+                <button class="send-btn" id="sendBtn" title="Enviar mensagem (Enter)">→</button>
             </div>
         </div>
     </div>
@@ -86,5 +88,11 @@
         const { ipcRenderer } = require('electron');
     </script>
     <script src="components/ChatInterface.js"></script>
+    <script>
+        // Inicializar ChatInterface quando DOM estiver pronto
+        console.log('🚀 Inicializando ChatInterface...');
+        const chatInterface = new ChatInterface();
+        console.log('✅ ChatInterface instanciado');
+    </script>
 </body>
 </html>

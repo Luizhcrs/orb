@@ -22,8 +22,66 @@ export class BackendLLMManager {
   private conversationHistory: ConversationMessage[] = [];
   private sessionId: string;
 
-  constructor() {
-    this.sessionId = this.generateSessionId();
+  constructor(sessionId?: string) {
+    this.sessionId = sessionId || this.generateSessionId();
+    console.log('🆔 BackendLLMManager criado com session:', this.sessionId);
+  }
+
+  /**
+   * Define um novo session_id (para carregar conversas antigas)
+   */
+  setSessionId(sessionId: string): void {
+    this.sessionId = sessionId;
+    console.log('🆔 Session ID atualizado:', this.sessionId);
+  }
+
+  /**
+   * Obtém o session_id atual
+   */
+  getSessionId(): string {
+    return this.sessionId;
+  }
+
+  /**
+   * Carrega histórico de uma sessão antiga
+   */
+  async loadSessionHistory(sessionId: string): Promise<boolean> {
+    try {
+      // Log removido para evitar duplicação (já loga em main.ts)
+      
+      // Buscar mensagens da API
+      const response = await fetch(`http://localhost:8000/api/v1/history/sessions/${sessionId}/messages`);
+      
+      if (!response.ok) {
+        throw new Error(`Erro ao carregar histórico: ${response.status}`);
+      }
+      
+      const messages = await response.json();
+      console.log('📥 Mensagens carregadas:', messages.length);
+      
+      // Limpar histórico atual
+      this.conversationHistory = [];
+      
+      // Converter mensagens da API para o formato interno
+      messages.forEach((msg: any) => {
+        this.conversationHistory.push({
+          role: msg.role,
+          content: msg.content,
+          timestamp: msg.created_at || new Date().toISOString(),
+          metadata: msg.additional_kwargs || {}
+        });
+      });
+      
+      // Atualizar session_id
+      this.setSessionId(sessionId);
+      
+      // Log removido (já loga em main.ts)
+      return true;
+      
+    } catch (error) {
+      console.error('❌ Erro ao carregar histórico:', error);
+      return false;
+    }
   }
 
   async processMessage(message: string, imageData?: string): Promise<LLMResponse> {

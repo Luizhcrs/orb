@@ -43,15 +43,23 @@ class ConfigInterface {
         this.elements.saveBtn = document.querySelector('#save-btn');
         this.elements.resetBtn = document.querySelector('#reset-btn');
         
-        // Outros elementos
-        this.elements.temperatureSlider = document.querySelector('#temperature-slider');
-        this.elements.temperatureValue = document.querySelector('#temperature-value');
-        this.elements.maxTokensSlider = document.querySelector('#max-tokens-slider');
-        this.elements.maxTokensValue = document.querySelector('#max-tokens-value');
-        this.elements.orbSizeSlider = document.querySelector('#orb-size-slider');
-        this.elements.orbSizeValue = document.querySelector('#orb-size-value');
-        this.elements.chatOpacitySlider = document.querySelector('#chat-opacity-slider');
-        this.elements.chatOpacityValue = document.querySelector('#chat-opacity-value');
+        // Elementos Geral
+        this.elements.themeSelect = document.querySelector('#theme-select');
+        this.elements.languageSelect = document.querySelector('#language-select');
+        this.elements.startupCheckbox = document.querySelector('#startup-checkbox');
+        this.elements.keepHistoryCheckbox = document.querySelector('#keep-history-checkbox');
+        
+        // Elementos Agente
+        this.elements.providerSelect = document.querySelector('#provider-select');
+        this.elements.apiKeyInput = document.querySelector('#api-key-input');
+        this.elements.modelSelect = document.querySelector('#model-select');
+        
+        // Elementos Histórico
+        this.elements.historyList = document.querySelector('#history-list');
+        this.elements.emptyState = document.querySelector('.empty-state');
+        
+        // Serviço de histórico
+        this.historyApiUrl = 'http://localhost:8000/api/v1/history';
     }
 
     bindEvents() {
@@ -124,18 +132,11 @@ class ConfigInterface {
             });
         }
 
-        // Sliders
-        if (this.elements.temperatureSlider) {
-            this.elements.temperatureSlider.addEventListener('input', () => this.updateSliderValues());
-        }
-        if (this.elements.maxTokensSlider) {
-            this.elements.maxTokensSlider.addEventListener('input', () => this.updateSliderValues());
-        }
-        if (this.elements.orbSizeSlider) {
-            this.elements.orbSizeSlider.addEventListener('input', () => this.updateSliderValues());
-        }
-        if (this.elements.chatOpacitySlider) {
-            this.elements.chatOpacitySlider.addEventListener('input', () => this.updateSliderValues());
+        // Provedor LLM - carregar modelos quando mudar
+        if (this.elements.providerSelect) {
+            this.elements.providerSelect.addEventListener('change', (e) => {
+                this.loadModelsForProvider(e.target.value);
+            });
         }
 
         // Atalhos de teclado
@@ -207,21 +208,41 @@ class ConfigInterface {
 
         this.currentSection = sectionName;
         console.log('🔧 Seção atual:', this.currentSection);
+        
+        // Carregar histórico ao entrar na aba de histórico
+        if (sectionName === 'history') {
+            this.loadHistorySessions();
+        }
     }
 
-    updateSliderValues() {
-        if (this.elements.temperatureValue && this.elements.temperatureSlider) {
-            this.elements.temperatureValue.textContent = this.elements.temperatureSlider.value;
+    loadModelsForProvider(provider) {
+        console.log('🔧 Carregando modelos para provider:', provider);
+        
+        if (!this.elements.modelSelect) return;
+        
+        this.elements.modelSelect.innerHTML = '';
+        
+        let models = [];
+        if (provider === 'openai') {
+            models = [
+                { value: 'gpt-4o-mini', label: 'GPT-4o Mini' },
+                { value: 'gpt-4o', label: 'GPT-4o' },
+                { value: 'gpt-3.5-turbo', label: 'GPT-3.5 Turbo' }
+            ];
+        } else if (provider === 'anthropic') {
+            models = [
+                { value: 'claude-3-haiku-20240307', label: 'Claude 3 Haiku' },
+                { value: 'claude-3-sonnet-20240229', label: 'Claude 3 Sonnet' },
+                { value: 'claude-3-opus-20240229', label: 'Claude 3 Opus' }
+            ];
         }
-        if (this.elements.maxTokensValue && this.elements.maxTokensSlider) {
-            this.elements.maxTokensValue.textContent = this.elements.maxTokensSlider.value;
-        }
-        if (this.elements.orbSizeValue && this.elements.orbSizeSlider) {
-            this.elements.orbSizeValue.textContent = `${this.elements.orbSizeSlider.value}px`;
-        }
-        if (this.elements.chatOpacityValue && this.elements.chatOpacitySlider) {
-            this.elements.chatOpacityValue.textContent = `${this.elements.chatOpacitySlider.value}%`;
-        }
+        
+        models.forEach(model => {
+            const option = document.createElement('option');
+            option.value = model.value;
+            option.textContent = model.label;
+            this.elements.modelSelect.appendChild(option);
+        });
     }
 
     async loadConfig() {
@@ -229,36 +250,31 @@ class ConfigInterface {
         // Configurações padrão
         const config = {
             general: {
-                theme: 'system',
+                theme: 'dark',
                 language: 'pt-BR',
                 startup: false,
-                notifications: true
+                keepHistory: true
             },
             agent: {
                 provider: 'openai',
-                model: 'gpt-4o-mini',
-                temperature: 0.7,
-                maxTokens: 1000
-            },
-            interface: {
-                orbSize: 50,
-                chatOpacity: 90,
-                alwaysOnTop: false,
-                autoHideOrb: true
-            },
-            history: {
-                saveHistory: true,
-                historyDays: '30'
+                apiKey: '',
+                model: 'gpt-4o-mini'
             }
         };
 
         // Aplicar configurações aos elementos da UI
-        if (this.elements.temperatureSlider) this.elements.temperatureSlider.value = config.agent.temperature;
-        if (this.elements.maxTokensSlider) this.elements.maxTokensSlider.value = config.agent.maxTokens;
-        if (this.elements.orbSizeSlider) this.elements.orbSizeSlider.value = config.interface.orbSize;
-        if (this.elements.chatOpacitySlider) this.elements.chatOpacitySlider.value = config.interface.chatOpacity;
+        if (this.elements.themeSelect) this.elements.themeSelect.value = config.general.theme;
+        if (this.elements.languageSelect) this.elements.languageSelect.value = config.general.language;
+        if (this.elements.startupCheckbox) this.elements.startupCheckbox.checked = config.general.startup;
+        if (this.elements.keepHistoryCheckbox) this.elements.keepHistoryCheckbox.checked = config.general.keepHistory;
+        
+        if (this.elements.providerSelect) this.elements.providerSelect.value = config.agent.provider;
+        if (this.elements.apiKeyInput) this.elements.apiKeyInput.value = config.agent.apiKey;
+        
+        // Carregar modelos para o provedor atual
+        this.loadModelsForProvider(config.agent.provider);
+        if (this.elements.modelSelect) this.elements.modelSelect.value = config.agent.model;
 
-        this.updateSliderValues();
         console.log('🔧 Configurações carregadas');
     }
 
@@ -292,19 +308,175 @@ class ConfigInterface {
             alert('Configurações redefinidas para o padrão.');
         }
     }
+
+    async loadHistorySessions() {
+        console.log('📚 Carregando histórico de sessões...');
+        
+        if (!this.elements.historyList) {
+            console.error('❌ historyList element não encontrado');
+            return;
+        }
+        
+        try {
+            // Buscar sessões da API
+            const response = await fetch(`${this.historyApiUrl}/sessions?limit=50`);
+            
+            if (!response.ok) {
+                throw new Error(`Erro HTTP: ${response.status}`);
+            }
+            
+            const sessions = await response.json();
+            console.log('📊 Sessões carregadas:', sessions.length);
+            
+            // Limpar lista atual
+            this.elements.historyList.innerHTML = '';
+            
+            if (sessions.length === 0) {
+                // Mostrar empty state
+                if (this.elements.emptyState) {
+                    this.elements.emptyState.style.display = 'block';
+                }
+            } else {
+                // Esconder empty state
+                if (this.elements.emptyState) {
+                    this.elements.emptyState.style.display = 'none';
+                }
+                
+                // Renderizar sessões
+                sessions.forEach(session => {
+                    this.renderHistoryItem(session);
+                });
+            }
+        } catch (error) {
+            console.error('❌ Erro ao carregar histórico:', error);
+            
+            // Mostrar erro na interface
+            this.elements.historyList.innerHTML = `
+                <div class="error-message">
+                    <p>❌ Erro ao carregar histórico</p>
+                    <p class="error-hint">${error.message}</p>
+                    <button onclick="location.reload()" class="action-btn">Tentar Novamente</button>
+                </div>
+            `;
+        }
+    }
+
+    renderHistoryItem(session) {
+        const item = document.createElement('div');
+        item.className = 'history-item';
+        item.dataset.sessionId = session.session_id;
+        
+        // Formatar data
+        const date = this.formatDate(session.updated_at);
+        
+        // Criar preview (usaremos as primeiras mensagens depois)
+        const preview = session.title || 'Nova Conversa';
+        
+        item.innerHTML = `
+            <div class="history-header">
+                <span class="history-date">${date}</span>
+                <button class="history-delete-btn" onclick="event.stopPropagation(); configInterface.deleteHistorySession('${session.session_id}')">🗑️</button>
+            </div>
+            <div class="history-title">${preview}</div>
+            <div class="history-meta">${session.message_count} mensagen${session.message_count !== 1 ? 's' : ''}</div>
+        `;
+        
+        // Click para abrir sessão (futuro: abrir no chat)
+        item.addEventListener('click', () => {
+            this.openHistorySession(session.session_id);
+        });
+        
+        this.elements.historyList.appendChild(item);
+    }
+
+    formatDate(dateString) {
+        const date = new Date(dateString);
+        const now = new Date();
+        const diff = now.getTime() - date.getTime();
+        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+        
+        const timeStr = date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+        
+        if (days === 0) {
+            return `Hoje, ${timeStr}`;
+        } else if (days === 1) {
+            return `Ontem, ${timeStr}`;
+        } else if (days < 7) {
+            const weekday = date.toLocaleDateString('pt-BR', { weekday: 'long' });
+            return `${weekday}, ${timeStr}`;
+        } else {
+            return date.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' }) + `, ${timeStr}`;
+        }
+    }
+
+    async deleteHistorySession(sessionId) {
+        if (!confirm('Tem certeza que deseja deletar esta conversa?')) {
+            return;
+        }
+        
+        try {
+            const response = await fetch(`${this.historyApiUrl}/sessions/${sessionId}`, {
+                method: 'DELETE'
+            });
+            
+            if (!response.ok) {
+                throw new Error('Erro ao deletar sessão');
+            }
+            
+            console.log('✅ Sessão deletada:', sessionId);
+            
+            // Recarregar lista
+            this.loadHistorySessions();
+        } catch (error) {
+            console.error('❌ Erro ao deletar sessão:', error);
+            alert('Erro ao deletar conversa.');
+        }
+    }
+
+    async openHistorySession(sessionId) {
+        console.log('📖 Abrindo sessão:', sessionId);
+        
+        try {
+            // Carregar histórico via IPC
+            const result = await require('electron').ipcRenderer.invoke('load-session-history', sessionId);
+            
+            if (!result.success) {
+                throw new Error(result.error || 'Erro ao carregar sessão');
+            }
+            
+            console.log('✅ Sessão carregada:', result.messages.length, 'mensagens');
+            
+            // Fechar janela de configuração
+            this.closeWindow();
+            
+            // Aguardar um pouco e então abrir o chat com histórico
+            setTimeout(() => {
+                // O chat será aberto automaticamente pelo main process
+                // que enviará 'load-session-messages' para o ChatInterface
+                console.log('💬 Chat será aberto com histórico da sessão');
+            }, 100);
+            
+        } catch (error) {
+            console.error('❌ Erro ao abrir sessão:', error);
+            alert('Erro ao abrir conversa: ' + error.message);
+        }
+    }
 }
+
+// Variável global para acesso aos métodos
+let configInterface;
 
 // Inicialização mais robusta
 function initializeConfig() {
     console.log('🔧 Inicializando ConfigInterface...');
     try {
-        new ConfigInterface();
+        configInterface = new ConfigInterface();
     } catch (error) {
         console.error('❌ Erro ao inicializar ConfigInterface:', error);
         // Tentar novamente após um delay
         setTimeout(() => {
             console.log('🔧 Tentando novamente...');
-            new ConfigInterface();
+            configInterface = new ConfigInterface();
         }, 500);
     }
 }

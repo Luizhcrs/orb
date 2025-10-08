@@ -45,14 +45,24 @@ class OpenAIProvider(BaseLLMProvider):
             ]
             
             # Adiciona histórico da conversa
-            conversation_history = context.get('conversation_history', '')
+            conversation_history = context.get('conversation_history', [])
             if conversation_history:
-                # Parse do histórico de conversa
-                for line in conversation_history.strip().split('\n'):
-                    if line.startswith('Usuário: '):
-                        messages.append({"role": "user", "content": line[9:]})
-                    elif line.startswith('Assistente: '):
-                        messages.append({"role": "assistant", "content": line[12:]})
+                # Se conversation_history é uma lista de dicts (formato novo)
+                if isinstance(conversation_history, list):
+                    for msg in conversation_history:
+                        if isinstance(msg, dict):
+                            role = msg.get('role', 'user')
+                            content = msg.get('content', '')
+                            # Mapear role se necessário
+                            if role in ['user', 'assistant', 'system']:
+                                messages.append({"role": role, "content": content})
+                # Se conversation_history é string (formato antigo - fallback)
+                elif isinstance(conversation_history, str):
+                    for line in conversation_history.strip().split('\n'):
+                        if line.startswith('Usuário: '):
+                            messages.append({"role": "user", "content": line[9:]})
+                        elif line.startswith('Assistente: '):
+                            messages.append({"role": "assistant", "content": line[12:]})
             
             # Prepara mensagem atual do usuário
             user_input = context.get('user_input', '')
