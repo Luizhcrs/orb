@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Orb Chat</title>
+    
     
     <!-- Component CSS Files -->
     <link rel="stylesheet" href="components/chat-styles.css">
@@ -19,31 +19,132 @@
             box-sizing: border-box;
         }
 
+        html, body {
+            overflow: hidden;
+        }
+
         body {
+            -webkit-app-region: drag; /* Permite arrastar a janela */
             font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
-            background: transparent;
+            background: transparent; /* ✅ Totalmente transparente para liquid glass */
             color: rgba(255, 255, 255, 0.95);
             height: 100vh;
             width: 100vw;
             margin: 0;
-            padding: 20px; /* Espaço para sombra */
+            padding: 0;
             display: flex;
             overflow: hidden;
             align-items: center;
             justify-content: center;
         }
+
+        /* Desabilitar drag em elementos interativos */
+        button, input, textarea, .chat-messages, .chat-input-container {
+            -webkit-app-region: no-drag;
+        }
+
+        /* ==================== CUSTOM TITLE BAR ==================== */
+        .custom-titlebar {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 32px;
+            background: rgba(255, 255, 255, 0.03); /* Liquid glass sutil */
+            backdrop-filter: blur(20px) saturate(150%); /* Efeito glass */
+            -webkit-backdrop-filter: blur(20px) saturate(150%);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05); /* Linha suave */
+            border-radius: 16px 16px 0 0; /* Arredondar só em cima */
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 10000;
+            padding: 0 12px;
+            -webkit-app-region: no-drag;
+        }
+
+        .titlebar-drag-region {
+            flex: 1;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            -webkit-app-region: drag; /* Permite arrastar */
+        }
+
+        .titlebar-title {
+            font-size: 11px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.5);
+            user-select: none;
+            letter-spacing: 0.3px;
+            text-transform: uppercase;
+        }
+
+        .titlebar-controls {
+            display: flex;
+            gap: 4px;
+            -webkit-app-region: no-drag;
+        }
+
+        .titlebar-btn {
+            width: 28px;
+            height: 28px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            color: rgba(255, 255, 255, 0.6);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+            -webkit-app-region: no-drag;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+
+        .titlebar-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.2);
+            color: rgba(255, 255, 255, 0.95);
+            transform: scale(1.05);
+        }
+
+        .titlebar-btn.close-btn:hover {
+            background: rgba(239, 68, 68, 0.2);
+            border-color: rgba(239, 68, 68, 0.3);
+            color: #ef4444;
+        }
+
+        .titlebar-btn svg {
+            pointer-events: none;
+            width: 10px;
+            height: 10px;
+        }
     </style>
 </head>
 <body>
-    <div class="chat-container">
-        <!-- Drag Area -->
-        <div class="drag-area"></div>
-        
-        <!-- Chat Controls -->
-        <div class="chat-controls">
-            <button class="expand-btn" id="expandBtn" title="Expandir chat">⛶</button>
-            <button class="close-btn" id="closeBtn" title="Fechar (ESC)">×</button>
+    <!-- Custom Title Bar -->
+    <div class="custom-titlebar">
+        <div class="titlebar-drag-region">
+            <span class="titlebar-title">Orb Chat</span>
         </div>
+        <div class="titlebar-controls">
+            <button class="titlebar-btn expand-btn" id="expandBtn" title="Expandir chat">
+                <svg width="10" height="10" viewBox="0 0 10 10">
+                    <rect x="0" y="0" width="9" height="9" fill="none" stroke="currentColor" stroke-width="1"/>
+                </svg>
+            </button>
+            <button class="titlebar-btn close-btn" id="closeBtn" title="Fechar (ESC)">
+                <svg width="10" height="10" viewBox="0 0 10 10">
+                    <line x1="0" y1="0" x2="10" y2="10" stroke="currentColor" stroke-width="1"/>
+                    <line x1="10" y1="0" x2="0" y2="10" stroke="currentColor" stroke-width="1"/>
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <div class="chat-container">
 
         <!-- Chat Content -->
         <div class="chat-content">

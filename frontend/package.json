@@ -34,7 +34,7 @@
     "@types/ws": "^8.18.1",
     "concurrently": "^8.2.2",
     "copyfiles": "^2.4.1",
-    "electron": "^28.1.0",
+    "electron": "28.1.0",
     "electron-builder": "^24.9.1",
     "nodemon": "^3.0.2",
     "rimraf": "^5.0.5",
@@ -64,15 +64,20 @@
     ],
     "extraResources": [
       {
-        "from": "../backend",
-        "to": "backend",
-        "filter": [
-          "**/*",
-          "!venv/**/*",
-          "!__pycache__/**/*",
-          "!*.pyc",
-          "!.env"
-        ]
+        "from": "../backend/dist/orb-backend.exe",
+        "to": "backend/orb-backend.exe"
+      },
+      {
+        "from": "../backend/install_service_native.bat",
+        "to": "backend/install_service_native.bat"
+      },
+      {
+        "from": "../backend/uninstall_service_native.bat",
+        "to": "backend/uninstall_service_native.bat"
+      },
+      {
+        "from": "../backend/update_service.bat",
+        "to": "backend/update_service.bat"
       }
     ],
     "win": {
@@ -86,7 +91,9 @@
           "arch": ["x64"]
         }
       ],
-      "icon": "assets/icon.png"
+      "icon": "assets/icon.png",
+      "sign": null,
+      "certificateFile": null
     },
     "nsis": {
       "oneClick": false,
@@ -94,7 +101,10 @@
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
       "shortcutName": "Orb Agent",
-      "runAfterFinish": true
+      "runAfterFinish": true,
+      "include": "installer.nsh",
+      "perMachine": true,
+      "allowElevation": true
     },
     "portable": {
       "artifactName": "OrbAgent-Portable-${version}.exe"

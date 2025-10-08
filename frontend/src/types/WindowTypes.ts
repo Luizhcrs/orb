@@ -40,7 +40,7 @@ export interface OrbWindowConfig extends WindowConfig {
 
 export interface ChatWindowConfig extends WindowConfig {
   width: 380;
-  height: 480;
+  height: 512; // 480 + 32px da custom title bar
   frame: false;
   transparent: true;
   alwaysOnTop: true;
