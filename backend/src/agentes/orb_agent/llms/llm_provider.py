@@ -26,8 +26,13 @@ class OpenAIProvider(BaseLLMProvider):
         # Importa OpenAI
         try:
             import openai
+            # Usar api_key do config (database) ou fallback para .env
+            api_key = config.get('api_key') or os.getenv('OPENAI_API_KEY')
+            if not api_key:
+                raise ValueError("API key do OpenAI nao encontrada no config ou .env")
+            
             self.client = openai.AsyncOpenAI(
-                api_key=os.getenv('OPENAI_API_KEY')
+                api_key=api_key
             )
             self.logger.info("OpenAI client inicializado")
         except ImportError:
@@ -116,8 +121,13 @@ class AnthropicProvider(BaseLLMProvider):
         # Importa Anthropic
         try:
             import anthropic
+            # Usar api_key do config (database) ou fallback para .env
+            api_key = config.get('api_key') or os.getenv('ANTHROPIC_API_KEY')
+            if not api_key:
+                raise ValueError("API key do Anthropic nao encontrada no config ou .env")
+            
             self.client = anthropic.AsyncAnthropic(
-                api_key=os.getenv('ANTHROPIC_API_KEY')
+                api_key=api_key
             )
             self.logger.info("Anthropic client inicializado")
         except ImportError:
@@ -187,17 +197,18 @@ class LLMProvider:
         """Inicializa o provedor LLM baseado na configuração"""
         provider_type = self.config.get('llm_provider', 'openai')
         
+        # Verificar se api_key está presente no config (prioritário) ou no .env (fallback)
+        api_key = self.config.get('api_key') or os.getenv('OPENAI_API_KEY' if provider_type == 'openai' else 'ANTHROPIC_API_KEY')
+        
         if provider_type == 'openai':
-            openai_key = os.getenv('OPENAI_API_KEY')
-            if not openai_key:
-                self.logger.warning("OPENAI_API_KEY não encontrada. Usando modo demonstração.")
+            if not api_key:
+                self.logger.warning("API key do OpenAI nao encontrada. Usando modo demonstracao.")
                 return DemoProvider(self.config)
             return OpenAIProvider(self.config)
         
         elif provider_type == 'anthropic':
-            anthropic_key = os.getenv('ANTHROPIC_API_KEY')
-            if not anthropic_key:
-                self.logger.warning("ANTHROPIC_API_KEY não encontrada. Usando modo demonstração.")
+            if not api_key:
+                self.logger.warning("API key do Anthropic nao encontrada. Usando modo demonstracao.")
                 return DemoProvider(self.config)
             return AnthropicProvider(self.config)
         

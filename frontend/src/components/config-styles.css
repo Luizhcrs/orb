@@ -1,169 +1,144 @@
-/* ===== CONFIGURAÇÕES - ESTILO ORB ===== */
+/* Configurações - UI Moderna */
 
-body {
+* {
     margin: 0;
     padding: 0;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    color: #E0E0E0;
-    background: transparent;
-    overflow: hidden;
-    user-select: none;
-    -webkit-user-select: none;
+    box-sizing: border-box;
 }
 
-/* ===== CONTAINER PRINCIPAL ===== */
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    background: transparent;
+    overflow: hidden;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* Container Principal */
 .config-container {
-    width: 100vw;
-    height: 100vh;
-    background: linear-gradient(135deg, 
-        rgba(0, 0, 0, 0.75) 0%, 
-        rgba(20, 20, 30, 0.85) 50%, 
-        rgba(0, 0, 0, 0.75) 100%);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    position: relative;
+    width: 700px;
+    height: 550px;
+    background: rgba(20, 20, 22, 0.85);
+    backdrop-filter: blur(40px) saturate(180%);
+    -webkit-backdrop-filter: blur(40px) saturate(180%);
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), 
+                0 0 1px rgba(255, 255, 255, 0.1) inset;
     display: flex;
     flex-direction: column;
     overflow: hidden;
 }
 
-.config-container::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(45deg, 
-        rgba(255, 255, 255, 0.05) 0%, 
-        rgba(255, 255, 255, 0.03) 50%, 
-        rgba(255, 255, 255, 0.05) 100%);
-    pointer-events: none;
-}
-
-/* ===== ÁREA DE ARRASTAR ===== */
+/* Área de Arrastar */
 .drag-area {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 50px;
+    width: 100%;
+    height: 40px;
     -webkit-app-region: drag;
-    cursor: move;
-    z-index: 100;
+    background: rgba(255, 255, 255, 0.02);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    flex-shrink: 0;
 }
 
-/* ===== CONTROLES DA JANELA ===== */
+/* Controles da Janela */
 .config-controls {
     position: absolute;
-    top: 12px;
+    top: 8px;
     right: 12px;
-    z-index: 200;
-    display: flex;
-    gap: 8px;
-    pointer-events: auto;
+    z-index: 100;
     -webkit-app-region: no-drag;
 }
 
 .close-btn {
-    width: 28px;
-    height: 28px;
-    border: none;
+    width: 26px;
+    height: 26px;
     border-radius: 50%;
-    background: rgba(255, 255, 255, 0.1);
-    color: #E0E0E0;
-    font-size: 16px;
+    border: none;
+    background: rgba(255, 255, 255, 0.08);
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 20px;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
     transition: all 0.2s ease;
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    pointer-events: auto;
-    -webkit-app-region: no-drag;
-    z-index: 1000;
-    position: relative;
+    line-height: 1;
 }
 
 .close-btn:hover {
-    background: rgba(255, 0, 0, 0.2);
-    color: #FF6B6B;
-    transform: scale(1.05);
-    box-shadow: 0 2px 8px rgba(255, 0, 0, 0.3);
+    background: rgba(255, 59, 48, 0.8);
+    color: white;
+    transform: scale(1.1);
 }
 
-/* ===== LAYOUT PRINCIPAL ===== */
+/* Layout Principal */
 .config-layout {
-    flex: 1;
     display: flex;
-    margin-top: 50px;
-    height: calc(100vh - 50px);
-    pointer-events: auto;
-    -webkit-app-region: no-drag;
+    flex: 1;
+    overflow: hidden;
 }
 
-/* ===== NAVEGAÇÃO LATERAL ===== */
+/* Navegação Lateral */
 .config-nav {
     width: 200px;
     background: rgba(0, 0, 0, 0.3);
-    border-right: 1px solid rgba(255, 255, 255, 0.1);
-    padding: 20px 0;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    pointer-events: auto;
-    -webkit-app-region: no-drag;
+    border-right: 1px solid rgba(255, 255, 255, 0.05);
+    padding: 20px 12px;
+    flex-shrink: 0;
 }
 
 .nav-item {
-    padding: 12px 20px;
     display: flex;
     align-items: center;
     gap: 12px;
+    padding: 12px 16px;
+    border-radius: 10px;
     cursor: pointer;
     transition: all 0.2s ease;
-    color: #B0B0B0;
-    border-left: 3px solid transparent;
-    pointer-events: auto;
-    -webkit-app-region: no-drag;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 14px;
+    margin-bottom: 8px;
+    user-select: none;
 }
 
 .nav-item:hover {
     background: rgba(255, 255, 255, 0.05);
-    color: #E0E0E0;
+    color: rgba(255, 255, 255, 0.9);
 }
 
 .nav-item.active {
-    background: rgba(255, 255, 255, 0.1);
-    color: #FFFFFF;
-    border-left-color: rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.08);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.12);
 }
 
 .nav-icon {
-    font-size: 16px;
-    width: 20px;
-    text-align: center;
+    font-size: 18px;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.nav-item.active .nav-icon {
+    background: rgba(255, 255, 255, 0.1);
 }
 
 .nav-text {
-    font-size: 14px;
+    flex: 1;
     font-weight: 500;
 }
 
-/* ===== CONTEÚDO PRINCIPAL ===== */
+/* Conteúdo Principal */
 .config-main {
     flex: 1;
-    padding: 30px 40px;
+    padding: 30px;
     overflow-y: auto;
-    scrollbar-width: thin;
-    scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
-    pointer-events: auto;
-    -webkit-app-region: no-drag;
 }
 
+/* Scrollbar Customizada */
 .config-main::-webkit-scrollbar {
     width: 8px;
 }
@@ -173,32 +148,49 @@ body {
 }
 
 .config-main::-webkit-scrollbar-thumb {
-    background-color: rgba(255, 255, 255, 0.2);
-    border-radius: 10px;
-    border: 2px solid transparent;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
 }
 
-/* ===== SEÇÕES ===== */
+.config-main::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+/* Seções */
 .config-section {
     display: none;
 }
 
 .config-section.active {
     display: block;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .config-section h1 {
-    font-size: 2em;
-    margin: 0 0 30px 0;
-    color: #FFFFFF;
+    color: white;
+    font-size: 24px;
     font-weight: 600;
+    margin-bottom: 24px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-/* ===== LINHAS DE CONFIGURAÇÃO ===== */
+/* Setting Row */
 .setting-row {
     display: flex;
-    justify-content: space-between;
     align-items: center;
+    justify-content: space-between;
     padding: 16px 0;
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
@@ -208,59 +200,87 @@ body {
 }
 
 .setting-label {
+    color: rgba(255, 255, 255, 0.9);
     font-size: 14px;
-    color: #C0C0C0;
     font-weight: 500;
-    min-width: 200px;
-}
-
-.value-display {
-    font-weight: bold;
-    color: #FFFFFF;
-    margin-left: 8px;
 }
 
 .setting-control {
-    display: flex;
-    align-items: center;
-    gap: 8px;
+    position: relative;
     min-width: 200px;
-    justify-content: flex-end;
 }
 
-/* ===== SELECTS ===== */
-.setting-control select {
-    background: rgba(0, 0, 0, 0.4);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+/* Select Customizado */
+select {
+    width: 100%;
+    padding: 10px 36px 10px 14px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 8px;
-    color: #E0E0E0;
-    padding: 8px 12px;
+    color: white;
     font-size: 14px;
-    outline: none;
-    transition: border-color 0.2s ease;
-    min-width: 150px;
-    -webkit-appearance: none;
-    -moz-appearance: none;
+    cursor: pointer;
     appearance: none;
+    transition: all 0.2s ease;
 }
 
-.setting-control select:focus {
-    border-color: rgba(255, 255, 255, 0.4);
-    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.2);
+select:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.18);
+}
+
+select:focus {
+    outline: none;
+    border-color: rgba(255, 255, 255, 0.25);
+    background: rgba(255, 255, 255, 0.08);
 }
 
 .dropdown-arrow {
-    color: #B0B0B0;
-    font-size: 12px;
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: rgba(255, 255, 255, 0.5);
     pointer-events: none;
+    font-size: 10px;
 }
 
-/* ===== SWITCHES ===== */
+/* Input */
+input[type="password"],
+input[type="text"] {
+    width: 100%;
+    padding: 10px 14px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    color: white;
+    font-size: 14px;
+    transition: all 0.2s ease;
+}
+
+input[type="password"]:hover,
+input[type="text"]:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.18);
+}
+
+input[type="password"]:focus,
+input[type="text"]:focus {
+    outline: none;
+    border-color: rgba(255, 255, 255, 0.25);
+    background: rgba(255, 255, 255, 0.08);
+}
+
+input::placeholder {
+    color: rgba(255, 255, 255, 0.3);
+}
+
+/* Toggle Switch */
 .switch {
     position: relative;
     display: inline-block;
-    width: 44px;
-    height: 24px;
+    width: 48px;
+    height: 26px;
 }
 
 .switch input {
@@ -276,150 +296,34 @@ body {
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(255, 255, 255, 0.2);
-    transition: 0.3s;
-    border-radius: 24px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 26px;
+    transition: all 0.3s ease;
 }
 
 .slider:before {
     position: absolute;
     content: "";
-    height: 18px;
-    width: 18px;
+    height: 20px;
+    width: 20px;
     left: 3px;
     bottom: 3px;
     background: white;
-    transition: 0.3s;
     border-radius: 50%;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 input:checked + .slider {
-    background: rgba(255, 255, 255, 0.3);
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0.2) 100%);
+    box-shadow: 0 0 12px rgba(255, 255, 255, 0.15);
 }
 
 input:checked + .slider:before {
-    transform: translateX(20px);
+    transform: translateX(22px);
 }
 
-/* ===== SLIDERS ===== */
-.setting-control input[type="range"] {
-    -webkit-appearance: none;
-    width: 100%;
-    height: 6px;
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: 3px;
-    outline: none;
-    transition: opacity 0.2s;
-}
-
-.setting-control input[type="range"]::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    appearance: none;
-    width: 18px;
-    height: 18px;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.8);
-    cursor: pointer;
-    box-shadow: 0 0 4px rgba(255, 255, 255, 0.3);
-    transition: background 0.2s ease, box-shadow 0.2s ease;
-}
-
-.setting-control input[type="range"]::-webkit-slider-thumb:hover {
-    background: rgba(255, 255, 255, 1);
-    box-shadow: 0 0 6px rgba(255, 255, 255, 0.5);
-}
-
-.setting-control input[type="password"],
-.setting-control input[type="text"] {
-    width: 100%;
-    padding: 8px 12px;
-    background: rgba(0, 0, 0, 0.3);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius: 6px;
-    color: #E0E0E0;
-    font-size: 14px;
-    outline: none;
-    transition: all 0.2s ease;
-}
-
-.setting-control input[type="password"]:focus,
-.setting-control input[type="text"]:focus {
-    border-color: rgba(255, 255, 255, 0.4);
-    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.2);
-}
-
-.setting-control input[type="password"]::placeholder,
-.setting-control input[type="text"]::placeholder {
-    color: rgba(255, 255, 255, 0.4);
-}
-
-/* ===== BOTÕES DE AÇÃO ===== */
-.action-btn {
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius: 8px;
-    color: #C0C0C0;
-    padding: 8px 16px;
-    font-size: 13px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    margin-left: 8px;
-}
-
-.action-btn:hover {
-    background: rgba(255, 255, 255, 0.15);
-    color: #FFFFFF;
-    border-color: rgba(255, 255, 255, 0.3);
-}
-
-/* ===== FOOTER ===== */
-.config-footer {
-    padding: 20px 40px;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
-    display: flex;
-    justify-content: flex-end;
-    gap: 12px;
-    background: rgba(0, 0, 0, 0.2);
-}
-
-.primary-btn, .secondary-btn {
-    padding: 10px 24px;
-    border: none;
-    border-radius: 8px;
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-.primary-btn {
-    background: linear-gradient(90deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0.15) 100%);
-    color: white;
-    box-shadow: 0 4px 15px rgba(255, 255, 255, 0.2);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-}
-
-.primary-btn:hover {
-    background: linear-gradient(90deg, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0.2) 100%);
-    box-shadow: 0 6px 20px rgba(255, 255, 255, 0.3);
-    transform: translateY(-2px);
-}
-
-.secondary-btn {
-    background: rgba(255, 255, 255, 0.1);
-    color: #C0C0C0;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-.secondary-btn:hover {
-    background: rgba(255, 255, 255, 0.2);
-    color: #FFFFFF;
-    transform: translateY(-2px);
-}
-
-/* ===== HISTÓRICO ===== */
+/* Empty State */
 .empty-state {
     text-align: center;
     padding: 60px 20px;
@@ -427,72 +331,76 @@ input:checked + .slider:before {
 }
 
 .empty-icon {
-    font-size: 64px;
-    margin-bottom: 20px;
-    opacity: 0.5;
+    font-size: 48px;
+    margin-bottom: 16px;
+    opacity: 0.3;
 }
 
 .empty-state p {
     margin: 8px 0;
-    font-size: 16px;
+    font-size: 14px;
 }
 
 .empty-hint {
-    font-size: 14px;
+    font-size: 12px;
     opacity: 0.7;
 }
 
+/* History List */
 .history-list {
     display: flex;
     flex-direction: column;
     gap: 12px;
-    margin-top: 20px;
 }
 
 .history-item {
-    background: rgba(0, 0, 0, 0.3);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 8px;
-    padding: 15px;
-    transition: all 0.2s ease;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    padding: 16px;
     cursor: pointer;
+    transition: all 0.2s ease;
 }
 
 .history-item:hover {
-    background: rgba(0, 0, 0, 0.4);
-    border-color: rgba(255, 255, 255, 0.2);
-    transform: translateY(-2px);
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(255, 255, 255, 0.15);
+    transform: translateX(4px);
 }
 
 .history-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 10px;
+    margin-bottom: 12px;
 }
 
 .history-date {
     font-size: 12px;
     color: rgba(255, 255, 255, 0.5);
+    font-weight: 500;
 }
 
 .history-delete-btn {
-    background: transparent;
+    background: none;
     border: none;
-    font-size: 16px;
+    color: rgba(255, 255, 255, 0.3);
     cursor: pointer;
-    opacity: 0.5;
-    transition: opacity 0.2s ease;
+    padding: 4px 8px;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+    font-size: 16px;
 }
 
 .history-delete-btn:hover {
-    opacity: 1;
+    background: rgba(255, 59, 48, 0.2);
+    color: rgba(255, 59, 48, 0.8);
 }
 
 .history-preview {
     font-size: 13px;
     color: rgba(255, 255, 255, 0.7);
-    margin: 4px 0;
+    margin: 6px 0;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -504,9 +412,12 @@ input:checked + .slider:before {
 
 .history-title {
     font-size: 14px;
-    font-weight: 600;
     color: rgba(255, 255, 255, 0.9);
+    font-weight: 500;
     margin-bottom: 6px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .history-meta {
@@ -514,44 +425,56 @@ input:checked + .slider:before {
     color: rgba(255, 255, 255, 0.5);
 }
 
-.error-message {
-    text-align: center;
-    padding: 40px 20px;
-    color: rgba(255, 100, 100, 0.8);
+/* Footer */
+.config-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    padding: 20px 30px;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    background: rgba(0, 0, 0, 0.2);
+    flex-shrink: 0;
 }
 
-.error-message p {
-    margin: 10px 0;
+/* Botões */
+.primary-btn,
+.secondary-btn {
+    padding: 10px 24px;
+    border-radius: 10px;
+    border: none;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: inherit;
 }
 
-.error-hint {
-    font-size: 13px;
-    color: rgba(255, 255, 255, 0.5);
+.primary-btn {
+    background: rgba(255, 255, 255, 0.12);
+    color: white;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2),
+                0 0 1px rgba(255, 255, 255, 0.2) inset;
+    backdrop-filter: blur(10px);
 }
 
-.error-message .action-btn {
-    margin-top: 15px;
+.primary-btn:hover {
+    transform: translateY(-2px);
+    background: rgba(255, 255, 255, 0.16);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3),
+                0 0 1px rgba(255, 255, 255, 0.3) inset;
 }
 
-/* ===== RESPONSIVIDADE ===== */
-@media (max-width: 768px) {
-    .config-nav {
-        width: 160px;
-    }
-    
-    .config-main {
-        padding: 20px 30px;
-    }
-    
-    .setting-row {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 12px;
-    }
-    
-    .setting-control {
-        justify-content: flex-start;
-        min-width: auto;
-        width: 100%;
-    }
+.primary-btn:active {
+    transform: translateY(0);
+}
+
+.secondary-btn {
+    background: rgba(255, 255, 255, 0.05);
+    color: rgba(255, 255, 255, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.secondary-btn:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.2);
 }

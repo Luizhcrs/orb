@@ -85,6 +85,12 @@ async def send_message(
             error=response.get('error')
         )
         
+    except ValueError as e:
+        # Erro de configuração (ex: API key não configurada)
+        raise HTTPException(
+            status_code=400,
+            detail=str(e)
+        )
     except Exception as e:
         raise HTTPException(
             status_code=500,

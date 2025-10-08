@@ -38,13 +38,10 @@
 /* ===== CHAT INPUT ===== */
 .chat-input {
     flex: 1;
-    background: 
-        linear-gradient(135deg, 
-            rgba(255, 255, 255, 0.2) 0%, 
-            rgba(255, 255, 255, 0.15) 100%);
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    border-radius: 25px;
-    padding: 14px 18px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 12px;
+    padding: 12px 16px;
     color: rgba(255, 255, 255, 1);
     font-size: 14px;
     resize: none;
@@ -52,23 +49,14 @@
     max-height: 100px;
     font-family: inherit;
     outline: none;
-    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-    backdrop-filter: blur(20px) saturate(150%);
-    -webkit-backdrop-filter: blur(20px) saturate(150%);
-    box-shadow: 
-        0 2px 8px rgba(0, 0, 0, 0.15),
-        inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    transition: all 0.2s ease;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
 }
 
 .chat-input:focus {
-    border-color: rgba(255, 255, 255, 0.5);
-    box-shadow: 
-        0 4px 16px rgba(0, 0, 0, 0.2),
-        inset 0 1px 0 rgba(255, 255, 255, 0.4);
-    background: 
-        linear-gradient(135deg, 
-            rgba(255, 255, 255, 0.25) 0%, 
-            rgba(255, 255, 255, 0.2) 100%);
+    border-color: rgba(255, 255, 255, 0.25);
+    background: rgba(255, 255, 255, 0.10);
 }
 
 .chat-input::placeholder {
@@ -87,26 +75,23 @@
 
 /* ===== SEND BUTTON ===== */
 .send-btn {
-    background: 
-        linear-gradient(135deg, 
-            rgba(255, 255, 255, 0.25) 0%, 
-            rgba(255, 255, 255, 0.18) 100%);
-    border: 1px solid rgba(255, 255, 255, 0.35);
+    background: rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.15);
     color: rgba(255, 255, 255, 1);
     width: 40px;
     height: 40px;
-    border-radius: 50%;
+    border-radius: 10px;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: all 0.2s ease;
     flex-shrink: 0;
-    backdrop-filter: blur(20px) saturate(150%);
-    -webkit-backdrop-filter: blur(20px) saturate(150%);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
     box-shadow: 
-        0 4px 16px rgba(0, 0, 0, 0.15),
-        inset 0 1px 0 rgba(255, 255, 255, 0.4);
+        0 2px 8px rgba(0, 0, 0, 0.2),
+        0 0 1px rgba(255, 255, 255, 0.2) inset;
     position: relative;
     overflow: hidden;
 }
@@ -125,15 +110,12 @@
 }
 
 .send-btn:hover {
-    transform: scale(1.05);
+    background: rgba(255, 255, 255, 0.16);
+    border-color: rgba(255, 255, 255, 0.25);
     box-shadow: 
-        0 6px 20px rgba(0, 0, 0, 0.2),
-        inset 0 1px 0 rgba(255, 255, 255, 0.5);
-    border-color: rgba(255, 255, 255, 0.45);
-    background: 
-        linear-gradient(135deg, 
-            rgba(255, 255, 255, 0.35) 0%, 
-            rgba(255, 255, 255, 0.25) 100%);
+        0 4px 12px rgba(0, 0, 0, 0.3),
+        0 0 1px rgba(255, 255, 255, 0.3) inset;
+    transform: translateY(-2px);
 }
 
 .send-btn:hover::before {

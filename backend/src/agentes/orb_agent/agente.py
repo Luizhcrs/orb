@@ -150,8 +150,38 @@ class AgenteORB:
             return logging.getLogger(__name__)
     
     def _load_config(self, config_path: Optional[str]) -> Dict[str, Any]:
-        """Carrega configurações do agente"""
-        # Configuração simplificada
+        """Carrega configurações do agente (database prioritário, .env apenas se database não disponível)"""
+        # Tentar carregar do database primeiro
+        if self.config_manager:
+            try:
+                llm_config = self.config_manager.get_llm_config()
+                
+                # Verificar se API key está configurada
+                if not llm_config.get('api_key'):
+                    self.logger.error("API key não configurada no banco de dados!")
+                    raise ValueError(
+                        "Configure a API key na tela de configuração (CommandOrControl+Shift+O). "
+                        "Não é permitido usar .env quando o banco de dados está disponível."
+                    )
+                
+                self.logger.info(f"Configuração do LLM carregada do database: {llm_config.get('provider')}/{llm_config.get('model')}")
+                return {
+                    'llm_provider': llm_config.get('provider', 'openai'),
+                    'model': llm_config.get('model', 'gpt-4o-mini'),
+                    'environment': os.getenv('ENVIRONMENT', 'development'),
+                    'max_tokens': int(os.getenv('MAX_TOKENS', 1000)),
+                    'temperature': float(os.getenv('TEMPERATURE', 0.7)),
+                    'api_key': llm_config.get('api_key')  # API key do database
+                }
+            except ValueError:
+                # Re-raise ValueError para propagar erro de configuração
+                raise
+            except Exception as e:
+                self.logger.warning(f"Erro ao carregar config do database: {e}")
+                self.logger.info("Database indisponível, usando .env como fallback")
+        
+        # Fallback para .env APENAS se database não estiver disponível
+        self.logger.warning("Database não disponível, usando configurações do .env")
         return {
             'llm_provider': os.getenv('LLM_PROVIDER', 'openai'),
             'environment': os.getenv('ENVIRONMENT', 'development'),

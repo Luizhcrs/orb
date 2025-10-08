@@ -20,100 +20,216 @@
             justify-content: center;
         }
 
-        .orb {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            background: 
-                linear-gradient(135deg, 
-                    rgba(255, 255, 255, 0.25) 0%, 
-                    rgba(255, 255, 255, 0.15) 50%,
-                    rgba(255, 255, 255, 0.25) 100%);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            box-shadow: 
-                0 8px 32px rgba(0, 0, 0, 0.12),
-                inset 0 1px 0 rgba(255, 255, 255, 0.4),
-                0 0 0 1px rgba(255, 255, 255, 0.1);
+        .orb-container {
             position: relative;
-            animation: liquidGlassPulse 3s ease-in-out infinite;
-            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-            opacity: 0.9;
-            backdrop-filter: blur(20px) saturate(180%);
-            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
+        /* Outer glow ring */
+        .orb-glow {
+            position: absolute;
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+            animation: pulseGlow 3s ease-in-out infinite;
+            pointer-events: none;
+        }
 
+        /* Main orb */
+        .orb {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: rgba(20, 20, 22, 0.6);
+            border: 1.5px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.4),
+                inset 0 0 20px rgba(255, 255, 255, 0.05),
+                inset 0 2px 4px rgba(255, 255, 255, 0.1),
+                0 0 40px rgba(255, 255, 255, 0.05);
+            position: relative;
+            backdrop-filter: blur(40px) saturate(180%);
+            -webkit-backdrop-filter: blur(40px) saturate(180%);
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            overflow: hidden;
+        }
+
+        /* Glass reflection */
         .orb::before {
             content: '';
             position: absolute;
-            top: -2px;
-            left: -2px;
-            right: -2px;
-            bottom: -2px;
+            top: 8%;
+            left: 15%;
+            width: 35%;
+            height: 35%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.4) 0%, transparent 70%);
             border-radius: 50%;
-            background: 
-                linear-gradient(135deg, 
-                    rgba(255, 255, 255, 0.1) 0%, 
-                    rgba(255, 255, 255, 0.05) 50%,
-                    rgba(255, 255, 255, 0.1) 100%);
-            z-index: -1;
-            animation: liquidGlassPulse 3s ease-in-out infinite reverse;
+            filter: blur(4px);
+            animation: shimmer 4s ease-in-out infinite;
         }
 
-        .orb:hover {
-            transform: scale(1.08);
+        /* Inner core */
+        .orb::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 30px;
+            height: 30px;
+            background: radial-gradient(circle, 
+                rgba(255, 255, 255, 0.15) 0%, 
+                rgba(255, 255, 255, 0.05) 50%,
+                transparent 100%);
+            border-radius: 50%;
+            animation: coreBreath 3s ease-in-out infinite;
+        }
+
+        /* Subtle particles inside */
+        .particle {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: rgba(255, 255, 255, 0.4);
+            border-radius: 50%;
+            box-shadow: 0 0 4px rgba(255, 255, 255, 0.6);
+            animation: float 4s ease-in-out infinite;
+        }
+
+        .particle:nth-child(1) {
+            top: 30%;
+            left: 40%;
+            animation-delay: 0s;
+        }
+
+        .particle:nth-child(2) {
+            top: 60%;
+            left: 60%;
+            animation-delay: 1.3s;
+        }
+
+        .particle:nth-child(3) {
+            top: 45%;
+            left: 25%;
+            animation-delay: 2.6s;
+        }
+
+        /* Hover state */
+        .orb-container:hover .orb {
+            transform: scale(1.1);
+            border-color: rgba(255, 255, 255, 0.25);
             box-shadow: 
-                0 12px 48px rgba(0, 0, 0, 0.15),
-                inset 0 1px 0 rgba(255, 255, 255, 0.5),
-                0 0 0 1px rgba(255, 255, 255, 0.2);
-            opacity: 1;
-            border-color: rgba(255, 255, 255, 0.4);
+                0 12px 48px rgba(0, 0, 0, 0.5),
+                inset 0 0 30px rgba(255, 255, 255, 0.08),
+                inset 0 2px 6px rgba(255, 255, 255, 0.15),
+                0 0 60px rgba(255, 255, 255, 0.1);
         }
 
-        @keyframes liquidGlassPulse {
+        .orb-container:hover .orb-glow {
+            width: 80px;
+            height: 80px;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.15) 0%, transparent 70%);
+        }
+
+        /* Active state */
+        .orb-container:active .orb {
+            transform: scale(1.05);
+        }
+
+        /* Animations */
+        @keyframes pulseGlow {
             0%, 100% {
+                opacity: 0.6;
                 transform: scale(1);
-                box-shadow: 
-                    0 8px 32px rgba(0, 0, 0, 0.12),
-                    inset 0 1px 0 rgba(255, 255, 255, 0.4),
-                    0 0 0 1px rgba(255, 255, 255, 0.1);
             }
             50% {
-                transform: scale(1.03);
-                box-shadow: 
-                    0 12px 48px rgba(0, 0, 0, 0.15),
-                    inset 0 1px 0 rgba(255, 255, 255, 0.5),
-                    0 0 0 1px rgba(255, 255, 255, 0.15);
+                opacity: 1;
+                transform: scale(1.1);
+            }
+        }
+
+        @keyframes shimmer {
+            0%, 100% {
+                opacity: 0.3;
+                transform: translate(0, 0);
+            }
+            50% {
+                opacity: 0.6;
+                transform: translate(2px, 2px);
+            }
+        }
+
+        @keyframes coreBreath {
+            0%, 100% {
+                opacity: 0.4;
+                transform: translate(-50%, -50%) scale(1);
+            }
+            50% {
+                opacity: 0.7;
+                transform: translate(-50%, -50%) scale(1.1);
+            }
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translate(0, 0);
+                opacity: 0.3;
+            }
+            25% {
+                transform: translate(3px, -3px);
+                opacity: 0.8;
+            }
+            50% {
+                transform: translate(-2px, 2px);
+                opacity: 0.5;
+            }
+            75% {
+                transform: translate(2px, 3px);
+                opacity: 0.8;
             }
         }
     </style>
 </head>
-    <body>
-        <div class="orb"></div>
+<body>
+    <div class="orb-container">
+        <div class="orb-glow"></div>
+        <div class="orb">
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+        </div>
+    </div>
 
-        <script>
-            // Garantir que o evento de clique funcione
-            document.addEventListener('DOMContentLoaded', () => {
-                console.log('🔵 Orb HTML carregado');
-                
-                // Clique no orb principal
-                document.querySelector('.orb').addEventListener('click', (e) => {
-                    console.log('🔵 Clique no orb principal detectado!');
-                    if (typeof require !== 'undefined') {
-                        console.log('🔵 Enviando evento orb-clicked via IPC');
-                        require('electron').ipcRenderer.send('orb-clicked');
-                    } else {
-                        console.log('🔵 require não disponível');
-                    }
-                });
-                
-                document.addEventListener('mousedown', (e) => {
-                    console.log('🔵 Mouse down no HTML do orb detectado!');
-                    if (typeof require !== 'undefined') {
-                        require('electron').ipcRenderer.send('orb-clicked');
-                    }
-                });
+    <script>
+        // Garantir que o evento de clique funcione
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('🔵 Orb HTML carregado');
+            
+            const orbContainer = document.querySelector('.orb-container');
+            
+            // Clique no orb
+            orbContainer.addEventListener('click', (e) => {
+                console.log('🔵 Clique no orb detectado!');
+                if (typeof require !== 'undefined') {
+                    console.log('🔵 Enviando evento orb-clicked via IPC');
+                    require('electron').ipcRenderer.send('orb-clicked');
+                } else {
+                    console.log('🔵 require não disponível');
+                }
             });
-        </script>
+            
+            document.addEventListener('mousedown', (e) => {
+                console.log('🔵 Mouse down no HTML do orb detectado!');
+                if (typeof require !== 'undefined') {
+                    require('electron').ipcRenderer.send('orb-clicked');
+                }
+            });
+        });
+    </script>
 </body>
 </html>
