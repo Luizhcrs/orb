@@ -9,7 +9,7 @@ import logging
 import os
 
 # Importa routers
-from .routers import health, agent, websocket, system
+from .routers import health, agent, websocket, system, history
 
 # Importa configurações
 from .config.api_config import APIConfig
@@ -96,6 +96,7 @@ app.include_router(health.router)
 app.include_router(agent.router)
 app.include_router(websocket.router)
 app.include_router(system.router)
+app.include_router(history.router)
 
 @app.on_event("startup")
 async def startup_event():

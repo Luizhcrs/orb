@@ -145,3 +145,23 @@
     opacity: 0.5;
     cursor: not-allowed;
 }
+
+/* ✨ UX: Loading state e micro-interação */
+.send-btn:active {
+    transform: scale(0.95);
+    transition: transform 0.1s ease;
+}
+
+.send-btn.loading {
+    background: 
+        linear-gradient(135deg, 
+            rgba(100, 100, 100, 0.3) 0%, 
+            rgba(80, 80, 80, 0.2) 100%);
+    pointer-events: none;
+    animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 0.6; }
+    50% { opacity: 1; }
+}

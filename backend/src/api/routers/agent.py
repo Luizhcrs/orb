@@ -15,10 +15,16 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..'))
 
 router = APIRouter(prefix="/agent", tags=["agent"])
 
+# Instância global do agente (singleton para performance)
+_agente_instance = None
+
 def get_agente():
-    """Dependency para obter instância do agente (nova instância a cada request)"""
-    from agentes.orb_agent.agente import AgenteORB
-    return AgenteORB()
+    """Dependency para obter instância do agente (singleton pattern)"""
+    global _agente_instance
+    if _agente_instance is None:
+        from agentes.orb_agent.agente import AgenteORB
+        _agente_instance = AgenteORB()
+    return _agente_instance
 
 # Modelos Pydantic
 class MessageRequest(BaseModel):

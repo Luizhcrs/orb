@@ -26,7 +26,8 @@ export class WindowManager {
       configWindow: null,
       isChatOpen: false,
       isOrbVisible: false,
-      capturedImage: null
+      capturedImage: null,
+      isChatExpanded: false // 🔥 FIX: Inicializar flag de expansão
     };
 
     this.setupIpcHandlers();
@@ -70,7 +71,15 @@ export class WindowManager {
     });
 
     this.state.orbWindow.loadFile(path.join(__dirname, '..', 'src', 'orb.html'));
+    
+    // ⚡ OTIMIZAÇÃO: Não mostrar o Orb imediatamente
+    // Ele será mostrado pelo MouseDetector quando o cursor entrar no hot corner
     this.state.isOrbVisible = false;
+
+    // Evento ready-to-show para garantir que o Orb está carregado
+    this.state.orbWindow.once('ready-to-show', () => {
+      console.log('✅ Orb window pronto (mas ainda oculto)');
+    });
 
     this.state.orbWindow.on('closed', () => {
       this.state.orbWindow = null;
@@ -119,6 +128,11 @@ export class WindowManager {
 
     this.state.chatWindow.loadFile(path.join(__dirname, '..', 'src', 'chat.html'));
 
+    // Evento quando a janela está pronta para mostrar
+    this.state.chatWindow.once('ready-to-show', () => {
+      console.log('✅ Chat window ready-to-show');
+    });
+
     this.state.chatWindow.on('closed', () => {
       this.state.chatWindow = null;
       this.state.isChatOpen = false;
@@ -153,6 +167,7 @@ export class WindowManager {
     if (this.state.chatWindow && !this.state.chatWindow.isDestroyed()) {
       this.state.chatWindow.hide();
       this.state.isChatOpen = false;
+      this.state.isChatExpanded = false; // 🔥 FIX: Resetar flag ao fechar (sempre abrir compacto)
       this.onChatClose();
       console.log('🔵 Chat fechado');
     }
@@ -178,13 +193,10 @@ export class WindowManager {
     }
 
     const { width: screenWidth, height: screenHeight } = screen.getPrimaryDisplay().workAreaSize;
-    const currentBounds = this.state.chatWindow.getBounds();
     
-    // Alternar entre tamanho compacto (380x480) e expandido (660x760)
-    const isExpanded = currentBounds.width > 400;
-    
-    const newWidth = isExpanded ? 380 : 660;
-    const newHeight = isExpanded ? 480 : 760;
+    // 🔥 FIX: Usar flag de estado ao invés de detectar pelo tamanho
+    const newWidth = this.state.isChatExpanded ? 380 : 660;
+    const newHeight = this.state.isChatExpanded ? 480 : 760;
     const newX = Math.floor((screenWidth - newWidth) / 2);
     const newY = Math.floor((screenHeight - newHeight) / 2);
 
@@ -195,7 +207,10 @@ export class WindowManager {
       height: newHeight
     });
 
-    console.log(`🔵 Chat ${isExpanded ? 'reduzido' : 'expandido'} para ${newWidth}x${newHeight}`);
+    // Alternar flag
+    this.state.isChatExpanded = !this.state.isChatExpanded;
+
+    console.log(`🔵 Chat ${this.state.isChatExpanded ? 'expandido' : 'reduzido'} para ${newWidth}x${newHeight}`);
   }
 
   /**
@@ -320,6 +335,16 @@ export class WindowManager {
    */
   openConfig(): void {
     console.log('🔧 Abrindo janela de configuração...');
+    
+    // ⚡ OTIMIZAÇÃO: Se já existe, apenas mostrar (instantâneo!)
+    if (this.state.configWindow && !this.state.configWindow.isDestroyed()) {
+      console.log('⚡ Reutilizando config window existente (cache)');
+      this.state.configWindow.show();
+      this.state.configWindow.focus();
+      return;
+    }
+    
+    // Criar pela primeira vez
     this.createConfigWindow();
   }
 
@@ -329,8 +354,8 @@ export class WindowManager {
   closeConfig(): void {
     console.log('🔧 WindowManager.closeConfig() chamado');
     if (this.state.configWindow && !this.state.configWindow.isDestroyed()) {
-      console.log('🔧 Fechando configWindow...');
-      this.state.configWindow.close();
+      console.log('⚡ Ocultando configWindow (cache - não destruir)');
+      this.state.configWindow.hide(); // ← HIDE ao invés de close!
     } else {
       console.log('🔧 configWindow não existe ou já foi destruída');
     }

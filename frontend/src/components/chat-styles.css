@@ -1,7 +1,9 @@
 /* ===== CHAT CONTAINER ===== */
 .chat-container {
-    width: 340px;
-    height: 440px;
+    /* 🔥 FIX URGENTE: Adaptar a QUALQUER tamanho de janela */
+    width: 100%;
+    height: 100%;
+    flex: 1;
     background: 
         linear-gradient(135deg, 
             rgba(0, 0, 0, 0.75) 0%, 
@@ -107,6 +109,12 @@
         inset 0 1px 0 rgba(255, 255, 255, 0.5);
 }
 
+/* ✨ UX: Micro-interação ao clicar */
+.expand-btn:active, .close-btn:active {
+    transform: scale(0.9);
+    transition: transform 0.1s ease;
+}
+
 .close-btn {
     background: 
         linear-gradient(135deg, 
@@ -172,6 +180,19 @@
     flex-direction: column;
     gap: 5px;
     max-width: 85%;
+    /* ✨ UX: Animação suave de entrada */
+    animation: messageSlideIn 0.3s ease;
+}
+
+@keyframes messageSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .message.user {

@@ -20,22 +20,18 @@
         <div class="config-layout">
             <!-- Navegação lateral -->
             <div class="config-nav">
-                <div class="nav-item active" data-section="general">
-                    <span class="nav-icon">⚙️</span>
-                    <span class="nav-text">Geral</span>
-                </div>
-                <div class="nav-item" data-section="agent">
-                    <span class="nav-icon">🤖</span>
-                    <span class="nav-text">Agente</span>
-                </div>
-                <div class="nav-item" data-section="interface">
-                    <span class="nav-icon">🎨</span>
-                    <span class="nav-text">Interface</span>
-                </div>
-                <div class="nav-item" data-section="history">
-                    <span class="nav-icon">📚</span>
-                    <span class="nav-text">Histórico</span>
-                </div>
+            <div class="nav-item active" data-section="general">
+                <span class="nav-icon">⚙️</span>
+                <span class="nav-text">Geral</span>
+            </div>
+            <div class="nav-item" data-section="agent">
+                <span class="nav-icon">🤖</span>
+                <span class="nav-text">Agente</span>
+            </div>
+            <div class="nav-item" data-section="history">
+                <span class="nav-icon">📚</span>
+                <span class="nav-text">Histórico</span>
+            </div>
             </div>
 
             <!-- Conteúdo principal -->
@@ -48,7 +44,6 @@
                         <span class="setting-label">Tema</span>
                         <div class="setting-control">
                             <select id="theme-select">
-                                <option value="system">Sistema</option>
                                 <option value="dark">Escuro</option>
                                 <option value="light">Claro</option>
                             </select>
@@ -60,9 +55,7 @@
                         <span class="setting-label">Idioma</span>
                         <div class="setting-control">
                             <select id="language-select">
-                                <option value="pt-BR">Português (Brasil)</option>
-                                <option value="en-US">English (US)</option>
-                                <option value="es-ES">Español</option>
+                                <option value="pt-BR">Português</option>
                             </select>
                             <span class="dropdown-arrow">▼</span>
                         </div>
@@ -79,10 +72,10 @@
                     </div>
 
                     <div class="setting-row">
-                        <span class="setting-label">Permitir notificações</span>
+                        <span class="setting-label">Manter Histórico</span>
                         <div class="setting-control">
                             <label class="switch">
-                                <input type="checkbox" id="notifications-checkbox" checked>
+                                <input type="checkbox" id="keep-history-checkbox" checked>
                                 <span class="slider"></span>
                             </label>
                         </div>
@@ -99,9 +92,15 @@
                             <select id="provider-select">
                                 <option value="openai">OpenAI</option>
                                 <option value="anthropic">Anthropic</option>
-                                <option value="demo">Demo</option>
                             </select>
                             <span class="dropdown-arrow">▼</span>
+                        </div>
+                    </div>
+
+                    <div class="setting-row">
+                        <span class="setting-label">API Key</span>
+                        <div class="setting-control">
+                            <input type="password" id="api-key-input" placeholder="Insira sua API Key">
                         </div>
                     </div>
 
@@ -116,94 +115,35 @@
                             <span class="dropdown-arrow">▼</span>
                         </div>
                     </div>
-
-                    <div class="setting-row">
-                        <span class="setting-label">Criatividade <span class="value-display" id="temperature-value">0.7</span></span>
-                        <div class="setting-control">
-                            <input type="range" id="temperature-slider" min="0" max="1" step="0.1" value="0.7">
-                        </div>
-                    </div>
-
-                    <div class="setting-row">
-                        <span class="setting-label">Máx. Tokens <span class="value-display" id="max-tokens-value">1000</span></span>
-                        <div class="setting-control">
-                            <input type="range" id="max-tokens-slider" min="100" max="4000" step="100" value="1000">
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Seção Interface -->
-                <div class="config-section" id="interface-section">
-                    <h1>Interface</h1>
-                    
-                    <div class="setting-row">
-                        <span class="setting-label">Tamanho do Orb <span class="value-display" id="orb-size-value">50px</span></span>
-                        <div class="setting-control">
-                            <input type="range" id="orb-size-slider" min="30" max="100" step="5" value="50">
-                        </div>
-                    </div>
-
-                    <div class="setting-row">
-                        <span class="setting-label">Opacidade do Chat <span class="value-display" id="chat-opacity-value">90%</span></span>
-                        <div class="setting-control">
-                            <input type="range" id="chat-opacity-slider" min="50" max="100" step="5" value="90">
-                        </div>
-                    </div>
-
-                    <div class="setting-row">
-                        <span class="setting-label">Sempre no topo</span>
-                        <div class="setting-control">
-                            <label class="switch">
-                                <input type="checkbox" id="always-on-top-checkbox">
-                                <span class="slider"></span>
-                            </label>
-                        </div>
-                    </div>
-
-                    <div class="setting-row">
-                        <span class="setting-label">Auto-ocultar Orb</span>
-                        <div class="setting-control">
-                            <label class="switch">
-                                <input type="checkbox" id="auto-hide-orb-checkbox" checked>
-                                <span class="slider"></span>
-                            </label>
-                        </div>
-                    </div>
                 </div>
 
                 <!-- Seção Histórico -->
                 <div class="config-section" id="history-section">
                     <h1>Histórico</h1>
                     
-                    <div class="setting-row">
-                        <span class="setting-label">Salvar histórico</span>
-                        <div class="setting-control">
-                            <label class="switch">
-                                <input type="checkbox" id="save-history-checkbox" checked>
-                                <span class="slider"></span>
-                            </label>
-                        </div>
+                    <div class="empty-state">
+                        <div class="empty-icon">📚</div>
+                        <p>Nenhuma conversa anterior encontrada.</p>
+                        <p class="empty-hint">Suas conversas aparecerão aqui quando você começar a usar o ORB.</p>
                     </div>
 
-                    <div class="setting-row">
-                        <span class="setting-label">Manter histórico por</span>
-                        <div class="setting-control">
-                            <select id="history-days-select">
-                                <option value="7">7 dias</option>
-                                <option value="30" selected>30 dias</option>
-                                <option value="90">90 dias</option>
-                                <option value="always">Sempre</option>
-                            </select>
-                            <span class="dropdown-arrow">▼</span>
+                    <!-- Lista de histórico será carregada dinamicamente -->
+                    <div id="history-list" class="history-list">
+                        <!-- Exemplo de item de histórico -->
+                        <!-- 
+                        <div class="history-item">
+                            <div class="history-header">
+                                <span class="history-date">Hoje, 15:30</span>
+                                <button class="history-delete-btn">🗑️</button>
+                            </div>
+                            <div class="history-preview">
+                                <strong>Usuário:</strong> Como fazer um loop em Python?
+                            </div>
+                            <div class="history-preview">
+                                <strong>Assistente:</strong> Você pode usar for ou while...
+                            </div>
                         </div>
-                    </div>
-
-                    <div class="setting-row">
-                        <span class="setting-label"></span>
-                        <div class="setting-control">
-                            <button id="clear-history-btn" class="action-btn">Limpar Histórico</button>
-                            <button id="export-history-btn" class="action-btn">Exportar</button>
-                        </div>
+                        -->
                     </div>
                 </div>
             </div>
