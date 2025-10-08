@@ -1,238 +1,325 @@
-# 🌟 ORB - Desktop AI Assistant
+# 🌐 ORB - Agente LLM Flutuante para Desktop
 
-> **Desktop AI Assistant** com interface Electron e backend Python/FastAPI  
-> **Desenvolvido por [Luiz Henrique](https://github.com/luizhcrs)** - Projeto open source para a comunidade
+![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)
+![License](https://img.shields.io/badge/license-MIT-green.svg)
+![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-lightgrey.svg)
 
-## 📁 Estrutura do Projeto
+ORB é um assistente de IA flutuante para desktop que utiliza modelos de linguagem (LLM) para fornecer ajuda contextual enquanto você trabalha. Com uma interface minimalista em "liquid glass", o ORB fica disponível através de hot corners e atalhos globais.
 
-```
-orb/
-├── frontend/                 # Node.js/Electron (Interface Desktop)
-│   ├── src/
-│   │   ├── main.ts          # Processo principal do Electron
-│   │   ├── managers/        # Gerenciadores (Window, Mouse, Shortcuts)
-│   │   ├── services/        # Serviços (Screenshot, LLM)
-│   │   ├── components/      # Componentes da UI
-│   │   └── types/           # Tipos TypeScript
-│   ├── package.json
-│   └── tsconfig.json
-├── backend/                  # Python/FastAPI (Backend API)
-│   ├── src/
-│   │   ├── api/            # Rotas da API
-│   │   ├── agentes/        # Agente ORB com LLM
-│   │   ├── services/       # Serviços do sistema
-│   │   └── utils/          # Utilitários
-│   ├── requirements.txt
-│   └── Dockerfile
-├── shared/                   # Tipos e configurações compartilhadas
-│   ├── types/              # Tipos TypeScript compartilhados
-│   └── config/             # Configurações comuns
-├── scripts/                 # Scripts de build e deploy
-├── docker-compose.yml       # Orquestração dos serviços
-└── package.json            # Gerenciamento do monorepo
-```
+## ✨ Características
+
+- 🎯 **Hot Corner**: Ative o ORB movendo o mouse para o canto superior esquerdo
+- ⌨️ **Atalhos Globais**: `Ctrl+Shift+Space` para chat, `Ctrl+Shift+O` para configurações
+- 🔒 **Privacidade**: Todas as conversas e configurações são armazenadas localmente em SQLite
+- 🎨 **Interface Moderna**: Design "liquid glass" com glassmorphism
+- 📸 **Capturas de Tela**: Analise imagens com visão computacional
+- 💾 **Histórico Persistente**: Acesse e retome conversas anteriores
+- 🔌 **Multi-LLM**: Suporte para OpenAI (GPT-4o, GPT-4o-mini) e Anthropic Claude
 
 ## 🚀 Início Rápido
 
-### Pré-requisitos
+### Para Usuários Finais
 
-- **Node.js** >= 18.0.0
-- **Python** >= 3.11.0
-- **Docker** (opcional, para desenvolvimento com containers)
+1. **Baixe o instalador** para seu sistema operacional:
+   - Windows: `OrbAgent-Setup-1.0.0.exe` ou `OrbAgent-Portable-1.0.0.exe`
+   - macOS: `OrbAgent-1.0.0.dmg` ou `OrbAgent-1.0.0-mac.zip`
+   - Linux: `OrbAgent-1.0.0.AppImage` ou `orb-agent_1.0.0_amd64.deb`
 
-### Instalação
+2. **Instale e execute**
 
+3. **Configure sua API key**:
+   - Pressione `Ctrl+Shift+O` para abrir as configurações
+   - Na seção "Agente", insira sua API key da OpenAI
+   - Salve as configurações
+
+4. **Comece a usar**:
+   - Mova o mouse para o canto superior esquerdo OU
+   - Pressione `Ctrl+Shift+Space` para abrir o chat
+
+### Para Desenvolvedores
+
+#### Requisitos
+
+- Node.js 18+
+- Python 3.11+
+- npm ou yarn
+
+#### Setup Automatizado
+
+**Linux/macOS:**
 ```bash
-# 1. Clonar o repositório
-git clone https://github.com/luizrocha/orb.git
-cd orb
-
-# 2. Instalar todas as dependências
-npm run install:all
-
-# 3. Configurar variáveis de ambiente
-cp backend/env.example backend/.env
-# Editar backend/.env com suas chaves de API
+chmod +x setup-dev.sh
+./setup-dev.sh
 ```
+
+**Windows:**
+```batch
+setup-dev.bat
+```
+
+#### Setup Manual
+
+1. **Clone o repositório:**
+```bash
+git clone https://github.com/seu-usuario/orb.git
+cd orb
+```
+
+2. **Configure o Backend:**
+```bash
+cd backend
+
+# Criar ambiente virtual
+python3 -m venv venv
+
+# Ativar (Linux/macOS)
+source venv/bin/activate
+# Ativar (Windows)
+venv\Scripts\activate
+
+# Instalar dependências
+pip install -r requirements.txt
+
+# Criar .env
+cp env.example .env
+
+# Gerar chave de criptografia
+python3 -c "from cryptography.fernet import Fernet; print('FERNET_KEY=' + Fernet.generate_key().decode())" >> .env
+
+cd ..
+```
+
+3. **Configure o Frontend:**
+```bash
+cd frontend
+
+# Criar .env
+cp env.example .env
+
+# Instalar dependências
+npm install
+
+# Build inicial
+npm run build
+
+cd ..
+```
+
+4. **Inicie o projeto:**
+```bash
+# Na raiz do projeto
+npm run dev
+```
+
+## 🏗️ Arquitetura
+
+```
+orb/
+├── frontend/                 # Aplicação Electron
+│   ├── src/
+│   │   ├── components/      # Componentes da UI (Chat, Config)
+│   │   ├── llm/            # Gerenciamento de LLM
+│   │   ├── managers/       # Window, Shortcuts, Mouse
+│   │   ├── services/       # Backend API, Screenshot
+│   │   └── main.ts         # Entry point do Electron
+│   └── package.json
+│
+├── backend/                 # API FastAPI
+│   ├── src/
+│   │   ├── api/            # Routers FastAPI
+│   │   ├── agentes/        # Pipeline do agente LLM
+│   │   ├── database/       # SQLite + Managers
+│   │   └── config/         # Configurações
+│   └── main.py
+│
+├── docs/                    # Documentação
+├── scripts/                 # Scripts de automação
+└── docker-compose.yml      # Docker para desenvolvimento
+```
+
+## 🛠️ Comandos Disponíveis
 
 ### Desenvolvimento
 
 ```bash
-# Desenvolvimento completo (frontend + backend)
+# Iniciar modo desenvolvimento (frontend + backend)
 npm run dev
 
-# Ou executar separadamente:
-npm run dev:frontend    # Apenas frontend
-npm run dev:backend     # Apenas backend
+# Apenas backend
+npm run dev:backend
+
+# Apenas frontend
+npm run dev:frontend
+
+# Build do TypeScript
+npm run build
+
+# Limpar builds
+npm run clean
 ```
 
-### Docker (Desenvolvimento)
-
-```bash
-# Subir todos os serviços
-npm run docker:up
-
-# Parar serviços
-npm run docker:down
-
-# Rebuild containers
-npm run docker:build
-```
-
-## 🧪 Testes
-
-```bash
-# Todos os testes
-npm run test
-
-# Testes específicos
-npm run test:frontend
-npm run test:backend
-```
-
-## 🏗️ Build e Deploy
+### Produção
 
 ```bash
 # Build completo
 npm run build
 
-# Build específico
-npm run build:frontend
-npm run build:backend
+# Criar instalador Windows
+npm run pack:win
+
+# Criar instalador macOS
+npm run pack:mac
+
+# Criar instalador Linux
+npm run pack:linux
+
+# Criar para todas as plataformas
+npm run pack:all
 ```
 
-## 🛠️ Serviços Windows
+### Docker
 
 ```bash
-# Instalar como serviço Windows
-npm run service:install
+# Iniciar backend com Docker
+docker-compose up
 
-# Gerenciar serviço
-npm run service:start
-npm run service:stop
-npm run service:uninstall
+# Build fresh
+docker-compose up --build
+
+# Parar serviços
+docker-compose down
 ```
-
-## 📡 API Endpoints
-
-### Health Check
-- `GET /health` - Status do serviço
-
-### Agente AI
-- `POST /agent/message` - Enviar mensagem para o agente
-- `WS /ws` - WebSocket para comunicação em tempo real
-
-### Sistema
-- `POST /system/screenshot` - Capturar tela
-- `POST /system/toggle-orb` - Alternar visibilidade do orb
-- `POST /system/hot-corner` - Configurar hot corner
-
-### Documentação
-- `GET /docs` - Swagger UI
-- `GET /openapi.json` - Especificação OpenAPI
 
 ## 🔧 Configuração
 
-### Variáveis de Ambiente (Backend)
+### Variáveis de Ambiente
 
+**Backend (`backend/.env`):**
 ```env
-# LLM Configuration
-OPENAI_API_KEY=your_openai_key
-ANTHROPIC_API_KEY=your_anthropic_key
-DEFAULT_MODEL=gpt-4o-mini
+# LLM Provider
+LLM_PROVIDER=openai
+OPENAI_API_KEY=sua-chave-aqui
 
-# API Configuration
+# Servidor
+HOST=0.0.0.0
+PORT=8000
 ENVIRONMENT=development
-API_HOST=0.0.0.0
-API_PORT=8000
 
-# Logging
-LOG_LEVEL=INFO
+# Banco de Dados
+DATABASE_PATH=orb.db
+FERNET_KEY=sua-chave-fernet-aqui
+
+# Opções
+MAX_TOKENS=1000
+TEMPERATURE=0.7
 ```
 
-### Configuração do Frontend
-
-O frontend se conecta automaticamente ao backend em `http://localhost:8000` por padrão. Para alterar:
-
-```typescript
-// shared/config/backend.ts
-export const BACKEND_CONFIG = {
-  url: process.env.ORB_BACKEND_URL || 'http://localhost:8000',
-  // ...
-};
+**Frontend (`frontend/.env`):**
+```env
+BACKEND_URL=http://localhost:8000
+VITE_APP_TITLE=Orb Agent
 ```
 
-## 🏗️ Arquitetura
+### Configuração via Interface
 
-### Frontend (Electron)
-- **WindowManager**: Gerencia janelas do orb e chat
-- **MouseDetector**: Detecta hot corner para mostrar/ocultar orb
-- **ShortcutManager**: Gerencia atalhos de teclado globais
-- **ScreenshotService**: Captura tela para análise do LLM
-- **LLMManager**: Interface com APIs de LLM (OpenAI/Anthropic)
+Todas as configurações podem ser ajustadas através da interface gráfica (`Ctrl+Shift+O`):
 
-### Backend (Python/FastAPI)
-- **AgenteORB**: Agente principal com pipeline de processamento
-- **LLMProvider**: Abstração para diferentes provedores de LLM
-- **ToolSelector**: Seleciona ferramentas baseado no contexto
-- **SystemAPI**: Endpoints para interação com o sistema
+- **Geral**: Tema, idioma, iniciar com Windows
+- **Agente**: Provider LLM, API key, modelo
+- **Histórico**: Gerenciar conversas anteriores
 
-### Comunicação
-- **HTTP/REST**: Comunicação principal frontend ↔ backend
-- **WebSocket**: Comunicação em tempo real
-- **Tipos Compartilhados**: TypeScript types compartilhados via `shared/`
+## 📦 Build e Release
 
-## 🔄 Fluxo de Desenvolvimento
+### Pré-requisitos para Build
 
-1. **Desenvolvimento**: `npm run dev`
-2. **Testes**: `npm run test`
-3. **Build**: `npm run build`
-4. **Deploy**: `npm run docker:up` ou instalar como serviço Windows
+- **Windows**: VS Build Tools 2019+
+- **macOS**: Xcode Command Line Tools
+- **Linux**: build-essential, rpm (para .deb e .rpm)
 
-## 📚 Documentação
+### Processo de Build
 
-- [API Documentation](backend/docs/API_DOCUMENTATION.md)
-- [Windows Service Guide](backend/docs/WINDOWS_SERVICE.md)
-- [Development Guide](docs/DEVELOPMENT.md)
+1. **Prepare o ambiente:**
+```bash
+# Instalar dependências de build
+npm install
 
-## 🤝 Contribuição
+# Build do backend (se necessário)
+cd backend && pip install -r requirements.txt && cd ..
+```
 
-Este é um projeto open source desenvolvido por **Luiz Henrique**. Contribuições da comunidade são muito bem-vindas!
+2. **Crie os instaladores:**
+```bash
+# Sua plataforma atual
+npm run pack:win    # Windows
+npm run pack:mac    # macOS
+npm run pack:linux  # Linux
 
-### Como Contribuir
+# Ou todas (requer ferramentas de cada plataforma)
+npm run pack:all
+```
 
-1. **Fork** o projeto
-2. **Crie** uma branch para sua feature (`git checkout -b feature/nova-funcionalidade`)
-3. **Commit** suas mudanças (`git commit -m 'feat: adiciona nova funcionalidade'`)
-4. **Push** para a branch (`git push origin feature/nova-funcionalidade`)
-5. **Abra** um Pull Request
+3. **Artefatos gerados em** `frontend/release/`:
+   - Windows: `.exe` (setup) e `.exe` (portable)
+   - macOS: `.dmg` e `.zip`
+   - Linux: `.AppImage` e `.deb`
 
-### Diretrizes de Contribuição
+### Versionamento
 
-- 🐛 **Bugs**: Use a label `bug` para reportar problemas
-- ✨ **Features**: Use a label `enhancement` para novas funcionalidades
-- 📚 **Documentação**: Melhorias na documentação são sempre bem-vindas
-- 🧪 **Testes**: Ajude a melhorar a cobertura de testes
-- 💡 **Ideias**: Sugestões são apreciadas via Issues
+Atualize a versão em `frontend/package.json`:
+```json
+{
+  "version": "1.1.0"
+}
+```
 
-### Contato
+## 🧪 Testes
 
-- 👨‍💻 **Desenvolvedor**: [Luiz Henrique](https://github.com/luizhcrs)
-- 📧 **Issues**: [GitHub Issues](https://github.com/luizhcrs/orb/issues)
-- 💬 **Discussões**: [GitHub Discussions](https://github.com/luizhcrs/orb/discussions)
+```bash
+# Backend
+cd backend
+pytest
 
-## 📄 Licença
+# Com cobertura
+pytest --cov=src --cov-report=html
 
-Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para detalhes.
+# Testes específicos
+pytest backend/tests/test_agent_integration.py
+```
+
+## 🤝 Contribuindo
+
+1. Fork o projeto
+2. Crie uma branch para sua feature (`git checkout -b feature/AmazingFeature`)
+3. Commit suas mudanças (`git commit -m 'Add some AmazingFeature'`)
+4. Push para a branch (`git push origin feature/AmazingFeature`)
+5. Abra um Pull Request
+
+## 📝 Licença
+
+Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
 
 ## 🙏 Agradecimentos
 
-- [Electron](https://electronjs.org/) - Framework para aplicações desktop
-- [FastAPI](https://fastapi.tiangolo.com/) - Framework web Python
-- [OpenAI](https://openai.com/) - API de linguagem
-- [Anthropic](https://anthropic.com/) - Claude API
-- **Comunidade open source** - Por todas as bibliotecas e ferramentas incríveis
+- [Electron](https://www.electronjs.org/) - Framework para aplicações desktop
+- [FastAPI](https://fastapi.tiangolo.com/) - Framework web Python moderno
+- [OpenAI](https://openai.com/) - APIs de LLM
+- [Anthropic](https://www.anthropic.com/) - Claude API
+
+## 📞 Suporte
+
+- 🐛 **Bugs**: Abra uma [issue](https://github.com/seu-usuario/orb/issues)
+- 💬 **Discussões**: Use [Discussions](https://github.com/seu-usuario/orb/discussions)
+- 📧 **Email**: seu-email@exemplo.com
+
+## 🗺️ Roadmap
+
+- [ ] Suporte para mais LLMs (Gemini, Llama)
+- [ ] Plugins e extensões
+- [ ] Themes customizáveis
+- [ ] Sincronização em nuvem (opcional)
+- [ ] Mobile companion app
+- [ ] Comandos de voz
 
 ---
 
-**Desenvolvido com ❤️ por [Luiz Henrique](https://github.com/luizhcrs)**
+**Desenvolvido com ❤️ para tornar a IA mais acessível no desktop**

@@ -118,12 +118,12 @@ class OrbApp {
       try {
         const result = await this.llmManager.processMessage(message, imageData);
         return result;
-      } catch (error) {
+      } catch (error: any) {
         console.error('Erro ao processar mensagem:', error);
-        return { 
-          error: 'Erro ao processar mensagem',
-          content: 'Desculpe, ocorreu um erro. Tente novamente.',
-          timestamp: new Date().toISOString()
+        // Retornar objeto de erro ao invés de throw para o IPC serializar corretamente
+        return {
+          error: true,
+          message: error.message || 'Erro ao processar mensagem'
         };
       }
     });

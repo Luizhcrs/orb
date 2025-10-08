@@ -7,12 +7,14 @@ class ConfigInterface {
         this.currentSection = 'general';
         this.historyApiUrl = 'http://localhost:8000/api/v1/history';
         this.configApiUrl = 'http://localhost:8000/api/v1/config';
+        this.modalResolve = null; // Para armazenar a Promise do modal
         
         // Aguardar um pouco para garantir que o DOM está pronto
         setTimeout(() => {
             this.initializeElements();
             this.bindEvents();
             this.loadConfig();
+            this.setupModal();
             console.log('🔧 ConfigInterface inicializado com sucesso');
         }, 100);
     }
@@ -380,11 +382,11 @@ class ConfigInterface {
         }
     }
 
-    resetConfig() {
+    async resetConfig() {
         console.log('🔧 Resetando configurações...');
-        if (confirm('Tem certeza que deseja redefinir todas as configurações para o padrão?')) {
+        const confirmed = await this.showConfirm('Tem certeza que deseja redefinir todas as configurações para o padrão?');
+        if (confirmed) {
             this.loadConfig();
-            alert('Configurações redefinidas para o padrão.');
         }
     }
 
@@ -489,7 +491,8 @@ class ConfigInterface {
     }
 
     async deleteHistorySession(sessionId) {
-        if (!confirm('Tem certeza que deseja deletar esta conversa?')) {
+        const confirmed = await this.showConfirm('Tem certeza que deseja deletar esta conversa?');
+        if (!confirmed) {
             return;
         }
         
@@ -559,6 +562,69 @@ function initializeConfig() {
         }, 500);
     }
 }
+
+// Adicionar métodos ao prototype
+ConfigInterface.prototype.setupModal = function() {
+    const modal = document.getElementById('confirm-modal');
+    const cancelBtn = document.getElementById('modal-cancel');
+    const confirmBtn = document.getElementById('modal-confirm');
+    
+    if (!modal || !cancelBtn || !confirmBtn) {
+        console.error('❌ Elementos do modal não encontrados');
+        return;
+    }
+    
+    cancelBtn.addEventListener('click', () => {
+        this.hideModal();
+        if (this.modalResolve) {
+            this.modalResolve(false);
+            this.modalResolve = null;
+        }
+    });
+    
+    confirmBtn.addEventListener('click', () => {
+        this.hideModal();
+        if (this.modalResolve) {
+            this.modalResolve(true);
+            this.modalResolve = null;
+        }
+    });
+    
+    // Fechar ao clicar fora do modal
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            this.hideModal();
+            if (this.modalResolve) {
+                this.modalResolve(false);
+                this.modalResolve = null;
+            }
+        }
+    });
+};
+
+ConfigInterface.prototype.showConfirm = function(message) {
+    return new Promise((resolve) => {
+        const modal = document.getElementById('confirm-modal');
+        const messageEl = document.getElementById('modal-message');
+        
+        if (!modal || !messageEl) {
+            console.error('❌ Modal não encontrado');
+            resolve(false);
+            return;
+        }
+        
+        this.modalResolve = resolve;
+        messageEl.textContent = message;
+        modal.style.display = 'flex';
+    });
+};
+
+ConfigInterface.prototype.hideModal = function() {
+    const modal = document.getElementById('confirm-modal');
+    if (modal) {
+        modal.style.display = 'none';
+    }
+};
 
 // Múltiplas formas de inicializar
 if (document.readyState === 'loading') {

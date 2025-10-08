@@ -120,6 +120,7 @@ export class WindowManager {
 
     this.state.chatWindow = new BrowserWindow({
       ...chatConfig,
+      hasShadow: false, // Remove sombra nativa do Electron
       webPreferences: {
         nodeIntegration: true,
         contextIsolation: false
@@ -310,6 +311,7 @@ export class WindowManager {
       skipTaskbar: true,
       center: true,
       show: true,
+      hasShadow: false, // Remove sombra nativa do Electron
       webPreferences: {
         nodeIntegration: true,
         contextIsolation: false
