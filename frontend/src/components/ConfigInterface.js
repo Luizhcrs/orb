@@ -5,13 +5,14 @@ class ConfigInterface {
         console.log('🔧 ConfigInterface iniciando...');
         this.elements = {};
         this.currentSection = 'general';
+        this.historyApiUrl = 'http://localhost:8000/api/v1/history';
+        this.configApiUrl = 'http://localhost:8000/api/v1/config';
         
         // Aguardar um pouco para garantir que o DOM está pronto
         setTimeout(() => {
             this.initializeElements();
             this.bindEvents();
             this.loadConfig();
-            this.updateSliderValues();
             console.log('🔧 ConfigInterface inicializado com sucesso');
         }, 100);
     }
@@ -57,9 +58,6 @@ class ConfigInterface {
         // Elementos Histórico
         this.elements.historyList = document.querySelector('#history-list');
         this.elements.emptyState = document.querySelector('.empty-state');
-        
-        // Serviço de histórico
-        this.historyApiUrl = 'http://localhost:8000/api/v1/history';
     }
 
     bindEvents() {
@@ -246,43 +244,112 @@ class ConfigInterface {
     }
 
     async loadConfig() {
-        console.log('🔧 Carregando configurações...');
-        // Configurações padrão
-        const config = {
-            general: {
-                theme: 'dark',
-                language: 'pt-BR',
-                startup: false,
-                keepHistory: true
-            },
-            agent: {
-                provider: 'openai',
-                apiKey: '',
-                model: 'gpt-4o-mini'
+        console.log('🔧 Carregando configurações da API...');
+        
+        try {
+            const response = await fetch(this.configApiUrl);
+            if (!response.ok) {
+                throw new Error(`Erro HTTP: ${response.status}`);
             }
-        };
-
-        // Aplicar configurações aos elementos da UI
-        if (this.elements.themeSelect) this.elements.themeSelect.value = config.general.theme;
-        if (this.elements.languageSelect) this.elements.languageSelect.value = config.general.language;
-        if (this.elements.startupCheckbox) this.elements.startupCheckbox.checked = config.general.startup;
-        if (this.elements.keepHistoryCheckbox) this.elements.keepHistoryCheckbox.checked = config.general.keepHistory;
-        
-        if (this.elements.providerSelect) this.elements.providerSelect.value = config.agent.provider;
-        if (this.elements.apiKeyInput) this.elements.apiKeyInput.value = config.agent.apiKey;
-        
-        // Carregar modelos para o provedor atual
-        this.loadModelsForProvider(config.agent.provider);
-        if (this.elements.modelSelect) this.elements.modelSelect.value = config.agent.model;
-
-        console.log('🔧 Configurações carregadas');
+            
+            const config = await response.json();
+            console.log('🔧 Configurações recebidas:', config);
+            
+            // Aplicar configurações gerais
+            if (config.general) {
+                if (this.elements.themeSelect) {
+                    this.elements.themeSelect.value = config.general.theme || 'dark';
+                }
+                if (this.elements.languageSelect) {
+                    this.elements.languageSelect.value = config.general.language || 'pt-BR';
+                }
+                if (this.elements.startupCheckbox) {
+                    this.elements.startupCheckbox.checked = config.general.startup || false;
+                }
+                if (this.elements.keepHistoryCheckbox) {
+                    this.elements.keepHistoryCheckbox.checked = config.general.keep_history !== false;
+                }
+            }
+            
+            // Aplicar configurações do agente
+            if (config.agent) {
+                if (this.elements.providerSelect) {
+                    this.elements.providerSelect.value = config.agent.provider || 'openai';
+                    // Carregar modelos para o provider atual
+                    this.loadModelsForProvider(config.agent.provider || 'openai');
+                }
+                if (this.elements.apiKeyInput) {
+                    // API key vem mascarada, apenas mostrar placeholder
+                    if (config.agent.api_key) {
+                        this.elements.apiKeyInput.placeholder = config.agent.api_key;
+                    }
+                }
+                if (this.elements.modelSelect) {
+                    // Aguardar um pouco para modelos carregarem
+                    setTimeout(() => {
+                        this.elements.modelSelect.value = config.agent.model || 'gpt-4o-mini';
+                    }, 100);
+                }
+            }
+            
+        } catch (error) {
+            console.error('❌ Erro ao carregar configurações:', error);
+            // Fallback: aplicar valores padrão
+            if (this.elements.themeSelect) this.elements.themeSelect.value = 'dark';
+            if (this.elements.languageSelect) this.elements.languageSelect.value = 'pt-BR';
+            if (this.elements.startupCheckbox) this.elements.startupCheckbox.checked = false;
+            if (this.elements.keepHistoryCheckbox) this.elements.keepHistoryCheckbox.checked = true;
+            if (this.elements.providerSelect) this.elements.providerSelect.value = 'openai';
+            this.loadModelsForProvider('openai');
+            if (this.elements.modelSelect) {
+                setTimeout(() => {
+                    this.elements.modelSelect.value = 'gpt-4o-mini';
+                }, 100);
+            }
+        }
     }
 
     async saveConfig() {
         console.log('🔧 Salvando configurações...');
         try {
-            // Simular salvamento
-            await new Promise(resolve => setTimeout(resolve, 500));
+            // Coletar dados dos campos
+            const configData = {
+                general: {
+                    theme: this.elements.themeSelect?.value,
+                    language: this.elements.languageSelect?.value,
+                    startup: this.elements.startupCheckbox?.checked,
+                    keep_history: this.elements.keepHistoryCheckbox?.checked
+                },
+                agent: {
+                    provider: this.elements.providerSelect?.value,
+                    api_key: this.elements.apiKeyInput?.value,
+                    model: this.elements.modelSelect?.value
+                }
+            };
+            
+            console.log('🔧 Enviando configurações:', configData);
+            
+            // Enviar para API
+            const response = await fetch(this.configApiUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(configData)
+            });
+            
+            if (!response.ok) {
+                throw new Error(`Erro HTTP: ${response.status}`);
+            }
+            
+            const result = await response.json();
+            console.log('✅ Configurações salvas:', result);
+            
+            // Limpar campo de API key após salvar
+            if (this.elements.apiKeyInput) {
+                this.elements.apiKeyInput.value = '';
+                this.elements.apiKeyInput.placeholder = '***' + (configData.agent.api_key?.slice(-4) || '');
+            }
             
             // Mostrar feedback visual
             if (this.elements.saveBtn) {
@@ -297,7 +364,19 @@ class ConfigInterface {
             }
             
         } catch (error) {
-            console.error('Erro ao salvar configurações:', error);
+            console.error('❌ Erro ao salvar configurações:', error);
+            
+            // Mostrar feedback de erro
+            if (this.elements.saveBtn) {
+                const originalText = this.elements.saveBtn.textContent;
+                this.elements.saveBtn.textContent = 'Erro!';
+                this.elements.saveBtn.style.background = 'linear-gradient(90deg, rgba(244, 67, 54, 0.3) 0%, rgba(229, 57, 53, 0.3) 100%)';
+                
+                setTimeout(() => {
+                    this.elements.saveBtn.textContent = originalText;
+                    this.elements.saveBtn.style.background = '';
+                }, 2000);
+            }
         }
     }
 
@@ -375,7 +454,7 @@ class ConfigInterface {
         item.innerHTML = `
             <div class="history-header">
                 <span class="history-date">${date}</span>
-                <button class="history-delete-btn" onclick="event.stopPropagation(); configInterface.deleteHistorySession('${session.session_id}')">🗑️</button>
+                <button class="history-delete-btn" onclick="event.stopPropagation(); configInterface.deleteHistorySession('${session.session_id}')">×</button>
             </div>
             <div class="history-title">${preview}</div>
             <div class="history-meta">${session.message_count} mensagen${session.message_count !== 1 ? 's' : ''}</div>

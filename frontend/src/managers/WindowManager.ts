@@ -298,16 +298,17 @@ export class WindowManager {
     console.log('🔧 Caminho do config:', configPath);
     
     this.state.configWindow = new BrowserWindow({
-      width: 900,
-      height: 600,
+      width: 700,
+      height: 550,
       minWidth: 700,
-      minHeight: 500,
-      resizable: true,
+      minHeight: 550,
+      resizable: false,
       movable: true,
       frame: false,
       transparent: true,
       alwaysOnTop: true,
       skipTaskbar: true,
+      center: true,
       show: true,
       webPreferences: {
         nodeIntegration: true,

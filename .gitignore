@@ -63,3 +63,9 @@ venv.bak/
 .coverage
 htmlcov/
 .tox/
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+orb.db

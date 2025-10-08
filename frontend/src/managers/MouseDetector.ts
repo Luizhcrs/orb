@@ -96,6 +96,7 @@ export class MouseDetector {
     try {
       const cursor = screen.getCursorScreenPoint();
       const isInHotCorner = this.isInHotCorner(cursor);
+      const isOverOrb = this.isMouseOverOrb(cursor);
 
       // Verificar se o mouse realmente se moveu significativamente
       const hasMouseMoved = this.hasMouseMovedSignificantly(cursor);
@@ -103,13 +104,23 @@ export class MouseDetector {
 
       // Debug: log da posição do mouse e estado (reduzido)
       if (this.state.isOrbVisible && hasMouseMoved) {
-        console.log(`🖱️ Mouse: (${cursor.x}, ${cursor.y}) | HotCorner: ${isInHotCorner} | OrbVisible: ${this.state.isOrbVisible}`);
+        console.log(`🖱️ Mouse: (${cursor.x}, ${cursor.y}) | HotCorner: ${isInHotCorner} | OverOrb: ${isOverOrb} | OrbVisible: ${this.state.isOrbVisible}`);
+      }
+
+      // Se o mouse está sobre o ORB, cancelar timeout de esconder
+      if (isOverOrb && this.state.isOrbVisible) {
+        if (this.state.hideTimeout) {
+          console.log('🖱️ Mouse sobre o ORB, cancelando timer de esconder...');
+          clearTimeout(this.state.hideTimeout);
+          this.state.hideTimeout = null;
+        }
+        return; // Não fazer nada enquanto mouse estiver sobre o ORB
       }
 
       if (isInHotCorner && !this.state.isOrbVisible) {
         this.showOrb();
-      } else if (!isInHotCorner && this.state.isOrbVisible && hasMouseMoved) {
-        console.log('🖱️ Mouse saiu do hot corner, agendando esconder orb...');
+      } else if (!isInHotCorner && !isOverOrb && this.state.isOrbVisible && hasMouseMoved) {
+        console.log('🖱️ Mouse saiu do hot corner e não está sobre o ORB, agendando esconder orb...');
         this.scheduleHideOrb();
       }
     } catch (error) {
@@ -145,6 +156,31 @@ export class MouseDetector {
   }
 
   /**
+   * Verifica se o mouse está sobre o ORB
+   */
+  private isMouseOverOrb(position: MousePosition): boolean {
+    if (!this.state.isOrbVisible) {
+      return false;
+    }
+
+    // Obter posição do ORB window (assumindo que está no canto superior esquerdo)
+    // O ORB tem 90x90px, então vamos verificar uma área um pouco maior para margem de erro
+    const orbArea = {
+      x: 0,
+      y: 0,
+      width: 100,
+      height: 100
+    };
+
+    return (
+      position.x >= orbArea.x &&
+      position.x <= orbArea.x + orbArea.width &&
+      position.y >= orbArea.y &&
+      position.y <= orbArea.y + orbArea.height
+    );
+  }
+
+  /**
    * Mostra o orb imediatamente
    */
   showOrb(): void {
@@ -161,6 +197,9 @@ export class MouseDetector {
     this.state.isOrbVisible = true;
     this.onShowOrb();
     console.log('👁️ Orb mostrado via hot corner');
+    
+    // Agendar esconder automaticamente após 5 segundos
+    this.scheduleHideOrb();
   }
 
   /**

@@ -9,7 +9,7 @@ import logging
 import os
 
 # Importa routers
-from .routers import health, agent, websocket, system, history
+from .routers import health, agent, websocket, system, history, config
 
 # Importa configurações
 from .config.api_config import APIConfig
@@ -55,7 +55,7 @@ app = FastAPI(
         "name": APIConfig.LICENSE_NAME,
         "url": APIConfig.LICENSE_URL,
     },
-    root_path="/api/v1",  # Adiciona prefixo global para todos os endpoints
+    redirect_slashes=False  # Evitar redirect 307 de /config para /config/
 )
 
 # Configuração de CORS
@@ -91,12 +91,13 @@ class LoggingMiddleware(BaseHTTPMiddleware):
 
 app.add_middleware(LoggingMiddleware)
 
-# Inclui routers
-app.include_router(health.router)
-app.include_router(agent.router)
-app.include_router(websocket.router)
-app.include_router(system.router)
-app.include_router(history.router)
+# Inclui routers com prefixo /api/v1
+app.include_router(health.router, prefix="/api/v1")
+app.include_router(agent.router, prefix="/api/v1")
+app.include_router(websocket.router, prefix="/api/v1")
+app.include_router(system.router, prefix="/api/v1")
+app.include_router(history.router, prefix="/api/v1")
+app.include_router(config.router, prefix="/api/v1")
 
 @app.on_event("startup")
 async def startup_event():

@@ -18,7 +18,7 @@ export const DEFAULT_HOT_CORNER: HotCornerConfig = {
   width: 3,
   height: 3,
   showDelay: 1000, // 1 segundo para começar a detectar
-  hideDelay: 200   // 200ms para esconder
+  hideDelay: 5000   // 5 segundos para esconder automaticamente
 };
 
 export interface MouseDetectorState {
