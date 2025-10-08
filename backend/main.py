@@ -9,7 +9,7 @@ import os
 import uvicorn
 
 # Configura logging limpo antes de qualquer import
-from logging_config import setup_clean_logging
+from src.config.logging_config import setup_clean_logging
 setup_clean_logging()
 
 # Adiciona src ao path para importações
