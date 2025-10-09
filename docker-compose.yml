@@ -21,8 +21,8 @@ services:
     networks:
       - orb-network
 
-  # Frontend Electron (apenas para desenvolvimento do backend)
-  # Nota: Electron precisa rodar localmente, este é apenas o backend
+  # Frontend WPF (apenas para desenvolvimento do backend)
+  # Nota: WPF precisa rodar localmente, este é apenas o backend
   
 volumes:
   backend-data:

@@ -245,7 +245,7 @@ class DemoProvider(BaseLLMProvider):
         
         # Verifica se há imagem
         if image_data:
-            return "📸 Imagem recebida! No modo demonstração, não posso analisar imagens. Configure suas chaves de API para análise completa de imagens com OpenAI GPT-4V ou Claude 3."
+            return " Imagem recebida! No modo demonstração, não posso analisar imagens. Configure suas chaves de API para análise completa de imagens com OpenAI GPT-4V ou Claude 3."
         
         # Respostas específicas baseadas no input
         if any(word in user_input for word in ['olá', 'oi', 'hello', 'hi']):

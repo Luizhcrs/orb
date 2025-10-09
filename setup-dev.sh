@@ -8,14 +8,14 @@ echo "🚀 ORB - Setup de Desenvolvimento"
 echo "=================================="
 echo ""
 
-# Verificar Node.js
-if ! command -v node &> /dev/null; then
-    echo "❌ Node.js não encontrado. Instale Node.js 18+ primeiro."
-    echo "   Download: https://nodejs.org/"
-    exit 1
+# Verificar .NET SDK (apenas para Windows/WSL)
+if command -v dotnet &> /dev/null; then
+    echo "✅ .NET SDK $(dotnet --version) encontrado"
+else
+    echo "⚠️  .NET SDK não encontrado. Necessário para frontend WPF."
+    echo "   Download: https://dotnet.microsoft.com/download"
+    echo "   Nota: WPF é apenas para Windows"
 fi
-
-echo "✅ Node.js $(node -v) encontrado"
 
 # Verificar Python
 if ! command -v python3 &> /dev/null; then
@@ -25,14 +25,6 @@ if ! command -v python3 &> /dev/null; then
 fi
 
 echo "✅ Python $(python3 --version) encontrado"
-
-# Verificar npm
-if ! command -v npm &> /dev/null; then
-    echo "❌ npm não encontrado. Instale npm primeiro."
-    exit 1
-fi
-
-echo "✅ npm $(npm -v) encontrado"
 echo ""
 
 # 1. Setup do Backend
@@ -74,25 +66,23 @@ fi
 
 cd ..
 
-# 2. Setup do Frontend
-echo "📦 Configurando Frontend..."
-cd frontend
-
-# Criar .env se não existir
-if [ ! -f ".env" ]; then
-    echo "   Criando arquivo .env..."
-    cp env.example .env
+# 2. Setup do Frontend (WPF - apenas Windows)
+if command -v dotnet &> /dev/null; then
+    echo "📦 Configurando Frontend WPF..."
+    cd frontend
+    
+    # Restaurar dependências NuGet
+    echo "   Restaurando dependências NuGet..."
+    dotnet restore
+    
+    # Build inicial
+    echo "   Compilando aplicação WPF..."
+    dotnet build --configuration Release
+    
+    cd ..
+else
+    echo "⏭️  Pulando setup do frontend (WPF requer Windows e .NET SDK)"
 fi
-
-# Instalar dependências Node.js
-echo "   Instalando dependências Node.js..."
-npm install
-
-# Build inicial do TypeScript
-echo "   Compilando TypeScript..."
-npm run build
-
-cd ..
 
 # 3. Inicializar banco de dados
 echo "🗄️  Inicializando banco de dados..."
@@ -121,14 +111,13 @@ echo "   - Edite backend/.env e adicione OPENAI_API_KEY=sua-chave"
 echo "   - OU use a interface após iniciar (Ctrl+Shift+O)"
 echo ""
 echo "2. Inicie o projeto:"
-echo "   npm run dev"
+echo "   npm run dev (ou dotnet run --project frontend)"
 echo ""
 echo "3. A aplicação abrirá automaticamente!"
 echo ""
 echo "🔧 Comandos úteis:"
 echo "   npm run dev          - Inicia frontend + backend"
 echo "   npm run dev:backend  - Apenas backend"
-echo "   npm run dev:frontend - Apenas frontend"
+echo "   dotnet run --project frontend - Apenas frontend WPF"
 echo "   npm run build        - Build de produção"
 echo ""
-

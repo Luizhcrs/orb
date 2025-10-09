@@ -6,13 +6,6 @@ Este documento resume tudo que você precisa para fazer deploy do ORB Agent, sej
 
 ### Setup Rápido (Automatizado)
 
-**Linux/macOS:**
-```bash
-chmod +x setup-dev.sh
-./setup-dev.sh
-npm run dev
-```
-
 **Windows:**
 ```batch
 setup-dev.bat
@@ -20,13 +13,13 @@ npm run dev
 ```
 
 **O que o script faz:**
-1. ✅ Verifica Node.js, Python e npm
+1. ✅ Verifica .NET SDK e Python
 2. ✅ Cria ambiente virtual Python
 3. ✅ Instala todas as dependências
 4. ✅ Gera chave de criptografia Fernet
 5. ✅ Cria arquivos `.env`
 6. ✅ Inicializa banco de dados SQLite
-7. ✅ Build inicial do TypeScript
+7. ✅ Build inicial do frontend WPF
 
 ### Setup com Docker
 
@@ -41,10 +34,10 @@ Isso inicia:
 - Volumes persistentes para banco de dados
 - Hot reload automático
 
-**Frontend ainda precisa rodar localmente** (Electron não roda em Docker):
+**Frontend WPF roda apenas em Windows localmente:**
 ```bash
 cd frontend
-npm run dev
+dotnet run
 ```
 
 ### Desenvolvimento Local
@@ -57,294 +50,225 @@ npm run dev
 npm run dev:backend
 
 # Apenas frontend
-npm run dev:frontend
+dotnet run --project frontend
 ```
 
 ## 🏭 Para Produção
 
-### Build Local
-
-#### 1. Windows
+### Build Local - Windows
 
 ```bash
-cd frontend
-npm install
-npm run build
-npm run pack:win
-```
+# 1. Build do backend standalone
+cd backend
+pip install -r requirements.txt
+pip install -r requirements-build.txt
+python build_standalone.py
 
-**Arquivos gerados em `frontend/release/`:**
-- `OrbAgent-Setup-1.0.0.exe` - Instalador completo
-- `OrbAgent-Portable-1.0.0.exe` - Versão portátil
-
-#### 2. macOS
-
-```bash
-cd frontend
-npm install
-npm run build
-npm run pack:mac
+# 2. Build do frontend WPF
+cd ../frontend
+dotnet restore
+dotnet build --configuration Release
+dotnet publish --configuration Release --self-contained --runtime win-x64 -p:PublishSingleFile=true
 ```
 
 **Arquivos gerados:**
-- `OrbAgent-1.0.0.dmg` - Instalador DMG
-- `OrbAgent-1.0.0-mac.zip` - Versão ZIP
+- `backend/dist/orb-backend.exe` - Backend standalone
+- `frontend/bin/Release/net9.0-windows/publish/Orb.exe` - Frontend WPF
 
-#### 3. Linux
+### Criar Instalador
 
-```bash
-cd frontend
-npm install
-npm run build
-npm run pack:linux
-```
-
-**Arquivos gerados:**
-- `OrbAgent-1.0.0.AppImage` - AppImage universal
-- `orb-agent_1.0.0_amd64.deb` - Pacote Debian
-
-### Build Multiplataforma
-
-Para criar todos os instaladores de uma vez:
+Use **Inno Setup** ou **WiX Toolset**:
 
 ```bash
-npm run pack:all
+# Com script automatizado
+build-all.bat
+
+# Manual com Inno Setup
+iscc installer.iss
 ```
 
-**Requer:**
-- Windows: VS Build Tools 2019+
-- macOS: Xcode Command Line Tools
-- Linux: build-essential, rpm
+---
 
-### CI/CD Automatizado (GitHub Actions)
+## 🔧 Configuração de Ambiente
 
-#### Configuração Inicial
+### Backend (.env)
 
-1. **Fork o repositório** ou crie seu próprio repo
-
-2. **Configure Secrets** (Settings → Secrets and variables → Actions):
-   - Nenhum secret necessário por padrão
-   - GITHUB_TOKEN é automático
-
-3. **Push uma tag** para disparar build:
-```bash
-git tag -a v1.0.0 -m "Release v1.0.0"
-git push origin v1.0.0
-```
-
-#### Workflows Disponíveis
-
-**`.github/workflows/test.yml`** - Executado em cada push/PR:
-- ✅ Lint Python (flake8, black)
-- ✅ Type check (mypy)
-- ✅ TypeScript build
-- ✅ Testes backend (pytest)
-
-**`.github/workflows/build.yml`** - Executado em tags `v*`:
-- ✅ Testes completos
-- ✅ Build para Windows, macOS e Linux
-- ✅ Upload de artifacts
-- ✅ Criação automática de release no GitHub
-
-#### Processo de Release Automatizado
-
-```bash
-# 1. Atualizar versão
-cd frontend
-npm version patch  # ou minor/major
-
-# 2. Commit
-git add .
-git commit -m "chore: bump version to v1.0.1"
-
-# 3. Tag
-git tag -a v1.0.1 -m "Release v1.0.1"
-
-# 4. Push (dispara CI/CD automaticamente)
-git push origin v1.0.1
-```
-
-**O GitHub Actions vai:**
-1. Rodar todos os testes
-2. Buildar para Windows, macOS e Linux
-3. Criar uma release draft
-4. Anexar todos os instaladores
-5. Gerar release notes automaticamente
-
-## 📋 Checklist de Deploy
-
-### Pré-Deploy
-
-- [ ] Todas as features testadas
-- [ ] Testes passando (`pytest` + `npm run build`)
-- [ ] Documentação atualizada
-- [ ] Version bump (`npm version`)
-- [ ] `.env.example` atualizado se necessário
-
-### Deploy Manual
-
-- [ ] Build executado com sucesso
-- [ ] Instaladores testados (pelo menos 1 plataforma)
-- [ ] Configuração inicial funciona (API key, etc)
-- [ ] Hot corner funcionando
-- [ ] Atalhos globais funcionando
-- [ ] Histórico persistindo
-
-### Deploy Automatizado (CI/CD)
-
-- [ ] Tag criada com padrão `v*`
-- [ ] GitHub Actions executou com sucesso
-- [ ] Release criada no GitHub
-- [ ] Todos os artifacts presentes
-- [ ] Release notes publicadas
-
-## 🔧 Configuração de Produção
-
-### Variáveis de Ambiente
-
-**Backend (obrigatórias):**
 ```env
-FERNET_KEY=<gerado-automaticamente-pelo-setup>
-```
-
-**Backend (opcionais):**
-```env
+# LLM Provider
 LLM_PROVIDER=openai
-OPENAI_API_KEY=<sua-chave>  # Pode ser configurado via UI
-HOST=0.0.0.0
+OPENAI_API_KEY=sua-chave-aqui
+
+# Servidor
+HOST=127.0.0.1
 PORT=8000
 ENVIRONMENT=production
-MAX_TOKENS=1000
-TEMPERATURE=0.7
+
+# Banco de Dados
+DATABASE_PATH=orb.db
+FERNET_KEY=sua-chave-fernet-aqui
+
+# Logging
+LOG_LEVEL=INFO
 ```
 
-**Frontend:**
-```env
-BACKEND_URL=http://localhost:8000
-VITE_APP_TITLE=Orb Agent
-```
+### Frontend (Configurado via interface)
 
-### Configuração via Interface
+- Tema: Dark
+- Idioma: pt-BR
+- Iniciar com Windows: Sim
+- Provider LLM: OpenAI
+- API Key: (configurado via UI)
 
-**Recomendado**: Configure via UI após instalação:
+---
 
-1. Instale o ORB
-2. Abra (ele aparece automaticamente ou via hot corner)
-3. Pressione `Ctrl+Shift+O`
-4. Na seção "Agente":
-   - Selecione o Provider: OpenAI
-   - Insira sua API Key
-   - Escolha o modelo: gpt-4o-mini
-5. Salve
+## 🐳 Docker (Backend Only)
 
-## 📦 Distribuição
+### Build da Imagem
 
-### Para Usuários Finais
-
-**Recomendações:**
-1. Hospedar releases no GitHub Releases
-2. Fornecer checksums (SHA256) para verificação
-3. Assinar executáveis (code signing)
-4. Manter changelog atualizado
-
-**Estrutura de Release:**
-```
-Release v1.0.0
-├── OrbAgent-Setup-1.0.0.exe          (Windows Installer)
-├── OrbAgent-Portable-1.0.0.exe       (Windows Portable)
-├── OrbAgent-1.0.0.dmg                (macOS DMG)
-├── OrbAgent-1.0.0-mac.zip            (macOS ZIP)
-├── OrbAgent-1.0.0.AppImage           (Linux AppImage)
-└── orb-agent_1.0.0_amd64.deb         (Debian Package)
-```
-
-### Code Signing (Opcional)
-
-**Windows:**
-```bash
-# Requer certificado de code signing
-electron-builder --win --publish never
-```
-
-**macOS:**
-```bash
-# Requer Apple Developer ID
-export CSC_LINK=<path-to-cert>
-export CSC_KEY_PASSWORD=<password>
-electron-builder --mac --publish never
-```
-
-## 🐛 Troubleshooting
-
-### Build Falha
-
-**Erro:** `Cannot find module '@electron/rebuild'`
-```bash
-cd frontend
-npm install --save-dev @electron/rebuild
-npm rebuild
-```
-
-**Erro:** Python não encontrado
-```bash
-# Windows
-npm config set python C:\Python311\python.exe
-
-# Linux/macOS
-npm config set python /usr/bin/python3
-```
-
-### Backend não inicia
-
-**Erro:** `FERNET_KEY not set`
 ```bash
 cd backend
-python3 -c "from cryptography.fernet import Fernet; print('FERNET_KEY=' + Fernet.generate_key().decode())" >> .env
+docker build -t orb-backend:latest .
 ```
 
-**Erro:** `Module not found`
+### Executar
+
 ```bash
-cd backend
-source venv/bin/activate  # ou venv\Scripts\activate (Windows)
-pip install -r requirements.txt
+docker run -d \
+  --name orb-backend \
+  -p 8000:8000 \
+  -v orb-data:/app/data \
+  -e OPENAI_API_KEY=sua-chave \
+  orb-backend:latest
 ```
 
-### Frontend não compila
+### Docker Compose
 
-**Erro:** TypeScript errors
 ```bash
-cd frontend
-rm -rf node_modules package-lock.json
-npm install
-npm run build
+docker-compose up -d
 ```
 
-## 📊 Monitoramento
+**Nota:** Frontend WPF não roda em Docker, apenas localmente em Windows.
+
+---
+
+## 📊 Arquitetura de Deploy
+
+```
+Windows Desktop
+├── Orb.exe (Frontend WPF)
+│   ├── .NET 9.0 Runtime (self-contained)
+│   ├── WPF UI Libraries
+│   └── HttpClient → Backend
+│
+└── OrbBackendService (Windows Service)
+    ├── orb-backend.exe
+    ├── Python 3.11 Runtime
+    ├── FastAPI + Uvicorn
+    └── SQLite Database
+```
+
+---
+
+## 🔒 Segurança
+
+### API Keys
+- ✅ Armazenadas criptografadas no SQLite (Fernet)
+- ✅ Nunca em plaintext
+- ✅ Configuradas via interface gráfica
+
+### Comunicação
+- ✅ Backend em `127.0.0.1` apenas (não exposto externamente)
+- ✅ CORS desabilitado
+- ✅ Sem autenticação externa (app local)
+
+---
+
+## 📈 Monitoramento
 
 ### Logs
 
 **Backend:**
-- Logs em: `backend/logs/` (se configurado)
-- Stdout/stderr do processo
+- `backend/logs/orb_backend.log`
+- Nível: INFO (produção), DEBUG (dev)
 
 **Frontend:**
-- Electron DevTools: `Ctrl+Shift+I`
-- Logs do sistema: `%APPDATA%/orb-agent/logs/` (Windows)
+- `frontend/bin/Debug/net9.0-windows/orb_debug.log`
+- Apenas em modo debug
 
-### Performance
+### Health Check
 
-- Uso de memória: ~100-200 MB (backend + frontend)
-- CPU: <5% idle, <30% durante processamento
-- Disco: ~500 MB instalação + histórico variável
+```bash
+curl http://localhost:8000/health
+```
 
-## 🔗 Links Úteis
-
-- [GitHub Releases](https://github.com/seu-usuario/orb/releases)
-- [Documentação Completa](../README.md)
-- [Guia de Release](./RELEASE.md)
-- [Contribuindo](../CONTRIBUTING.md)
+Resposta esperada:
+```json
+{
+  "status": "healthy",
+  "service": "ORB Backend API",
+  "version": "1.0.0"
+}
+```
 
 ---
 
-**Deploy com confiança! 🚀**
+## 🔄 Atualizações
 
+### Processo de Update
+
+1. Build nova versão
+2. Distribuir instalador
+3. Usuário executa novo instalador
+4. Instalador atualiza arquivos
+5. Reinicia serviço do backend
+
+### Migração de Dados
+
+- ✅ Banco SQLite é preservado automaticamente
+- ✅ Configurações mantidas
+- ✅ Histórico de conversas preservado
+
+---
+
+## 🐛 Troubleshooting
+
+### Backend não inicia
+
+```bash
+# Verificar logs
+tail -f backend/logs/orb_backend.log
+
+# Testar manualmente
+cd backend/dist
+orb-backend.exe
+```
+
+### Frontend não conecta
+
+1. Verificar se backend está rodando (`http://localhost:8000/health`)
+2. Verificar firewall do Windows
+3. Verificar logs: `frontend/orb_debug.log`
+
+### Serviço Windows não inicia
+
+```bash
+# Reinstalar serviço
+cd "C:\Program Files\Orb Agent\backend"
+uninstall_service.bat
+install_service.bat
+
+# Verificar status
+sc query OrbBackendService
+```
+
+---
+
+## 📞 Suporte
+
+- 🐛 **Bugs**: [GitHub Issues](https://github.com/seu-usuario/orb/issues)
+- 💬 **Discussões**: [GitHub Discussions](https://github.com/seu-usuario/orb/discussions)
+- 📧 **Email**: seu-email@exemplo.com
+
+---
+
+**Feito com ❤️ para tornar a IA mais acessível no desktop Windows**

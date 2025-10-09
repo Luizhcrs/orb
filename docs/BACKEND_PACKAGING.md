@@ -1,140 +1,204 @@
-# 🐍 Empacotando o Backend Python
+# 🐍 Backend Packaging - Criar Executável Standalone
 
-Existem 3 abordagens para distribuir o backend com o instalador:
+Este documento explica como criar um executável standalone do backend Python, que pode rodar **sem Python instalado**.
 
-## **Opção 1: PyInstaller (Recomendado)**
+---
 
-Cria um executável standalone do backend.
+## 🎯 Objetivo
 
-### Setup
+Criar `orb-backend.exe` que:
+- ✅ Roda sem Python instalado
+- ✅ Inclui todas as dependências (FastAPI, Uvicorn, OpenAI SDK, etc.)
+- ✅ Pode ser instalado como serviço Windows
+- ✅ É distribuído junto com o frontend WPF
+
+---
+
+## 🔧 Ferramentas
+
+Usamos **PyInstaller** para empacotar Python em executável.
+
+---
+
+## 📋 Processo
+
+### 1. Instalar Dependências de Build
 
 ```bash
 cd backend
-pip install pyinstaller
+pip install -r requirements.txt
+pip install -r requirements-build.txt
+```
+
+**requirements-build.txt:**
+```txt
+pyinstaller==6.3.0
+```
+
+### 2. Criar Script de Build
+
+**`build_standalone.py`:**
+```python
+import PyInstaller.__main__
+import os
+
+PyInstaller.__main__.run([
+    'src/main.py',
+    '--name=orb-backend',
+    '--onefile',
+    '--noconsole',
+    '--hidden-import=uvicorn',
+    '--hidden-import=uvicorn.logging',
+    '--hidden-import=uvicorn.loops',
+    '--hidden-import=uvicorn.protocols',
+    '--hidden-import=fastapi',
+    '--hidden-import=pydantic',
+    '--hidden-import=sqlalchemy',
+    '--hidden-import=openai',
+    '--add-data=src;src',
+    '--distpath=dist',
+    '--workpath=build',
+    '--specpath=.',
+])
+```
+
+### 3. Executar Build
+
+```bash
 python build_standalone.py
 ```
 
-Isso gera `backend/dist/orb-backend.exe` (Windows) ou `orb-backend` (Linux/Mac).
-
-### Configurar electron-builder
-
-Em `frontend/package.json`, atualize:
-
-```json
-{
-  "build": {
-    "extraResources": [
-      {
-        "from": "../backend/dist/orb-backend${.exe}",
-        "to": "backend/"
-      }
-    ]
-  }
-}
-```
-
-### Atualizar BackendProcessManager
-
-```typescript
-private getPythonPath(): string {
-  if (app.isPackaged) {
-    // Usar executável standalone
-    const ext = process.platform === 'win32' ? '.exe' : '';
-    return path.join(process.resourcesPath, 'backend', `orb-backend${ext}`);
-  }
-  // Desenvolvimento
-  return process.platform === 'win32' ? 'python' : 'python3';
-}
-```
+**Resultado:**
+- `backend/dist/orb-backend.exe` (~50-80 MB)
 
 ---
 
-## **Opção 2: Python Portable (Mais Simples)**
+## 🧪 Testar Executável
 
-Incluir uma instalação portátil do Python.
-
-### Windows
-
-1. Baixe Python Embeddable: https://www.python.org/downloads/windows/
-2. Extraia em `backend/python-embed/`
-3. Instale dependências: `python-embed/python -m pip install -r requirements.txt`
-
-### Configurar electron-builder
-
-```json
-{
-  "build": {
-    "extraResources": [
-      {
-        "from": "../backend",
-        "to": "backend",
-        "filter": ["**/*", "!venv/**", "!__pycache__/**"]
-      }
-    ]
-  }
-}
-```
-
----
-
-## **Opção 3: Requerer Python do Sistema (Mais Fácil de Desenvolver)**
-
-O usuário precisa ter Python instalado.
-
-### Adicionar ao instalador (NSIS)
-
-```json
-{
-  "build": {
-    "nsis": {
-      "include": "installer.nsh"
-    }
-  }
-}
-```
-
-`installer.nsh`:
-```nsis
-!macro customInit
-  ; Verificar Python
-  nsExec::ExecToStack 'python --version'
-  Pop $0
-  ${If} $0 != 0
-    MessageBox MB_OK "Python 3.11+ é necessário. Instale de python.org"
-    Abort
-  ${EndIf}
-!macroend
-```
-
----
-
-## **Recomendação Atual**
-
-**Para desenvolvimento rápido:**
-- Use Opção 3 (usuário instala Python)
-- Adicione verificação no instalador
-- Documente no README
-
-**Para produção profissional:**
-- Use Opção 1 (PyInstaller)
-- Executável standalone
-- Melhor UX (usuário não precisa de nada)
-
----
-
-## **Por Agora (Solução Temporária)**
-
-Mantenha o backend rodando separadamente durante desenvolvimento:
+### Teste Básico
 
 ```bash
-# Terminal 1 - Backend
-cd backend
-python scripts/dev.py
-
-# Terminal 2 - Frontend
-cd frontend
-npm run dev
+cd backend/dist
+orb-backend.exe
 ```
 
-Para o instalador, adicione no README que Python 3.11+ é necessário.
+Deve iniciar servidor em `http://127.0.0.1:8000`
 
+### Teste de Health Check
+
+```bash
+curl http://localhost:8000/health
+```
+
+Resposta esperada:
+```json
+{
+  "status": "healthy",
+  "service": "ORB Backend API",
+  "version": "1.0.0"
+}
+```
+
+---
+
+## 🔄 Instalação como Serviço Windows
+
+### Criar Serviço
+
+```batch
+sc create OrbBackendService binPath="C:\Program Files\Orb Agent\backend\orb-backend.exe" start=auto
+sc description OrbBackendService "Orb Agent Backend API Service"
+sc start OrbBackendService
+```
+
+### Script de Instalação
+
+**`install_service.bat`:**
+```batch
+@echo off
+echo Instalando Orb Backend Service...
+
+sc create OrbBackendService ^
+  binPath="%~dp0orb-backend.exe" ^
+  start=auto ^
+  DisplayName="Orb Agent Backend"
+
+sc description OrbBackendService "Servico de backend do Orb Agent - FastAPI + Python"
+sc start OrbBackendService
+
+echo.
+echo Servico instalado e iniciado com sucesso!
+pause
+```
+
+### Script de Remoção
+
+**`uninstall_service.bat`:**
+```batch
+@echo off
+echo Removendo Orb Backend Service...
+
+sc stop OrbBackendService
+sc delete OrbBackendService
+
+echo.
+echo Servico removido com sucesso!
+pause
+```
+
+---
+
+## 🐛 Troubleshooting
+
+### Erro: "Module not found"
+
+Adicione ao `hidden-import`:
+```python
+'--hidden-import=nome_do_modulo',
+```
+
+### Executável muito grande
+
+**Normal!** Inclui:
+- Python runtime (~15 MB)
+- FastAPI + Uvicorn (~10 MB)
+- OpenAI SDK (~5 MB)
+- SQLite + SQLAlchemy (~5 MB)
+- Outras dependências (~15 MB)
+- **Total:** ~50-80 MB
+
+### Erro ao iniciar serviço
+
+```bash
+# Verificar logs do Windows Event Viewer
+eventvwr.msc
+
+# Testar executável manualmente primeiro
+orb-backend.exe
+```
+
+---
+
+## 📦 Estrutura Final
+
+```
+backend/dist/
+├── orb-backend.exe          # Executável standalone
+├── install_service.bat      # Instalar como serviço
+├── uninstall_service.bat    # Remover serviço
+└── orb.db                   # Banco de dados (criado em runtime)
+```
+
+---
+
+## 🚀 Integração com Frontend WPF
+
+O frontend WPF gerencia o backend através de:
+
+1. **BackendProcessManager.cs** - Inicia processo do backend
+2. **BackendService.cs** - Comunica via HTTP com backend
+3. **SystemTrayService.cs** - Notifica status do backend
+
+---
+
+**Backend Standalone Pronto! 🎉**

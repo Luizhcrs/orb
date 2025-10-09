@@ -21,8 +21,8 @@ def main():
     """Função principal para desenvolvimento"""
     print("ORB Backend - Modo Desenvolvimento (com reload)")
     print("=" * 50)
-    print("⚠️  ATENÇÃO: Use este script apenas para desenvolvimento isolado")
-    print("⚠️  Para integração com frontend, use: python main.py")
+    print("  ATENÇÃO: Use este script apenas para desenvolvimento isolado")
+    print("  Para integração com frontend, use: python main.py")
     print("=" * 50)
     
     uvicorn.run(

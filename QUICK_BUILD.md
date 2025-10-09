@@ -6,13 +6,13 @@
 build-all.bat
 ```
 
-**Resultado:** `frontend/release/OrbAgent-Setup-1.0.0.exe` (~200 MB)
+**Resultado:** `frontend/bin/Release/net9.0-windows/Orb.exe` + Backend standalone
 
 **Inclui:**
 - ✅ Backend como serviço Windows (roda sempre em background)
-- ✅ Frontend como aplicativo desktop
+- ✅ Frontend WPF como aplicativo desktop
 - ✅ Instalador completo e standalone
-- ✅ **NÃO requer Python ou Node.js no PC do usuário!**
+- ✅ **NÃO requer Python ou .NET no PC do usuário!**
 
 ---
 
@@ -22,9 +22,7 @@ build-all.bat
 1. Baixa `OrbAgent-Setup-1.0.0.exe`
 2. Executa (pede permissão de admin)
 3. Instala em `C:\Program Files\Orb Agent\`
-4. **Após instalação:** Execute `install_service_native.bat` como Admin
-   - Isso configura o serviço Windows `OrbBackendService`
-   - Inicia serviço automaticamente
+4. **Após instalação:** Backend inicia automaticamente como serviço
 5. Cria atalhos no Desktop e Menu Iniciar
 
 ### Uso
@@ -34,8 +32,7 @@ build-all.bat
 4. **Pronto! Funciona!**
 
 ### Desinstalação
-1. **Primeiro:** Execute `C:\Program Files\Orb Agent\resources\backend\uninstall_service_native.bat` como Admin
-   - Remove o serviço Windows
+1. **Primeiro:** Serviço é removido automaticamente
 2. **Depois:** Desinstale via Painel de Controle ou Menu Iniciar
 
 ---
@@ -44,7 +41,7 @@ build-all.bat
 
 ### Requisitos de Build
 - Windows 10+
-- Node.js 18+
+- .NET 9.0 SDK
 - Python 3.11+
 
 ### Build Passo-a-Passo
@@ -56,11 +53,11 @@ pip install -r requirements.txt
 pip install -r requirements-build.txt
 python build_standalone.py
 
-# 2. Frontend + Instalador
+# 2. Frontend WPF
 cd ../frontend
-npm install
-npm run build
-npm run pack:win
+dotnet restore
+dotnet build --configuration Release
+dotnet publish --configuration Release --self-contained
 ```
 
 ### Ou use o script automatizado:
@@ -76,9 +73,9 @@ build-all.bat
 ```
 OrbAgent-Setup-1.0.0.exe
 │
-├─ Frontend (Electron App)
-│  ├─ Aplicativo desktop
-│  ├─ Interface do chat
+├─ Frontend (WPF App)
+│  ├─ Aplicativo desktop .NET
+│  ├─ Interface do chat (liquid glass)
 │  └─ Gerenciamento de config
 │
 └─ Backend (Windows Service)
@@ -94,7 +91,7 @@ OrbAgent-Setup-1.0.0.exe
 
 **Para o Usuário:**
 - ✅ Instalação em 1 clique
-- ✅ Não precisa instalar Python, Node.js, nada!
+- ✅ Não precisa instalar Python, .NET Runtime, nada!
 - ✅ Backend roda automaticamente sempre
 - ✅ Desinstalação limpa
 
@@ -118,12 +115,10 @@ pip install pyinstaller
 
 ### Build falha no frontend
 
-**Erro:** "electron-builder failed"
+**Erro:** "dotnet command not found"
 ```bash
-cd frontend
-rm -rf node_modules
-npm install
-npm run pack:win
+# Instale .NET 9.0 SDK
+# Download: https://dotnet.microsoft.com/download
 ```
 
 ### Instalador muito grande
@@ -132,7 +127,7 @@ npm run pack:win
 - Python runtime completo
 - FastAPI + Uvicorn
 - OpenAI SDK
-- Anthropic SDK
+- .NET Runtime
 - Todas as dependências
 
 ---
@@ -146,4 +141,3 @@ Veja documentação completa em:
 ---
 
 **Pronto para distribuir! 🎉**
-

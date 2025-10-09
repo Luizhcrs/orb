@@ -1,21 +1,53 @@
-# Assets
+# Assets - Recursos do Orb Agent
 
-Esta pasta contém os ícones e recursos visuais do Orb Agent.
+## Ícone do Sistema (orb.ico)
 
-## Ícones Necessários
+Para personalizar o ícone do Orb Agent:
 
-Para build completo, adicione os seguintes arquivos:
+1. **Criar o ícone:**
+   - Tamanho: 256x256, 128x128, 64x64, 32x32, 16x16 (multi-size)
+   - Formato: `.ico`
+   - Design sugerido: Círculo roxo (#290060) com efeito de brilho/gradiente
 
-- `icon.ico` - Ícone para Windows (256x256)
-- `icon.icns` - Ícone para macOS (512x512)  
-- `icon.png` - Ícone para Linux (512x512)
+2. **Adicionar ao projeto:**
+   - Salvar o arquivo como `orb.ico` nesta pasta (`frontend-wpf/Assets/`)
+   - Descomentar a linha `<ApplicationIcon>Assets\orb.ico</ApplicationIcon>` em `OrbAgent.Frontend.csproj`
+   - O arquivo será automaticamente incluído no build
 
-## Gerando Ícones
+3. **Onde o ícone é usado:**
+   - **System Tray** → Ícone na bandeja do Windows
+   - **Executável** → Ícone do arquivo `Orb.exe`
+   - **Barra de Tarefas** → Quando a aplicação está em execução
 
-Você pode gerar os ícones a partir de uma imagem PNG usando ferramentas online como:
+## Ícone Padrão
 
-- https://convertio.co/
-- https://iconverticons.com/
-- https://cloudconvert.com/
+Se nenhum arquivo `orb.ico` for encontrado, o sistema usará um ícone padrão gerado em código:
+- Círculo roxo (#290060)
+- Borda branca
+- Fundo transparente
 
-Ou usar ferramentas de linha de comando como `electron-icon-builder`.
+## Ferramentas Recomendadas
+
+Para criar/editar ícones `.ico`:
+- **Online:** [ICO Convert](https://icoconvert.com/)
+- **Windows:** [IcoFX](https://icofx.ro/) (gratuito)
+- **Cross-platform:** [GIMP](https://www.gimp.org/) (gratuito)
+
+## Exemplo de Design
+
+```
+┌─────────────┐
+│   ◯◯◯◯◯◯   │  ← Círculo principal (#290060)
+│  ◯      ◯  │  ← Brilho/gradiente central
+│ ◯   ORB  ◯ │  ← Opcional: texto ou símbolo
+│  ◯      ◯  │
+│   ◯◯◯◯◯◯   │
+└─────────────┘
+```
+
+## Notas
+
+- O sistema de System Tray irá redimensionar automaticamente para 16x16
+- Para melhor qualidade, inclua todos os tamanhos no arquivo .ico
+- Use fundo transparente para melhor integração visual
+

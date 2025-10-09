@@ -74,24 +74,25 @@ def processar_mensagem(texto: str, contexto: dict) -> str:
     ...
 ```
 
-#### TypeScript (Frontend)
+#### C# (Frontend WPF)
 
-- Use strict mode
-- Evite `any`, prefira tipos específicos
-- Componentes devem ter interfaces claras
+- Use nullable reference types
+- Evite `dynamic`, prefira tipos específicos
+- Siga convenções WPF para MVVM (se aplicável)
 
-```typescript
-interface ChatMessage {
-  role: 'user' | 'assistant';
-  content: string;
-  timestamp: string;
+```csharp
+public class ChatMessage
+{
+    public string Role { get; set; } = string.Empty;
+    public string Content { get; set; } = string.Empty;
+    public DateTime? Timestamp { get; set; }
 }
 ```
 
 ### Testes
 
 - Backend: Use pytest
-- Frontend: Use jest (se configurado)
+- Frontend: Use MSTest ou xUnit (se configurado)
 - Cobertura mínima: 70%
 
 ```bash
@@ -185,7 +186,7 @@ Use o template de issue:
 ## Ambiente
 - OS: [Windows/macOS/Linux]
 - Versão do ORB: [1.0.0]
-- Node.js: [18.x]
+- .NET SDK: [9.0.x]
 - Python: [3.11]
 ```
 
@@ -222,7 +223,7 @@ nova-feature/
 
 - **Arquivos**: `snake_case.py`, `kebab-case.ts`
 - **Classes**: `PascalCase`
-- **Funções**: `snake_case` (Python), `camelCase` (TypeScript)
+- **Funções**: `snake_case` (Python), `PascalCase` (C# métodos públicos), `camelCase` (C# variáveis locais)
 - **Constantes**: `UPPER_SNAKE_CASE`
 - **Variáveis privadas**: `_leading_underscore`
 
