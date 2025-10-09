@@ -32,12 +32,17 @@ public partial class App : System.Windows.Application
     private ChatWindow? _chatWindow;
     private ConfigWindow? _configWindow;
     private HotCornerService? _hotCornerService;
+    private SystemTrayService? _systemTrayService;
+    private BackendProcessManager? _backendProcessManager;
     private HwndSource? _hwndSource;
     private Window? _invisibleWindow; // Janela auxiliar para hotkey
 
     protected override void OnStartup(StartupEventArgs e)
     {
         base.OnStartup(e);
+
+        // Iniciar backend Python
+        InitializeBackendAsync();
 
         // Configurar Dependency Injection
         var services = new ServiceCollection();
@@ -56,8 +61,45 @@ public partial class App : System.Windows.Application
         _hotCornerService.HotCornerEntered += OnHotCornerEntered;
         _hotCornerService.Start();
         
+        // Configurar System Tray
+        _systemTrayService = new SystemTrayService();
+        _systemTrayService.ConfigurationRequested += OnConfigRequest;
+        _systemTrayService.AboutRequested += OnAboutRequest;
+        _systemTrayService.ExitRequested += OnExitRequest;
+        
         // Criar janela invisível para receber hotkeys globais
         CreateInvisibleWindow();
+    }
+
+    private async void InitializeBackendAsync()
+    {
+        System.Diagnostics.Debug.WriteLine("🚀 Iniciando backend...");
+        _backendProcessManager = new BackendProcessManager();
+        var started = await _backendProcessManager.StartBackendAsync();
+        
+        if (!started)
+        {
+            System.Diagnostics.Debug.WriteLine("❌ FALHA ao iniciar backend Python");
+            System.Windows.MessageBox.Show(
+                "Falha ao conectar com o backend Python.\n\n" +
+                "Verifique:\n" +
+                "1. Python está instalado\n" +
+                "2. Backend está em: backend/\n" +
+                "3. Veja o Debug Output para mais detalhes",
+                "Erro - Backend",
+                MessageBoxButton.OK,
+                MessageBoxImage.Warning
+            );
+        }
+        else
+        {
+            System.Diagnostics.Debug.WriteLine("✅ Backend Python inicializado com sucesso!");
+            _systemTrayService?.ShowNotification(
+                "Orb Agent",
+                "Backend conectado com sucesso!",
+                System.Windows.Forms.ToolTipIcon.Info
+            );
+        }
     }
 
     private void ConfigureServices(IServiceCollection services)
@@ -78,15 +120,16 @@ public partial class App : System.Windows.Application
 
     private void OnOrbClicked(object? sender, EventArgs e)
     {
-        // Criar ou mostrar janela de chat
-        if (_chatWindow == null || !_chatWindow.IsLoaded)
+        // SEMPRE criar nova instância para nova sessão
+        var backendService = _serviceProvider?.GetService<BackendService>();
+        if (backendService != null)
         {
-            var backendService = _serviceProvider?.GetService<BackendService>();
-            if (backendService != null)
-            {
-                _chatWindow = new ChatWindow(backendService);
-                _chatWindow.ChatClosed += OnChatClosed;
-            }
+            // Fechar janela anterior se existir
+            _chatWindow?.Close();
+            
+            // Criar nova instância
+            _chatWindow = new ChatWindow(backendService);
+            _chatWindow.ChatClosed += OnChatClosed;
         }
         
         _chatWindow?.ShowChat();
@@ -182,15 +225,16 @@ public partial class App : System.Windows.Application
         var screenshotService = new ScreenshotService();
         var base64Image = screenshotService.CaptureFullScreen();
         
-        // Abrir ou focar o chat
-        if (_chatWindow == null || !_chatWindow.IsLoaded)
+        // SEMPRE criar nova instância para nova sessão
+        var backendService = _serviceProvider?.GetService<BackendService>();
+        if (backendService != null)
         {
-            var backendService = _serviceProvider?.GetService<BackendService>();
-            if (backendService != null)
-            {
-                _chatWindow = new ChatWindow(backendService);
-                _chatWindow.ChatClosed += OnChatClosed;
-            }
+            // Fechar janela anterior se existir
+            _chatWindow?.Close();
+            
+            // Criar nova instância
+            _chatWindow = new ChatWindow(backendService);
+            _chatWindow.ChatClosed += OnChatClosed;
         }
         
         // Mostrar chat e adicionar imagem
@@ -206,7 +250,8 @@ public partial class App : System.Windows.Application
         // Criar ou mostrar janela de configuração
         if (_configWindow == null || !_configWindow.IsLoaded)
         {
-            _configWindow = new ConfigWindow();
+            var backendService = _serviceProvider?.GetService<BackendService>();
+            _configWindow = new ConfigWindow(backendService);
             _configWindow.ConfigClosed += OnConfigClosed;
         }
         
@@ -216,6 +261,25 @@ public partial class App : System.Windows.Application
     private void OnConfigClosed(object? sender, EventArgs e)
     {
         // Config fechado - sem ação necessária por enquanto
+    }
+    
+    private void OnAboutRequest(object? sender, EventArgs e)
+    {
+        // Mostrar informações sobre o Orb
+        _systemTrayService?.ShowNotification(
+            "Orb Agent",
+            "Assistente Inteligente v1.0\nDesenvolvido com WPF + Python",
+            System.Windows.Forms.ToolTipIcon.Info
+        );
+    }
+    
+    private void OnExitRequest(object? sender, EventArgs e)
+    {
+        // Confirmação antes de sair com janela personalizada
+        if (ConfirmationWindow.ShowExitConfirmation())
+        {
+            System.Windows.Application.Current.Shutdown();
+        }
     }
 
     protected override void OnExit(ExitEventArgs e)
@@ -231,6 +295,8 @@ public partial class App : System.Windows.Application
         
         _invisibleWindow?.Close();
         _hotCornerService?.Stop();
+        _systemTrayService?.Dispose();
+        _backendProcessManager?.Dispose();
         _serviceProvider?.Dispose();
         base.OnExit(e);
     }

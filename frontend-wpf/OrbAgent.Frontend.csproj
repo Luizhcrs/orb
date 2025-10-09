@@ -7,6 +7,11 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
     <UseWindowsForms>true</UseWindowsForms>
+    
+    <!-- Nome do processo -->
+    <AssemblyName>Orb</AssemblyName>
+    <Product>Orb Agent</Product>
+    <!-- <ApplicationIcon>Assets\orb.ico</ApplicationIcon> --> <!-- Descomentar quando adicionar orb.ico -->
   </PropertyGroup>
 
   <ItemGroup>
@@ -14,6 +19,10 @@
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.9" />
     <PackageReference Include="Microsoft.Extensions.Http" Version="9.0.9" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Assets\**\*" />
   </ItemGroup>
 
 </Project>
