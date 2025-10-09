@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Controls;
@@ -17,6 +18,7 @@ namespace OrbAgent.Frontend.Windows
         private readonly BackendService _backendService;
         private bool _isExpanded = false;
         private string? _currentScreenshot;
+        private string? _currentSessionId;
         private const int COMPACT_WIDTH = 380;
         private const int COMPACT_HEIGHT = 512;
         private const int EXPANDED_WIDTH = 660;
@@ -58,12 +60,287 @@ namespace OrbAgent.Frontend.Windows
 
         public ChatWindow(BackendService backendService)
         {
+            Services.LoggingService.LogInfo("🪟 ChatWindow construtor chamado");
             InitializeComponent();
             _backendService = backendService;
             
+            Services.LoggingService.LogDebug("InitializeComponent concluído");
+            
+            // FORÇAR VISIBILIDADE IMEDIATA (sem animação)
+            ChatContainer.Opacity = 1.0;
+            Services.LoggingService.LogDebug("ChatContainer.Opacity definido como 1.0");
+            
             // Habilitar transparência real após carregamento
             this.SourceInitialized += OnSourceInitialized;
+            this.Loaded += ChatWindow_Loaded;
         }
+        
+        private void ChatWindow_Loaded(object sender, RoutedEventArgs e)
+        {
+            Services.LoggingService.LogInfo("🪟 ChatWindow.Loaded evento disparado");
+            Services.LoggingService.LogDebug($"ChatContainer é null? {ChatContainer == null}");
+            Services.LoggingService.LogDebug($"MessagesPanel é null? {MessagesPanel == null}");
+            Services.LoggingService.LogDebug($"MessagesScrollViewer é null? {MessagesScrollViewer == null}");
+            Services.LoggingService.LogDebug($"ExpandBtn é null? {ExpandBtn == null}");
+            Services.LoggingService.LogDebug($"CloseBtn é null? {CloseBtn == null}");
+            
+            // Verificar tamanho da janela
+            Services.LoggingService.LogDebug($"Window Width: {this.Width}, Height: {this.Height}");
+            Services.LoggingService.LogDebug($"Window Position: Left={this.Left}, Top={this.Top}");
+            Services.LoggingService.LogDebug($"WindowState: {this.WindowState}");
+            
+            // NOVA SESSÃO A CADA ABERTURA (se não veio do histórico)
+            if (string.IsNullOrEmpty(_currentSessionId))
+            {
+                _currentSessionId = Guid.NewGuid().ToString();
+                Services.LoggingService.LogInfo($"🆕 Nova sessão criada no Loaded: {_currentSessionId}");
+            }
+            else
+            {
+                Services.LoggingService.LogInfo($"📚 Usando sessão existente: {_currentSessionId}");
+            }
+        }
+        
+        // INDICADOR DE DIGITAÇÃO (3 pontos animados)
+        private void ShowTypingIndicator()
+        {
+            try
+            {
+                Services.LoggingService.LogDebug("🔵 Mostrando indicador de digitação...");
+                
+                // CRIAR INDICADOR PROGRAMATICAMENTE (sempre no final)
+                var typingIndicator = CreateTypingIndicator();
+                
+                // Adicionar ao FINAL do MessagesPanel
+                MessagesPanel.Children.Add(typingIndicator);
+                
+                Services.LoggingService.LogDebug($"Indicador adicionado ao MessagesPanel. Total children: {MessagesPanel.Children.Count}");
+                
+                // Iniciar animação dos pontos
+                StartTypingAnimation(typingIndicator);
+                
+                // Scroll para o final para mostrar o indicador
+                MessagesScrollViewer.ScrollToEnd();
+                
+                Services.LoggingService.LogSuccess("✅ Indicador de digitação mostrado com sucesso!");
+            }
+            catch (Exception ex)
+            {
+                Services.LoggingService.LogError("Erro ao mostrar indicador de digitação", ex);
+            }
+        }
+        
+        private void HideTypingIndicator()
+        {
+            try
+            {
+                Services.LoggingService.LogDebug("🔴 Escondendo indicador de digitação...");
+                
+                // REMOVER INDICADOR DO PANEL (se existir)
+                var typingIndicator = MessagesPanel.Children.OfType<Border>()
+                    .FirstOrDefault(b => b.Name == "TypingIndicator");
+                
+                if (typingIndicator != null)
+                {
+                    MessagesPanel.Children.Remove(typingIndicator);
+                    Services.LoggingService.LogDebug("Indicador removido do MessagesPanel");
+                }
+                else
+                {
+                    Services.LoggingService.LogDebug("Nenhum indicador encontrado para remover");
+                }
+            }
+            catch (Exception ex)
+            {
+                Services.LoggingService.LogError("Erro ao esconder indicador de digitação", ex);
+            }
+        }
+        
+        private Border CreateTypingIndicator()
+        {
+            var typingIndicator = new Border
+            {
+                Name = "TypingIndicator",
+                HorizontalAlignment = System.Windows.HorizontalAlignment.Left,
+                MaxWidth = 200,
+                Margin = new Thickness(0, 8, 0, 0),
+                Background = new LinearGradientBrush
+                {
+                    StartPoint = new System.Windows.Point(0, 0),
+                    EndPoint = new System.Windows.Point(1, 1),
+                    GradientStops = new GradientStopCollection
+                    {
+                        new GradientStop(System.Windows.Media.Color.FromArgb(46, 255, 255, 255), 0),
+                        new GradientStop(System.Windows.Media.Color.FromArgb(38, 255, 255, 255), 1)
+                    }
+                },
+                BorderBrush = new SolidColorBrush(System.Windows.Media.Color.FromArgb(64, 255, 255, 255)),
+                BorderThickness = new Thickness(1),
+                CornerRadius = new CornerRadius(18),
+                Effect = new DropShadowEffect
+                {
+                    Color = System.Windows.Media.Colors.Black,
+                    BlurRadius = 8,
+                    ShadowDepth = 2,
+                    Opacity = 0.15
+                }
+            };
+            
+            var dotsPanel = new StackPanel
+            {
+                Orientation = System.Windows.Controls.Orientation.Horizontal,
+                Margin = new Thickness(12),
+                HorizontalAlignment = System.Windows.HorizontalAlignment.Center
+            };
+            
+            // 3 PONTOS ANIMADOS
+            var dot1 = new System.Windows.Shapes.Ellipse
+            {
+                Name = "TypingDot1",
+                Width = 8,
+                Height = 8,
+                Fill = new SolidColorBrush(System.Windows.Media.Color.FromArgb(204, 255, 255, 255)),
+                Margin = new Thickness(0, 0, 4, 0),
+                RenderTransform = new ScaleTransform(0.8, 0.8)
+            };
+            
+            var dot2 = new System.Windows.Shapes.Ellipse
+            {
+                Name = "TypingDot2",
+                Width = 8,
+                Height = 8,
+                Fill = new SolidColorBrush(System.Windows.Media.Color.FromArgb(204, 255, 255, 255)),
+                Margin = new Thickness(0, 0, 4, 0),
+                RenderTransform = new ScaleTransform(0.8, 0.8)
+            };
+            
+            var dot3 = new System.Windows.Shapes.Ellipse
+            {
+                Name = "TypingDot3",
+                Width = 8,
+                Height = 8,
+                Fill = new SolidColorBrush(System.Windows.Media.Color.FromArgb(204, 255, 255, 255)),
+                RenderTransform = new ScaleTransform(0.8, 0.8)
+            };
+            
+            dotsPanel.Children.Add(dot1);
+            dotsPanel.Children.Add(dot2);
+            dotsPanel.Children.Add(dot3);
+            
+            typingIndicator.Child = dotsPanel;
+            
+            return typingIndicator;
+        }
+        
+        private void StartTypingAnimation(Border typingIndicator)
+        {
+            try
+            {
+                // Encontrar os pontos dentro do indicador
+                var dotsPanel = typingIndicator.Child as StackPanel;
+                if (dotsPanel?.Children.Count >= 3)
+                {
+                    var dot1 = dotsPanel.Children[0] as System.Windows.Shapes.Ellipse;
+                    var dot2 = dotsPanel.Children[1] as System.Windows.Shapes.Ellipse;
+                    var dot3 = dotsPanel.Children[2] as System.Windows.Shapes.Ellipse;
+                    
+                    if (dot1?.RenderTransform is ScaleTransform scale1 &&
+                        dot2?.RenderTransform is ScaleTransform scale2 &&
+                        dot3?.RenderTransform is ScaleTransform scale3)
+                    {
+                        // Animação do ponto 1 (delay 0s)
+                        var storyboard1 = new System.Windows.Media.Animation.Storyboard();
+                        var animation1 = new System.Windows.Media.Animation.DoubleAnimation
+                        {
+                            From = 0.8,
+                            To = 1.0,
+                            Duration = TimeSpan.FromMilliseconds(700),
+                            RepeatBehavior = System.Windows.Media.Animation.RepeatBehavior.Forever,
+                            AutoReverse = true
+                        };
+                        System.Windows.Media.Animation.Storyboard.SetTarget(animation1, scale1);
+                        System.Windows.Media.Animation.Storyboard.SetTargetProperty(animation1, new PropertyPath("ScaleX"));
+                        storyboard1.Children.Add(animation1);
+                        
+                        var animation1Y = new System.Windows.Media.Animation.DoubleAnimation
+                        {
+                            From = 0.8,
+                            To = 1.0,
+                            Duration = TimeSpan.FromMilliseconds(700),
+                            RepeatBehavior = System.Windows.Media.Animation.RepeatBehavior.Forever,
+                            AutoReverse = true
+                        };
+                        System.Windows.Media.Animation.Storyboard.SetTarget(animation1Y, scale1);
+                        System.Windows.Media.Animation.Storyboard.SetTargetProperty(animation1Y, new PropertyPath("ScaleY"));
+                        storyboard1.Children.Add(animation1Y);
+                        storyboard1.Begin();
+                        
+                        // Animação do ponto 2 (delay 0.16s)
+                        var storyboard2 = new System.Windows.Media.Animation.Storyboard();
+                        var animation2 = new System.Windows.Media.Animation.DoubleAnimation
+                        {
+                            From = 0.8,
+                            To = 1.0,
+                            Duration = TimeSpan.FromMilliseconds(700),
+                            BeginTime = TimeSpan.FromMilliseconds(160),
+                            RepeatBehavior = System.Windows.Media.Animation.RepeatBehavior.Forever,
+                            AutoReverse = true
+                        };
+                        System.Windows.Media.Animation.Storyboard.SetTarget(animation2, scale2);
+                        System.Windows.Media.Animation.Storyboard.SetTargetProperty(animation2, new PropertyPath("ScaleX"));
+                        storyboard2.Children.Add(animation2);
+                        
+                        var animation2Y = new System.Windows.Media.Animation.DoubleAnimation
+                        {
+                            From = 0.8,
+                            To = 1.0,
+                            Duration = TimeSpan.FromMilliseconds(700),
+                            BeginTime = TimeSpan.FromMilliseconds(160),
+                            RepeatBehavior = System.Windows.Media.Animation.RepeatBehavior.Forever,
+                            AutoReverse = true
+                        };
+                        System.Windows.Media.Animation.Storyboard.SetTarget(animation2Y, scale2);
+                        System.Windows.Media.Animation.Storyboard.SetTargetProperty(animation2Y, new PropertyPath("ScaleY"));
+                        storyboard2.Children.Add(animation2Y);
+                        storyboard2.Begin();
+                        
+                        // Animação do ponto 3 (delay 0.32s)
+                        var storyboard3 = new System.Windows.Media.Animation.Storyboard();
+                        var animation3 = new System.Windows.Media.Animation.DoubleAnimation
+                        {
+                            From = 0.8,
+                            To = 1.0,
+                            Duration = TimeSpan.FromMilliseconds(700),
+                            BeginTime = TimeSpan.FromMilliseconds(320),
+                            RepeatBehavior = System.Windows.Media.Animation.RepeatBehavior.Forever,
+                            AutoReverse = true
+                        };
+                        System.Windows.Media.Animation.Storyboard.SetTarget(animation3, scale3);
+                        System.Windows.Media.Animation.Storyboard.SetTargetProperty(animation3, new PropertyPath("ScaleX"));
+                        storyboard3.Children.Add(animation3);
+                        
+                        var animation3Y = new System.Windows.Media.Animation.DoubleAnimation
+                        {
+                            From = 0.8,
+                            To = 1.0,
+                            Duration = TimeSpan.FromMilliseconds(700),
+                            BeginTime = TimeSpan.FromMilliseconds(320),
+                            RepeatBehavior = System.Windows.Media.Animation.RepeatBehavior.Forever,
+                            AutoReverse = true
+                        };
+                        System.Windows.Media.Animation.Storyboard.SetTarget(animation3Y, scale3);
+                        System.Windows.Media.Animation.Storyboard.SetTargetProperty(animation3Y, new PropertyPath("ScaleY"));
+                        storyboard3.Children.Add(animation3Y);
+                        storyboard3.Begin();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Services.LoggingService.LogError("Erro ao iniciar animação de digitação", ex);
+            }
+        }
+        
         
         private void OnSourceInitialized(object? sender, EventArgs e)
         {
@@ -210,20 +487,42 @@ namespace OrbAgent.Frontend.Windows
             
             try
             {
-                // Enviar para backend
+                // MOSTRAR INDICADOR DE DIGITAÇÃO
+                ShowTypingIndicator();
+                
+                // Enviar para backend (continuando sessão se existir)
+                Services.LoggingService.LogDebug($"Enviando mensagem com SessionId: {_currentSessionId}");
+                
                 var request = new AgentRequest
                 {
                     Message = message,
-                    ImageData = _currentScreenshot // Incluir imagem se disponível
+                    ImageData = _currentScreenshot, // Incluir imagem se disponível
+                    SessionId = _currentSessionId // Continuar sessão histórica se carregada
                 };
                 
                 var response = await _backendService.SendMessageAsync(request);
                 
+                // Atualizar session ID se veio do backend
+                if (!string.IsNullOrEmpty(response.SessionId))
+                {
+                    Services.LoggingService.LogDebug($"Backend retornou SessionId: {response.SessionId}");
+                    _currentSessionId = response.SessionId;
+                }
+                else
+                {
+                    Services.LoggingService.LogDebug("Backend não retornou SessionId");
+                }
+                
+                // ESCONDER INDICADOR DE DIGITAÇÃO
+                HideTypingIndicator();
+                
                 // Adicionar resposta do agente
-                AddMessage("assistant", response.Response);
+                AddMessage("assistant", response.Content);
             }
             catch (Exception ex)
             {
+                // ESCONDER INDICADOR DE DIGITAÇÃO EM CASO DE ERRO
+                HideTypingIndicator();
                 AddMessage("error", $"Erro: {ex.Message}");
             }
             finally
@@ -254,6 +553,8 @@ namespace OrbAgent.Frontend.Windows
 
         private void AddMessage(string role, string content, string? imageData = null)
         {
+            Services.LoggingService.LogDebug($"💬 AddMessage chamado - Role: {role}, Content: {(string.IsNullOrEmpty(content) ? "(vazio)" : content.Substring(0, Math.Min(50, content.Length)))}...");
+            
             // Container para mensagem + timestamp
             var messageContainer = new StackPanel
             {
@@ -322,10 +623,13 @@ namespace OrbAgent.Frontend.Windows
                     // ZIndex será definido após a criação
                 };
                 
+                // Remover prefixo se existir (data:image/png;base64,)
+                var base64Only = imageData.Contains(",") ? imageData.Split(',')[1] : imageData;
+                
                 // Converter base64 para BitmapImage
                 var bitmap = new System.Windows.Media.Imaging.BitmapImage();
                 bitmap.BeginInit();
-                bitmap.StreamSource = new System.IO.MemoryStream(Convert.FromBase64String(imageData.Split(',')[1]));
+                bitmap.StreamSource = new System.IO.MemoryStream(Convert.FromBase64String(base64Only));
                 bitmap.EndInit();
                 bitmap.Freeze();
                 
@@ -375,7 +679,10 @@ namespace OrbAgent.Frontend.Windows
             };
             
             messageContainer.Children.Add(timestamp);
+            
+            Services.LoggingService.LogDebug($"➕ Adicionando mensagem ao MessagesPanel. Total antes: {MessagesPanel.Children.Count}");
             MessagesPanel.Children.Add(messageContainer);
+            Services.LoggingService.LogSuccess($"✅ Mensagem adicionada! Total agora: {MessagesPanel.Children.Count}");
             
             // Scroll para o final
             MessagesScrollViewer.ScrollToEnd();
@@ -418,13 +725,18 @@ namespace OrbAgent.Frontend.Windows
         /// </summary>
         public void AttachScreenshot(string base64Image)
         {
-            // Armazenar imagem
-            _currentScreenshot = base64Image;
+            // Remover prefixo "data:image/png;base64," se existir
+            var base64Only = base64Image.Contains(",") ? base64Image.Split(',')[1] : base64Image;
+            
+            // Armazenar apenas o base64 puro (sem prefixo)
+            _currentScreenshot = base64Only;
+            
+            LoggingService.Log($"📸 Screenshot anexado - tamanho: {base64Only.Length} chars");
             
             // Converter base64 para BitmapImage
             var bitmap = new System.Windows.Media.Imaging.BitmapImage();
             bitmap.BeginInit();
-            bitmap.StreamSource = new System.IO.MemoryStream(Convert.FromBase64String(base64Image.Split(',')[1]));
+            bitmap.StreamSource = new System.IO.MemoryStream(Convert.FromBase64String(base64Only));
             bitmap.EndInit();
             bitmap.Freeze();
             
@@ -645,6 +957,68 @@ namespace OrbAgent.Frontend.Windows
             
             ChatContainer.BeginAnimation(OpacityProperty, fadeIn);
             MessageInput.Focus();
+        }
+        
+        /// <summary>
+        /// Carrega uma sessão histórica no chat
+        /// </summary>
+        public System.Threading.Tasks.Task LoadHistorySession(string sessionId, System.Text.Json.JsonElement sessionData)
+        {
+            Services.LoggingService.LogInfo($"📚 Carregando sessão histórica: {sessionId}");
+            
+            try
+            {
+                // Guardar ID da sessão para continuar conversando
+                _currentSessionId = sessionId;
+                
+                // LIMPAR MENSAGENS EXISTENTES (incluindo o indicador se estiver visível)
+                MessagesPanel.Children.Clear();
+                Services.LoggingService.LogDebug("MessagesPanel limpo para carregar histórico");
+                
+                // O backend retorna um ARRAY de mensagens diretamente (não um objeto com propriedade "messages")
+                if (sessionData.ValueKind == System.Text.Json.JsonValueKind.Array)
+                {
+                    var messagesCount = sessionData.GetArrayLength();
+                    Services.LoggingService.LogDebug($"Encontradas {messagesCount} mensagens");
+                    
+                    foreach (var messageElement in sessionData.EnumerateArray())
+                    {
+                        var role = messageElement.GetProperty("role").GetString();
+                        var content = messageElement.GetProperty("content").GetString();
+                        
+                        // Extrair imageData se existir
+                        string? imageData = null;
+                        if (messageElement.TryGetProperty("additional_kwargs", out var additionalKwargs))
+                        {
+                            if (additionalKwargs.TryGetProperty("image_data", out var imageDataProp))
+                            {
+                                imageData = imageDataProp.GetString();
+                            }
+                        }
+                        
+                        if (role == "user")
+                        {
+                            AddMessage("user", content ?? "", imageData);
+                        }
+                        else if (role == "assistant")
+                        {
+                            AddMessage("assistant", content ?? "");
+                        }
+                    }
+                    
+                    Services.LoggingService.LogSuccess($"✅ {messagesCount} mensagens carregadas!");
+                }
+                else
+                {
+                    Services.LoggingService.LogError($"sessionData não é um array! Tipo: {sessionData.ValueKind}");
+                }
+            }
+            catch (Exception ex)
+            {
+                Services.LoggingService.LogError("Erro ao carregar sessão histórica", ex);
+            }
+            
+            return System.Threading.Tasks.Task.CompletedTask;
         }
     }
 }

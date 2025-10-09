@@ -31,10 +31,14 @@ namespace OrbAgent.Frontend.Models
     /// </summary>
     public class AgentResponse
     {
-        public string Response { get; set; } = string.Empty;
+        public string Content { get; set; } = string.Empty;
+        public string SessionId { get; set; } = string.Empty;
         public string Timestamp { get; set; } = string.Empty;
-        public string Model { get; set; } = string.Empty;
-        public string Provider { get; set; } = string.Empty;
+        public string? ModelUsed { get; set; }
+        public string? Provider { get; set; }
+        public string? ToolUsed { get; set; }
+        public string? Reasoning { get; set; }
+        public string? Error { get; set; }
     }
 }
 
