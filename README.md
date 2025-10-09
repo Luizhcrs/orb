@@ -2,9 +2,9 @@
 
 ![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)
 ![License](https://img.shields.io/badge/license-MIT-green.svg)
-![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-lightgrey.svg)
+![Platform](https://img.shields.io/badge/platform-Windows-lightgrey.svg)
 
-ORB é um assistente de IA flutuante para desktop que utiliza modelos de linguagem (LLM) para fornecer ajuda contextual enquanto você trabalha. Com uma interface minimalista em "liquid glass", o ORB fica disponível através de hot corners e atalhos globais.
+ORB é um assistente de IA flutuante para desktop que utiliza modelos de linguagem (LLM) para fornecer ajuda contextual enquanto você trabalha. Com uma interface minimalista em "liquid glass" desenvolvida em WPF, o ORB fica disponível através de hot corners e atalhos globais.
 
 ## ✨ Características
 
@@ -20,10 +20,8 @@ ORB é um assistente de IA flutuante para desktop que utiliza modelos de linguag
 
 ### Para Usuários Finais
 
-1. **Baixe o instalador** para seu sistema operacional:
+1. **Baixe o instalador** para Windows:
    - Windows: `OrbAgent-Setup-1.0.0.exe` ou `OrbAgent-Portable-1.0.0.exe`
-   - macOS: `OrbAgent-1.0.0.dmg` ou `OrbAgent-1.0.0-mac.zip`
-   - Linux: `OrbAgent-1.0.0.AppImage` ou `orb-agent_1.0.0_amd64.deb`
 
 2. **Instale e execute**
 
@@ -40,17 +38,11 @@ ORB é um assistente de IA flutuante para desktop que utiliza modelos de linguag
 
 #### Requisitos
 
-- Node.js 18+
+- .NET 9.0 SDK
 - Python 3.11+
-- npm ou yarn
+- Visual Studio 2022 ou VS Code (recomendado)
 
 #### Setup Automatizado
-
-**Linux/macOS:**
-```bash
-chmod +x setup-dev.sh
-./setup-dev.sh
-```
 
 **Windows:**
 ```batch
@@ -93,14 +85,11 @@ cd ..
 ```bash
 cd frontend
 
-# Criar .env
-cp env.example .env
-
-# Instalar dependências
-npm install
+# Restaurar dependências NuGet
+dotnet restore
 
 # Build inicial
-npm run build
+dotnet build
 
 cd ..
 ```
@@ -109,20 +98,20 @@ cd ..
 ```bash
 # Na raiz do projeto
 npm run dev
+# ou
+dotnet run --project frontend
 ```
 
 ## 🏗️ Arquitetura
 
 ```
 orb/
-├── frontend/                 # Aplicação Electron
-│   ├── src/
-│   │   ├── components/      # Componentes da UI (Chat, Config)
-│   │   ├── llm/            # Gerenciamento de LLM
-│   │   ├── managers/       # Window, Shortcuts, Mouse
-│   │   ├── services/       # Backend API, Screenshot
-│   │   └── main.ts         # Entry point do Electron
-│   └── package.json
+├── frontend/                 # Aplicação WPF (.NET)
+│   ├── Windows/             # Janelas da aplicação (Chat, Config, Orb)
+│   ├── Services/            # Serviços (Backend, Screenshot, System Tray)
+│   ├── Models/              # Modelos de dados
+│   ├── Helpers/             # Utilitários
+│   └── OrbAgent.Frontend.csproj
 │
 ├── backend/                 # API FastAPI
 │   ├── src/
@@ -151,7 +140,7 @@ npm run dev:backend
 # Apenas frontend
 npm run dev:frontend
 
-# Build do TypeScript
+# Build do .NET
 npm run build
 
 # Limpar builds
@@ -232,9 +221,7 @@ Todas as configurações podem ser ajustadas através da interface gráfica (`Ct
 
 ### Pré-requisitos para Build
 
-- **Windows**: VS Build Tools 2019+
-- **macOS**: Xcode Command Line Tools
-- **Linux**: build-essential, rpm (para .deb e .rpm)
+- **Windows**: .NET 9.0 SDK, Visual Studio 2022 ou VS Code
 
 ### Processo de Build
 
@@ -247,29 +234,23 @@ npm install
 cd backend && pip install -r requirements.txt && cd ..
 ```
 
-2. **Crie os instaladores:**
+2. **Crie o instalador:**
 ```bash
-# Sua plataforma atual
-npm run pack:win    # Windows
-npm run pack:mac    # macOS
-npm run pack:linux  # Linux
-
-# Ou todas (requer ferramentas de cada plataforma)
-npm run pack:all
+# Windows
+npm run pack:win
 ```
 
 3. **Artefatos gerados em** `frontend/release/`:
    - Windows: `.exe` (setup) e `.exe` (portable)
-   - macOS: `.dmg` e `.zip`
-   - Linux: `.AppImage` e `.deb`
 
 ### Versionamento
 
-Atualize a versão em `frontend/package.json`:
-```json
-{
-  "version": "1.1.0"
-}
+Atualize a versão em `frontend/OrbAgent.Frontend.csproj`:
+```xml
+<PropertyGroup>
+  <AssemblyVersion>1.1.0.0</AssemblyVersion>
+  <FileVersion>1.1.0.0</FileVersion>
+</PropertyGroup>
 ```
 
 ## 🧪 Testes
@@ -300,10 +281,9 @@ Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para ma
 
 ## 🙏 Agradecimentos
 
-- [Electron](https://www.electronjs.org/) - Framework para aplicações desktop
+- [WPF](https://docs.microsoft.com/en-us/dotnet/desktop/wpf/) - Framework para aplicações desktop .NET
 - [FastAPI](https://fastapi.tiangolo.com/) - Framework web Python moderno
 - [OpenAI](https://openai.com/) - APIs de LLM
-- [Anthropic](https://www.anthropic.com/) - Claude API
 
 ## 📞 Suporte
 
@@ -317,8 +297,8 @@ Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para ma
 - [ ] Plugins e extensões
 - [ ] Themes customizáveis
 - [ ] Sincronização em nuvem (opcional)
-- [ ] Mobile companion app
 - [ ] Comandos de voz
+- [ ] Backend em C# (.NET Core)
 
 ---
 

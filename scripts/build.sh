@@ -1,38 +1,21 @@
 #!/bin/bash
 
-# Script de build para distribuição do Orb Agent
+# Build script for ORB project
+set -e
 
-echo "🔨 Building Orb Agent for distribution..."
+echo "🔨 Building ORB project..."
 
-# Limpar builds anteriores
-echo "🧹 Limpando builds anteriores..."
-npm run clean
+# Build frontend (WPF)
+echo "📦 Building frontend..."
+cd frontend
+dotnet restore
+dotnet build --configuration Release
+cd ..
 
-# Instalar dependências
-echo "📦 Instalando dependências..."
-npm install
+# Build backend
+echo "🐍 Building backend..."
+cd backend
+python -m pip install -r requirements.txt
+cd ..
 
-# Build TypeScript
-echo "🔧 Compilando TypeScript..."
-npm run build
-
-if [ $? -ne 0 ]; then
-    echo "❌ Erro ao compilar TypeScript"
-    exit 1
-fi
-
-# Criar executáveis
-echo "📦 Criando executáveis..."
-npm run electron:pack
-
-if [ $? -ne 0 ]; then
-    echo "❌ Erro ao criar executáveis"
-    exit 1
-fi
-
-echo "✅ Build concluído com sucesso!"
-echo ""
-echo "📁 Executáveis disponíveis em: release/"
-echo ""
-echo "🚀 Para testar localmente:"
-echo "   npm start"
+echo "✅ Build completed successfully!"

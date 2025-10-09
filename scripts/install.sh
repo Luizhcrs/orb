@@ -1,56 +1,46 @@
 #!/bin/bash
 
-# Script de instalação do Orb Agent
+# Installation script for ORB project
+set -e
 
-echo "🚀 Instalando Orb Agent..."
+echo "🚀 Installing ORB project..."
 
-# Verificar se Node.js está instalado
-if ! command -v node &> /dev/null; then
-    echo "❌ Node.js não encontrado. Por favor, instale Node.js 18+ primeiro."
-    echo "   Download: https://nodejs.org/"
+# Check if .NET SDK is installed
+if ! command -v dotnet &> /dev/null; then
+    echo "❌ .NET SDK not found. Please install .NET 9.0 SDK first."
+    echo "Visit: https://dotnet.microsoft.com/download"
     exit 1
 fi
 
-# Verificar versão do Node.js
-NODE_VERSION=$(node -v | cut -d'v' -f2 | cut -d'.' -f1)
-if [ "$NODE_VERSION" -lt 18 ]; then
-    echo "❌ Node.js versão 18+ é necessária. Versão atual: $(node -v)"
+# Check if Python is installed
+if ! command -v python3 &> /dev/null; then
+    echo "❌ Python not found. Please install Python 3.11+ first."
     exit 1
 fi
 
-echo "✅ Node.js $(node -v) encontrado"
+# Install backend dependencies
+echo "🐍 Installing backend dependencies..."
+cd backend
+python3 -m pip install -r requirements.txt
 
-# Instalar dependências
-echo "📦 Instalando dependências..."
-npm install
-
-if [ $? -ne 0 ]; then
-    echo "❌ Erro ao instalar dependências"
-    exit 1
-fi
-
-# Criar arquivo .env se não existir
+# Create .env if it doesn't exist
 if [ ! -f .env ]; then
-    echo "📝 Criando arquivo .env..."
+    echo "📝 Creating .env file..."
     cp env.example .env
-    echo "⚠️  Configure suas chaves de API no arquivo .env"
+    
+    # Generate Fernet key
+    echo "🔑 Generating encryption key..."
+    python3 -c "from cryptography.fernet import Fernet; print('FERNET_KEY=' + Fernet.generate_key().decode())" >> .env
 fi
 
-# Build do projeto
-echo "🔨 Compilando projeto..."
-npm run build
+cd ..
 
-if [ $? -ne 0 ]; then
-    echo "❌ Erro ao compilar projeto"
-    exit 1
-fi
+# Build frontend
+echo "📦 Building frontend..."
+cd frontend
+dotnet restore
+dotnet build --configuration Release
+cd ..
 
-echo "✅ Orb Agent instalado com sucesso!"
-echo ""
-echo "🎮 Para executar:"
-echo "   npm start"
-echo ""
-echo "🛠️  Para desenvolvimento:"
-echo "   npm run dev"
-echo ""
-echo "⚙️  Configure suas chaves de API no arquivo .env para usar o assistente AI"
+echo "✅ Installation completed successfully!"
+echo "🎉 You can now run the project with: npm run dev"

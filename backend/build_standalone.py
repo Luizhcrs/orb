@@ -57,11 +57,11 @@ args = [
 ]
 
 if __name__ == '__main__':
-    print("🔨 Criando executável standalone do backend...")
-    print(f"📂 Diretório base: {BASE_DIR}")
+    print(" Criando executável standalone do backend...")
+    print(f" Diretório base: {BASE_DIR}")
     
     PyInstaller.__main__.run(args)
     
-    print("✅ Build concluído!")
-    print(f"📦 Executável: {os.path.join(BASE_DIR, 'dist', 'orb-backend.exe' if sys.platform == 'win32' else 'orb-backend')}")
+    print(" Build concluído!")
+    print(f" Executável: {os.path.join(BASE_DIR, 'dist', 'orb-backend.exe' if sys.platform == 'win32' else 'orb-backend')}")
 

@@ -2,8 +2,8 @@
 
 Este guia mostra como criar um instalador **standalone** que:
 - ✅ Instala o backend como **serviço Windows**
-- ✅ Instala o frontend como **aplicativo desktop**
-- ✅ **NÃO requer** Python ou Node.js instalados
+- ✅ Instala o frontend WPF como **aplicativo desktop**
+- ✅ **NÃO requer** Python ou .NET Runtime instalados
 - ✅ **Tudo em um único instalador**
 
 ---
@@ -12,9 +12,10 @@ Este guia mostra como criar um instalador **standalone** que:
 
 ### No PC de Desenvolvimento
 
-1. **Node.js 18+** (para build do frontend)
+1. **.NET 9.0 SDK** (para build do frontend WPF)
 2. **Python 3.11+** (para build do backend)
-3. **Windows** (para testar o instalador)
+3. **Windows 10+** (para testar o instalador)
+4. **Visual Studio 2022** ou **VS Code** (recomendado)
 
 ---
 
@@ -42,200 +43,232 @@ python build_standalone.py
 
 ---
 
-### **Passo 2: Preparar Frontend**
+### **Passo 2: Compilar Frontend WPF**
 
 ```bash
 cd frontend
 
-# 1. Instalar dependências
-npm install
+# 1. Restaurar dependências NuGet
+dotnet restore
 
-# 2. Build TypeScript
-npm run build
+# 2. Build em Release
+dotnet build --configuration Release
+
+# 3. Publicar como self-contained
+dotnet publish --configuration Release --self-contained --runtime win-x64 -p:PublishSingleFile=true
 ```
+
+**Resultado:** `frontend/bin/Release/net9.0-windows/publish/Orb.exe`
+
+**O que isso faz:**
+- Compila aplicação WPF
+- Inclui .NET Runtime embutido
+- Cria executável único com todas dependências
+- ~80-100 MB (inclui .NET Runtime)
 
 ---
 
-### **Passo 3: Criar Instalador**
+### **Passo 3: Criar Instalador (Avançado)**
 
+**Opção A: Inno Setup (Recomendado)**
+
+1. Instale [Inno Setup](https://jrsoftware.org/isdl.php)
+2. Crie script `installer.iss`:
+
+```iss
+[Setup]
+AppName=Orb Agent
+AppVersion=1.0.0
+DefaultDirName={pf}\Orb Agent
+DefaultGroupName=Orb Agent
+OutputDir=release
+OutputBaseFilename=OrbAgent-Setup-1.0.0
+
+[Files]
+Source: "frontend\bin\Release\net9.0-windows\publish\*"; DestDir: "{app}"; Flags: recursesubdirs
+Source: "backend\dist\orb-backend.exe"; DestDir: "{app}\backend"
+Source: "backend\orb.db"; DestDir: "{app}\backend"; Flags: onlyifdoesntexist
+
+[Icons]
+Name: "{group}\Orb Agent"; Filename: "{app}\Orb.exe"
+Name: "{commondesktop}\Orb Agent"; Filename: "{app}\Orb.exe"
+
+[Run]
+Filename: "{app}\backend\install_service.bat"; Description: "Instalar serviço do backend"; Flags: runascurrentuser
+
+[UninstallRun]
+Filename: "{app}\backend\uninstall_service.bat"; Flags: runascurrentuser
+```
+
+3. Compile:
 ```bash
-# Ainda em frontend/
-npm run pack:win
+iscc installer.iss
 ```
 
-**Resultado:** `frontend/release/OrbAgent-Setup-1.0.0.exe`
+**Opção B: Script Automatizado**
 
-**O que o instalador faz:**
-1. ✅ Copia `orb-backend.exe` para `C:\Program Files\Orb Agent\resources\backend\`
-2. ✅ Baixa e instala NSSM (Service Manager)
-3. ✅ Registra `OrbBackendService` no Windows
-4. ✅ Inicia o serviço automaticamente
-5. ✅ Instala o frontend Electron
-6. ✅ Cria atalhos Desktop e Menu Iniciar
-
----
-
-## 🎯 Resultado Final
-
-### Para o Desenvolvedor
-
-Você terá em `frontend/release/`:
-- `OrbAgent-Setup-1.0.0.exe` - **Instalador completo**
-- `OrbAgent-Portable-1.0.0.exe` - Versão portátil (sem instalação)
-
-### Para o Usuário Final
-
-**Instalação:**
-1. Baixar `OrbAgent-Setup-1.0.0.exe`
-2. Executar (pede admin para instalar serviço)
-3. Seguir o wizard de instalação
-4. Pronto! ORB está instalado e funcionando
-
-**O que é instalado:**
-- `C:\Program Files\Orb Agent\` - Aplicação frontend
-- `C:\Program Files\Orb Agent\resources\backend\` - Backend + NSSM
-- Serviço Windows: `OrbBackendService` (inicia automaticamente)
-- Atalhos: Desktop + Menu Iniciar
-
-**Nenhuma dependência externa necessária!**
-
----
-
-## 🔍 Verificar Instalação
-
-### Verificar Serviço
-
-```powershell
-# Verificar status do serviço
-sc query OrbBackendService
-
-# Ver logs
-type "C:\Program Files\Orb Agent\resources\backend\logs\stdout.log"
-```
-
-### Verificar Backend
-
-```powershell
-# Testar API
-curl http://127.0.0.1:8000/api/v1/health
-```
-
-### Gerenciar Serviço Manualmente
-
-```powershell
-# Parar
-sc stop OrbBackendService
-
-# Iniciar
-sc start OrbBackendService
-
-# Remover
-sc delete OrbBackendService
-```
-
----
-
-## 🛠️ Troubleshooting
-
-### Erro: "orb-backend.exe not found"
-
-**Causa:** Backend não foi buildado antes do frontend.
-
-**Solução:**
-```bash
-cd backend
-python build_standalone.py
-cd ../frontend
-npm run pack:win
-```
-
-### Erro: "NSSM download failed"
-
-**Causa:** Sem internet ou bloqueio de firewall.
-
-**Solução:** 
-1. Baixe NSSM manualmente: https://nssm.cc/release/nssm-2.24.zip
-2. Extraia e copie `nssm.exe` para `frontend/`
-3. Edite `installer.nsh` para usar arquivo local
-
-### Serviço não inicia
-
-**Debug:**
-```powershell
-# Ver logs detalhados
-type "C:\Program Files\Orb Agent\resources\backend\logs\stderr.log"
-
-# Testar executável manualmente
-cd "C:\Program Files\Orb Agent\resources\backend"
-.\orb-backend.exe
-```
-
----
-
-## 📊 Script Automatizado Completo
-
-Para automatizar tudo de uma vez, crie `build-all.bat`:
-
-```batch
-@echo off
-echo ========================================
-echo    ORB - Build Completo
-echo ========================================
-
-echo [1/3] Building backend...
-cd backend
-pip install -r requirements.txt -q
-pip install -r requirements-build.txt -q
-python build_standalone.py
-cd ..
-
-echo [2/3] Building frontend...
-cd frontend
-call npm install
-call npm run build
-cd ..
-
-echo [3/3] Creating installer...
-cd frontend
-call npm run pack:win
-cd ..
-
-echo.
-echo ========================================
-echo    Build concluido com sucesso!
-echo ========================================
-echo.
-echo Instalador: frontend\release\OrbAgent-Setup-1.0.0.exe
-echo.
-pause
-```
-
-**Uso:**
 ```batch
 build-all.bat
 ```
 
 ---
 
-## 🚀 Publicar Release
+## 📦 Estrutura do Instalador Final
 
-1. **Teste localmente:**
-   - Instale em máquina limpa
-   - Verifique serviço rodando
-   - Teste funcionalidades
-
-2. **Crie release no GitHub:**
-   ```bash
-   git tag -a v1.0.0 -m "Release v1.0.0"
-   git push origin v1.0.0
-   ```
-
-3. **Upload do instalador:**
-   - Vá para GitHub Releases
-   - Anexe `OrbAgent-Setup-1.0.0.exe`
-   - Adicione notas de release
+```
+C:\Program Files\Orb Agent\
+├── Orb.exe                    # Frontend WPF
+├── Orb.dll                    # Bibliotecas da aplicação
+├── *.dll                      # Dependências .NET
+├── backend\
+│   ├── orb-backend.exe       # Backend standalone
+│   ├── orb.db                # Banco SQLite
+│   ├── install_service.bat   # Instalar serviço
+│   └── uninstall_service.bat # Remover serviço
+└── Assets\                   # Recursos da aplicação
+```
 
 ---
 
-**Parabéns! Você tem um instalador profissional completo! 🎉**
+## 🧪 Testar o Build
 
+### Teste Local (Sem Instalador)
+
+```bash
+# 1. Executar backend manualmente
+cd backend\dist
+orb-backend.exe
+
+# 2. Em outro terminal, executar frontend
+cd frontend\bin\Release\net9.0-windows\publish
+Orb.exe
+```
+
+### Teste do Instalador
+
+1. Execute `OrbAgent-Setup-1.0.0.exe` em uma **máquina limpa**
+2. Verifique se:
+   - ✅ Frontend abre corretamente
+   - ✅ Hot corner funciona
+   - ✅ Atalhos globais funcionam
+   - ✅ Backend responde (teste com chat)
+   - ✅ Configurações salvam corretamente
+   - ✅ Histórico persiste
+
+---
+
+## 🚀 Build Automatizado (CI/CD)
+
+### GitHub Actions
+
+```yaml
+name: Build Instalador
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    runs-on: windows-latest
+    
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '9.0.x'
+      
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      
+      - name: Build Backend
+        run: |
+          cd backend
+          pip install -r requirements.txt
+          pip install -r requirements-build.txt
+          python build_standalone.py
+      
+      - name: Build Frontend
+        run: |
+          cd frontend
+          dotnet restore
+          dotnet publish --configuration Release --self-contained --runtime win-x64 -p:PublishSingleFile=true
+      
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: orb-agent-build
+          path: |
+            frontend/bin/Release/net9.0-windows/publish/
+            backend/dist/
+```
+
+---
+
+## 📊 Tamanhos Estimados
+
+| Componente | Tamanho | Observação |
+|------------|---------|------------|
+| Frontend WPF (self-contained) | ~80-100 MB | Inclui .NET Runtime |
+| Backend (PyInstaller) | ~50-80 MB | Inclui Python + FastAPI |
+| **Total do Instalador** | **~150-200 MB** | Standalone completo |
+
+---
+
+## 🐛 Troubleshooting
+
+### Backend não compila
+
+**Erro:** "PyInstaller failed"
+```bash
+pip install --upgrade pyinstaller
+python build_standalone.py
+```
+
+### Frontend não compila
+
+**Erro:** "dotnet command not found"
+```bash
+# Instale .NET 9.0 SDK
+# Download: https://dotnet.microsoft.com/download
+```
+
+**Erro:** "CS0103" ou outras falhas de compilação
+```bash
+cd frontend
+dotnet clean
+dotnet restore
+dotnet build
+```
+
+### Instalador muito grande
+
+**Normal!** O instalador é grande porque inclui:
+- .NET 9.0 Runtime completo
+- Python 3.11 runtime
+- FastAPI + Uvicorn
+- OpenAI SDK
+- Todas as dependências WPF
+
+**Otimizações possíveis:**
+- Use `PublishTrimmed=true` (pode causar problemas)
+- Use `PublishSingleFile=true` (já implementado)
+- Comprima com UPX (risco de antivírus)
+
+---
+
+## 📞 Precisa de Ajuda?
+
+Veja também:
+- `DEPLOYMENT.md` - Opções de deploy
+- `RELEASE.md` - Processo de release
+- `QUICK_BUILD.md` - Build rápido para testes
+
+---
+
+**Pronto para distribuir! 🎉**

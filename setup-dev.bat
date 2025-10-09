@@ -8,16 +8,16 @@ echo    ORB - Setup de Desenvolvimento
 echo ========================================
 echo.
 
-REM Verificar Node.js
-where node >nul 2>&1
+REM Verificar .NET SDK
+where dotnet >nul 2>&1
 if %ERRORLEVEL% NEQ 0 (
-    echo [ERRO] Node.js nao encontrado. Instale Node.js 18+ primeiro.
-    echo        Download: https://nodejs.org/
+    echo [ERRO] .NET SDK nao encontrado. Instale .NET 9.0 SDK primeiro.
+    echo        Download: https://dotnet.microsoft.com/download
     exit /b 1
 )
 
-echo [OK] Node.js encontrado
-node -v
+echo [OK] .NET SDK encontrado
+dotnet --version
 
 REM Verificar Python
 where python >nul 2>&1
@@ -29,16 +29,6 @@ if %ERRORLEVEL% NEQ 0 (
 
 echo [OK] Python encontrado
 python --version
-
-REM Verificar npm
-where npm >nul 2>&1
-if %ERRORLEVEL% NEQ 0 (
-    echo [ERRO] npm nao encontrado. Instale npm primeiro.
-    exit /b 1
-)
-
-echo [OK] npm encontrado
-npm -v
 echo.
 
 REM 1. Setup do Backend
@@ -81,19 +71,13 @@ REM 2. Setup do Frontend
 echo [2/4] Configurando Frontend...
 cd frontend
 
-REM Criar .env se nao existir
-if not exist ".env" (
-    echo    Criando arquivo .env...
-    copy env.example .env
-)
+REM Restaurar dependencias NuGet
+echo    Restaurando dependencias NuGet...
+dotnet restore
 
-REM Instalar dependencias Node.js
-echo    Instalando dependencias Node.js...
-call npm install
-
-REM Build inicial do TypeScript
-echo    Compilando TypeScript...
-call npm run build
+REM Build inicial do .NET
+echo    Compilando aplicacao WPF...
+dotnet build --configuration Release
 
 cd ..
 
@@ -124,6 +108,7 @@ echo    npm run dev          - Inicia frontend + backend
 echo    npm run dev:backend  - Apenas backend
 echo    npm run dev:frontend - Apenas frontend
 echo    npm run build        - Build de producao
+echo    dotnet run --project frontend - Executar apenas frontend WPF
 echo.
 pause
 

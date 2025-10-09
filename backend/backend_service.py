@@ -25,7 +25,7 @@ logger = logging.getLogger(__name__)
 def main():
     """Entry point para o serviço"""
     try:
-        logger.info("🚀 Iniciando ORB Backend Service...")
+        logger.info(" Iniciando ORB Backend Service...")
         
         # Configurar diretório de dados
         if getattr(sys, 'frozen', False):
@@ -48,11 +48,11 @@ def main():
             from cryptography.fernet import Fernet
             encryption_key = Fernet.generate_key().decode()
             os.environ['ENCRYPTION_KEY'] = encryption_key
-            logger.warning(f"⚠️ Nova ENCRYPTION_KEY gerada: {encryption_key}")
-            logger.warning("⚠️ Esta chave será perdida ao reiniciar o serviço!")
-            logger.warning("⚠️ Configure ENCRYPTION_KEY como variável de ambiente do sistema!")
+            logger.warning(f" Nova ENCRYPTION_KEY gerada: {encryption_key}")
+            logger.warning(" Esta chave será perdida ao reiniciar o serviço!")
+            logger.warning(" Configure ENCRYPTION_KEY como variável de ambiente do sistema!")
         
-        logger.info(f"📂 Banco de dados: {db_path}")
+        logger.info(f" Banco de dados: {db_path}")
         
         # Importar e iniciar o servidor
         import uvicorn
@@ -62,7 +62,7 @@ def main():
         host = os.getenv("HOST", "127.0.0.1")
         port = int(os.getenv("PORT", "8000"))
         
-        logger.info(f"📡 Servidor iniciando em {host}:{port}")
+        logger.info(f" Servidor iniciando em {host}:{port}")
         
         # Iniciar servidor
         uvicorn.run(
@@ -75,7 +75,7 @@ def main():
         )
         
     except Exception as e:
-        logger.error(f"❌ Erro fatal: {e}", exc_info=True)
+        logger.error(f" Erro fatal: {e}", exc_info=True)
         sys.exit(1)
 
 if __name__ == "__main__":

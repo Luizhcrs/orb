@@ -1,179 +1,86 @@
-# 🌟 Orb - Assistente AI Flutuante
+# Frontend WPF - Orb Agent
 
-[![CI/CD](https://github.com/luizhcrs/orb/actions/workflows/ci.yml/badge.svg)](https://github.com/luizhcrs/orb/actions/workflows/ci.yml)
-[![GitHub issues](https://img.shields.io/github/issues/luizhcrs/orb)](https://github.com/luizhcrs/orb/issues)
-[![GitHub stars](https://img.shields.io/github/stars/luizhcrs/orb)](https://github.com/luizhcrs/orb/stargazers)
-[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+## 📋 Configurações Centralizadas
 
-Um assistente de inteligência artificial flutuante e minimalista para desktop, construído com Electron e TypeScript.
+Todas as configurações da aplicação estão centralizadas em `Config/AppSettings.cs`.
 
-> **Desenvolvido por [Luiz Henrique](https://github.com/luizhcrs)** - Projeto open source para a comunidade
+### 🔧 Como Configurar
 
-## ✨ Características
+#### Método 1: Variáveis de Ambiente (Recomendado para Dev)
 
-- **Orb Flutuante**: Interface minimalista que flutua sobre todas as janelas
-- **Sempre Visível**: Permanece no topo de todas as aplicações
-- **Chat Intuitivo**: Interface de chat moderna que aparece ao clicar no orb
-- **Integração LLM**: Suporte para OpenAI GPT e Anthropic Claude
-- **Atalhos Globais**: Acesso rápido via teclado
-- **Multiplataforma**: Windows, macOS e Linux
-
-## 🚀 Instalação
-
-### Pré-requisitos
-- Node.js 18+ 
-- npm ou yarn
-
-### Setup
-```bash
-# Clone o repositório
-git clone <seu-repo>
-cd orb
-
-# Instale as dependências
-npm install
-
-# Configure as variáveis de ambiente
-cp env.example .env
-# Edite o .env com suas chaves de API
-```
-
-## 🔧 Configuração
-
-Edite o arquivo `.env` com suas configurações:
+Crie um arquivo `.env` (copie de `env.example`):
 
 ```env
-# OpenAI
-OPENAI_API_KEY=sua_chave_openai_aqui
-
-# Anthropic Claude  
-ANTHROPIC_API_KEY=sua_chave_anthropic_aqui
-
-# Modelo padrão
-DEFAULT_MODEL=gpt-3.5-turbo
+ORB_BACKEND_URL=http://127.0.0.1:8000
+ORB_BACKEND_PORT=8000
+ORB_DEBUG=true
 ```
 
-## 🎮 Como Usar
+#### Método 2: Editar Diretamente no Código
 
-### Desenvolvimento
-```bash
-npm run dev
+Edite `Config/AppSettings.cs` e altere os valores padrão:
+
+```csharp
+public static string BackendBaseUrl { get; set; } = "http://127.0.0.1:9000"; // Nova porta
+public static int HttpTimeoutSeconds { get; set; } = 60; // Timeout maior
 ```
 
-### Produção
-```bash
-npm run build
-npm start
-```
+### ⚙️ Configurações Disponíveis
 
-### Atalhos Globais
-- `Ctrl+Shift+O`: Mostrar/ocultar orb
-- `Ctrl+Shift+C`: Abrir/fechar chat
-- **Clique no orb**: Abrir chat
+#### Backend
+- `BackendBaseUrl` - URL do backend (padrão: `http://127.0.0.1:8000`)
+- `BackendPort` - Porta do backend (padrão: `8000`)
+- `HttpTimeoutSeconds` - Timeout HTTP (padrão: `30`)
+- `BackendExecutablePath` - Caminho do executável Python
 
-## 🏗️ Arquitetura
+#### UI
+- `ChatWindowCompactWidth` / `ChatWindowCompactHeight` - Tamanho do chat compacto
+- `ChatWindowExpandedWidth` / `ChatWindowExpandedHeight` - Tamanho do chat expandido
+- `ConfigWindowWidth` / `ConfigWindowHeight` - Tamanho da tela de config
+- `OrbSize` - Tamanho do Orb (padrão: `60`)
+- `OrbInactivityTimeoutSeconds` - Tempo antes do Orb desaparecer (padrão: `5`)
 
-### Estrutura do Projeto
-```
-src/
-├── main.ts          # Processo principal do Electron
-├── orb.html         # Interface do orb flutuante
-└── chat.html        # Interface do chat
-```
+#### Hot Corner
+- `HotCornerMargin` - Margem de detecção (pixels)
+- `HotCornerDelayMs` - Delay de ativação (ms)
+- `HotCornerPosition` - Posição (TopLeft, TopRight, etc.)
 
-### Componentes Principais
-- **OrbApp**: Classe principal que gerencia as janelas
-- **Orb Window**: Janela flutuante transparente
-- **Chat Window**: Interface de conversação
-- **LLM Integration**: Processamento de mensagens via API
+#### Logging
+- `EnableDebugLogging` - Habilitar logs detalhados
+- `LogFileName` - Nome do arquivo de log
+- `MaxLogFileSizeMB` - Tamanho máximo do log
 
-## 🎨 Personalização
-
-### Posição do Orb
-Edite `src/main.ts` para alterar a posição padrão:
-```typescript
-x: width - 100,  // Posição X
-y: 50,           // Posição Y
-```
-
-### Cores e Estilo
-Modifique `src/orb.html` para personalizar a aparência do orb:
-```css
-background: radial-gradient(circle at 30% 30%, #290060, #1a0038);
-```
-
-## 📦 Build e Distribuição
+### 🚀 Build
 
 ```bash
-# Build para produção
-npm run build
+# Restaurar dependências
+dotnet restore
 
-# Criar executável
-npm run electron:pack
+# Build
+dotnet build --configuration Release
+
+# Executar
+dotnet run
 ```
 
-Os executáveis serão gerados na pasta `release/`.
+### 🧪 Debug
 
-## 🤝 Contribuição
+Logs são gravados em `orb_debug.log` na pasta do executável.
 
-Este é um projeto open source desenvolvido por **Luiz Henrique**. Contribuições da comunidade são muito bem-vindas!
+Para habilitar debug via ambiente:
 
-### Como Contribuir
+```bash
+set ORB_DEBUG=true
+dotnet run
+```
 
-1. **Fork** o projeto
-2. **Crie** uma branch para sua feature (`git checkout -b feature/nova-funcionalidade`)
-3. **Commit** suas mudanças (`git commit -m 'feat: adicionar nova funcionalidade'`)
-4. **Push** para a branch (`git push origin feature/nova-funcionalidade`)
-5. **Abra** um Pull Request
+### 📦 Publish
 
-### Diretrizes de Contribuição
-
-- 🐛 **Bugs**: Use a label `bug` para reportar problemas
-- ✨ **Features**: Use a label `enhancement` para novas funcionalidades
-- 📚 **Documentação**: Melhorias na documentação são sempre bem-vindas
-- 🧪 **Testes**: Ajude a melhorar a cobertura de testes
-- 💡 **Ideias**: Sugestões são apreciadas via Issues
-
-### 🏷️ Labels Disponíveis
-- `bug`: Problemas no código
-- `enhancement`: Novas funcionalidades  
-- `question`: Perguntas e dúvidas
-- `help-wanted`: Precisa de ajuda
-- `good-first-issue`: Boa para iniciantes
-
-## 🐛 Reportar Bugs
-
-Use nosso [template de bug report](.github/ISSUE_TEMPLATE/bug_report.md) para reportar problemas.
-
-## ✨ Sugerir Features
-
-Use nosso [template de feature request](.github/ISSUE_TEMPLATE/feature_request.md) para sugerir novas funcionalidades.
-
-## 📞 Suporte
-
-Para dúvidas, sugestões ou problemas:
-- 📋 [Issues](https://github.com/luizhcrs/orb/issues)
-- 💬 [Discussions](https://github.com/luizhcrs/orb/discussions)
-- 👨‍💻 **Desenvolvedor**: [Luiz Henrique](https://github.com/luizhcrs)
-
-## 📄 Licença
-
-Este projeto está sob a licença MIT. Veja o arquivo `LICENSE` para mais detalhes.
+```bash
+dotnet publish --configuration Release --self-contained --runtime win-x64 -p:PublishSingleFile=true
+```
 
 ---
 
-**Desenvolvido com ❤️ por [Luiz Henrique](https://github.com/luizhcrs) para a comunidade**
+**Dúvidas? Veja a documentação completa em `/docs`**
 
-## 🐛 Problemas Conhecidos
-
-- Em alguns sistemas, o orb pode não aparecer sobre jogos em tela cheia
-- Transparência pode não funcionar em todas as configurações de GPU
-
-## 🔮 Roadmap
-
-- [ ] Integração com mais provedores de LLM
-- [ ] Temas personalizáveis
-- [ ] Comandos de voz
-- [ ] Plugins e extensões
-- [ ] Integração com calendário e tarefas
-- [ ] Modo escuro/claro automático
