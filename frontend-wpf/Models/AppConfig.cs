@@ -33,9 +33,11 @@ namespace OrbAgent.Frontend.Models
         public string Language { get; set; } = "pt-BR";
         
         [JsonPropertyName("startup")]
+        [JsonConverter(typeof(StringToBoolConverter))]
         public bool StartWithWindows { get; set; } = true;
         
         [JsonPropertyName("keep_history")]
+        [JsonConverter(typeof(StringToBoolConverter))]
         public bool KeepHistory { get; set; } = true;
     }
 
@@ -81,6 +83,36 @@ namespace OrbAgent.Frontend.Models
         [JsonPropertyName("updated_at")]
         [System.Text.Json.Serialization.JsonConverter(typeof(DateTimeConverter))]
         public DateTime UpdatedAt { get; set; }
+    }
+    
+    /// <summary>
+    /// Conversor que aceita string "1"/"0" ou bool true/false
+    /// </summary>
+    public class StringToBoolConverter : System.Text.Json.Serialization.JsonConverter<bool>
+    {
+        public override bool Read(ref System.Text.Json.Utf8JsonReader reader, Type typeToConvert, System.Text.Json.JsonSerializerOptions options)
+        {
+            if (reader.TokenType == System.Text.Json.JsonTokenType.String)
+            {
+                var stringValue = reader.GetString();
+                return stringValue == "1" || stringValue?.ToLower() == "true";
+            }
+            else if (reader.TokenType == System.Text.Json.JsonTokenType.True)
+            {
+                return true;
+            }
+            else if (reader.TokenType == System.Text.Json.JsonTokenType.False)
+            {
+                return false;
+            }
+            
+            return false;
+        }
+
+        public override void Write(System.Text.Json.Utf8JsonWriter writer, bool value, System.Text.Json.JsonSerializerOptions options)
+        {
+            writer.WriteStringValue(value ? "1" : "0");
+        }
     }
     
     /// <summary>

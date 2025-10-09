@@ -478,8 +478,20 @@ namespace OrbAgent.Frontend.Windows
             if (string.IsNullOrEmpty(message) && _currentScreenshot == null)
                 return;
             
+            // Guardar screenshot antes de limpar
+            var screenshot = _currentScreenshot;
+            
             // Adicionar mensagem do usuário (com imagem se houver)
-            AddMessage("user", message, _currentScreenshot);
+            AddMessage("user", message, screenshot);
+            
+            // LIMPAR INPUT E IMAGEM IMEDIATAMENTE
+            MessageInput.Text = string.Empty;
+            if (_currentScreenshot != null)
+            {
+                _currentScreenshot = null;
+                ImagePreview.Source = null;
+                ImagePreviewContainer.Visibility = Visibility.Collapsed;
+            }
             
             // Mostrar loading
             SendBtn.IsEnabled = false;
@@ -496,7 +508,7 @@ namespace OrbAgent.Frontend.Windows
                 var request = new AgentRequest
                 {
                     Message = message,
-                    ImageData = _currentScreenshot, // Incluir imagem se disponível
+                    ImageData = screenshot, // Usar screenshot guardado
                     SessionId = _currentSessionId // Continuar sessão histórica se carregada
                 };
                 
@@ -527,15 +539,6 @@ namespace OrbAgent.Frontend.Windows
             }
             finally
             {
-                // Limpar input e imagem
-                MessageInput.Text = string.Empty;
-                if (_currentScreenshot != null)
-                {
-                    _currentScreenshot = null;
-                    ImagePreview.Source = null;
-                    ImagePreviewContainer.Visibility = Visibility.Collapsed;
-                }
-                
                 // Restaurar botão
                 SendBtn.IsEnabled = true;
                 SendBtn.Content = new TextBlock
