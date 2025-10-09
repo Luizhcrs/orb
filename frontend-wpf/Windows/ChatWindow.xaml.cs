@@ -554,7 +554,7 @@ namespace OrbAgent.Frontend.Windows
             }
         }
 
-        private void AddMessage(string role, string content, string? imageData = null)
+        private void AddMessage(string role, string content, string? imageData = null, DateTime? timestamp = null)
         {
             Services.LoggingService.LogDebug($"💬 AddMessage chamado - Role: {role}, Content: {(string.IsNullOrEmpty(content) ? "(vazio)" : content.Substring(0, Math.Min(50, content.Length)))}...");
             
@@ -672,16 +672,16 @@ namespace OrbAgent.Frontend.Windows
             messageContainer.Children.Add(messageBlock);
             
             // Timestamp
-            var timestamp = new TextBlock
+            var timestampText = new TextBlock
             {
-                Text = DateTime.Now.ToString("HH:mm"),
+                Text = (timestamp ?? DateTime.Now).ToString("HH:mm"),
                 Foreground = new SolidColorBrush(System.Windows.Media.Color.FromArgb(0xB3, 0xFF, 0xFF, 0xFF)), // 70% opacity
                 FontSize = 11,
                 Margin = new Thickness(8, 2, 8, 0),
                 HorizontalAlignment = role == "user" ? System.Windows.HorizontalAlignment.Right : System.Windows.HorizontalAlignment.Left
             };
             
-            messageContainer.Children.Add(timestamp);
+            messageContainer.Children.Add(timestampText);
             
             Services.LoggingService.LogDebug($"➕ Adicionando mensagem ao MessagesPanel. Total antes: {MessagesPanel.Children.Count}");
             MessagesPanel.Children.Add(messageContainer);
@@ -986,8 +986,32 @@ namespace OrbAgent.Frontend.Windows
                     
                     foreach (var messageElement in sessionData.EnumerateArray())
                     {
+                        // Log da estrutura completa da mensagem para debug
+                        Services.LoggingService.LogDebug($"📋 Estrutura da mensagem: {messageElement}");
+                        
                         var role = messageElement.GetProperty("role").GetString();
                         var content = messageElement.GetProperty("content").GetString();
+                        
+                        // Extrair timestamp se existir
+                        DateTime? messageTimestamp = null;
+                        if (messageElement.TryGetProperty("created_at", out var timestampProp))
+                        {
+                            if (timestampProp.ValueKind == System.Text.Json.JsonValueKind.String)
+                            {
+                                var timestampStr = timestampProp.GetString();
+                                Services.LoggingService.LogDebug($"🔍 Tentando parse do timestamp: '{timestampStr}'");
+                                
+                                if (DateTime.TryParse(timestampStr, out var parsedDt))
+                                {
+                                    messageTimestamp = parsedDt;
+                                    Services.LoggingService.LogDebug($"✅ Timestamp parseado com sucesso: {parsedDt:HH:mm:ss}");
+                                }
+                                else
+                                {
+                                    Services.LoggingService.LogDebug($"❌ Falha ao fazer parse do timestamp: '{timestampStr}'");
+                                }
+                            }
+                        }
                         
                         // Extrair imageData se existir
                         string? imageData = null;
@@ -999,13 +1023,15 @@ namespace OrbAgent.Frontend.Windows
                             }
                         }
                         
+                        Services.LoggingService.LogDebug($"📅 Timestamp da mensagem: {(messageTimestamp?.ToString("HH:mm:ss") ?? "não encontrado")}");
+                        
                         if (role == "user")
                         {
-                            AddMessage("user", content ?? "", imageData);
+                            AddMessage("user", content ?? "", imageData, messageTimestamp);
                         }
                         else if (role == "assistant")
                         {
-                            AddMessage("assistant", content ?? "");
+                            AddMessage("assistant", content ?? "", null, messageTimestamp);
                         }
                     }
                     

@@ -94,11 +94,7 @@ public partial class App : System.Windows.Application
         else
         {
             System.Diagnostics.Debug.WriteLine("✅ Backend Python inicializado com sucesso!");
-            _systemTrayService?.ShowNotification(
-                "Orb Agent",
-                "Backend conectado com sucesso!",
-                System.Windows.Forms.ToolTipIcon.Info
-            );
+            // Notificação removida - não é necessária
         }
     }
 
@@ -265,12 +261,9 @@ public partial class App : System.Windows.Application
     
     private void OnAboutRequest(object? sender, EventArgs e)
     {
-        // Mostrar informações sobre o Orb
-        _systemTrayService?.ShowNotification(
-            "Orb Agent",
-            "Assistente Inteligente v1.0\nDesenvolvido com WPF + Python",
-            System.Windows.Forms.ToolTipIcon.Info
-        );
+        // Mostrar modal "Sobre" com visual liquid glass
+        var aboutWindow = new Windows.AboutWindow();
+        aboutWindow.ShowDialog();
     }
     
     private void OnExitRequest(object? sender, EventArgs e)

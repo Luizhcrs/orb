@@ -26,7 +26,8 @@
     <Border Background="{StaticResource GlassBackground}"
             BorderBrush="#4DFFFFFF"
             BorderThickness="1.5"
-            CornerRadius="16">
+            CornerRadius="8"
+            ClipToBounds="True">
         <Border.Effect>
             <DropShadowEffect Color="Black" 
                             BlurRadius="24" 
@@ -36,7 +37,7 @@
         
         <!-- Camada de Reflexo Superior com Grid dentro -->
         <Border Background="{StaticResource TopReflection}"
-                CornerRadius="16">
+                CornerRadius="8">
             <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="60"/>
@@ -47,7 +48,7 @@
             <!-- Title Bar com Liquid Glass -->
             <Border Grid.Row="0"
                     Background="#0DFFFFFF"
-                    CornerRadius="16,16,0,0"
+                    CornerRadius="8,8,0,0"
                     BorderBrush="#14FFFFFF"
                     BorderThickness="0,0,0,1">
                 <Grid>
@@ -81,7 +82,7 @@
                     Background="#0DFFFFFF"
                     BorderBrush="#14FFFFFF"
                     BorderThickness="0,1,0,0"
-                    CornerRadius="0,0,16,16"
+                    CornerRadius="0,0,8,8"
                     Padding="28,20">
                 <Grid>
                     <Grid.ColumnDefinitions>
@@ -107,7 +108,7 @@
                                 </Setter>
                                 <Setter Property="BorderBrush" Value="#4DFFFFFF"/>
                                 <Setter Property="BorderThickness" Value="1"/>
-                                <Setter Property="CornerRadius" Value="12"/>
+                                <Setter Property="CornerRadius" Value="8"/>
                                 <Style.Triggers>
                                     <Trigger Property="IsMouseOver" Value="True">
                                         <Setter Property="Background">
@@ -151,7 +152,7 @@
                                 </Setter>
                                 <Setter Property="BorderBrush" Value="#E6FF6666"/>
                                 <Setter Property="BorderThickness" Value="1"/>
-                                <Setter Property="CornerRadius" Value="12"/>
+                                <Setter Property="CornerRadius" Value="8"/>
                                 <Style.Triggers>
                                     <Trigger Property="IsMouseOver" Value="True">
                                         <Setter Property="Background">
