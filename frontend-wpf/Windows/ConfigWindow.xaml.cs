@@ -197,6 +197,15 @@ namespace OrbAgent.Frontend.Windows
 
         private void LoadAgenteSection()
         {
+            LoggingService.LogInfo("LoadAgenteSection iniciado!");
+            LoggingService.LogDebug($"_currentConfig é null? {_currentConfig == null}");
+            
+            if (_currentConfig != null)
+            {
+                LoggingService.LogDebug($"API Key: {_currentConfig.Agent?.ApiKey ?? "(null)"}");
+                LoggingService.LogDebug($"Provider: {_currentConfig.Agent?.LlmProvider ?? "(null)"}");
+            }
+            
             ContentPanel.Children.Clear();
             
             AddSectionTitle("Configurações do Agente");
@@ -217,6 +226,8 @@ namespace OrbAgent.Frontend.Windows
             
             // Botão Salvar com estilo liquid glass
             AddSaveButton();
+            
+            LoggingService.LogInfo("LoadAgenteSection concluído!");
         }
 
         private async void LoadHistoricoSection()
