@@ -188,11 +188,6 @@ namespace OrbAgent.Frontend.Windows
             
             // Iniciar com Windows
             AddCheckBox("Iniciar com o Windows", false);
-            
-            AddSpacer();
-            
-            // Manter histórico
-            AddCheckBox("Manter histórico de conversas", true);
         }
 
         private void LoadAgenteSection()
@@ -219,13 +214,8 @@ namespace OrbAgent.Frontend.Windows
             
             AddSpacer();
             
-            // API Key com campo mascarado e botão Redefinir
+            // API Key com campo mascarado e botões Salvar/Redefinir
             AddApiKeyField();
-            
-            AddSpacer();
-            
-            // Botão Salvar com estilo liquid glass
-            AddSaveButton();
             
             LoggingService.LogInfo("LoadAgenteSection concluído!");
         }
@@ -388,17 +378,26 @@ namespace OrbAgent.Frontend.Windows
             Grid.SetColumn(dateText, 0);
             header.Children.Add(dateText);
             
-            var deleteBtn = new System.Windows.Controls.Button
-            {
-                Content = "×",
-                Width = 24,
-                Height = 24,
-                FontSize = 16,
-                Background = System.Windows.Media.Brushes.Transparent,
-                BorderThickness = new Thickness(0),
-                Foreground = new SolidColorBrush(System.Windows.Media.Color.FromArgb(0x4D, 0xFF, 0xFF, 0xFF)),
-                Cursor = System.Windows.Input.Cursors.Hand
+            // Botão deletar com bordas arredondadas e sem hover azul
+            var deleteBtn = CreateRoundedButton("×",
+                System.Windows.Media.Brushes.Transparent,
+                System.Windows.Media.Brushes.Transparent,
+                new SolidColorBrush(System.Windows.Media.Color.FromArgb(0x4D, 0xFF, 0xFF, 0xFF)));
+            
+            deleteBtn.Width = 24;
+            deleteBtn.Height = 24;
+            deleteBtn.FontSize = 16;
+            
+            // Hover effect (liquid glass - vermelho suave, não azul)
+            deleteBtn.MouseEnter += (s, e) => {
+                deleteBtn.Foreground = new SolidColorBrush(System.Windows.Media.Color.FromRgb(0xFF, 0x96, 0x96));
+                deleteBtn.Background = new SolidColorBrush(System.Windows.Media.Color.FromArgb(0x1A, 0xFF, 0x64, 0x64));
             };
+            deleteBtn.MouseLeave += (s, e) => {
+                deleteBtn.Foreground = new SolidColorBrush(System.Windows.Media.Color.FromArgb(0x4D, 0xFF, 0xFF, 0xFF));
+                deleteBtn.Background = System.Windows.Media.Brushes.Transparent;
+            };
+            
             deleteBtn.Click += async (s, e) => {
                 e.Handled = true;
                 await DeleteHistorySession(session.SessionId);
@@ -615,18 +614,222 @@ namespace OrbAgent.Frontend.Windows
             var apiKeyBox = AddPasswordBox(placeholder);
             apiKeyBox.Tag = "api_key";
             
-            // Se já tem API key, DESABILITAR o campo (não pode editar)
+            // Se já tem API key, DESABILITAR o campo e adicionar botões Redefinir + Salvar
             if (hasApiKey)
             {
                 apiKeyBox.IsEnabled = false; // DESABILITAR completamente
                 apiKeyBox.Password = ""; // Deixar vazio - só salva se usuário digite novo valor
                 LoggingService.LogInfo("Campo API Key DESABILITADO (já existe API key)");
+                
+                // Botões Redefinir + Salvar
+                AddResetApiKeyButton(apiKeyBox);
             }
             else
             {
                 apiKeyBox.IsEnabled = true; // HABILITAR para edição
                 LoggingService.LogInfo("Campo API Key HABILITADO (sem API key)");
+                
+                // Apenas botão Salvar (sem Redefinir, pois não há key para redefinir)
+                AddSaveApiKeyButton();
             }
+        }
+        
+        /// <summary>
+        /// Adiciona apenas botão Salvar (quando não tem API key configurada)
+        /// </summary>
+        private void AddSaveApiKeyButton()
+        {
+            var saveButton = CreateRoundedButton("Salvar",
+                new SolidColorBrush(System.Windows.Media.Color.FromArgb(0x40, 0xFF, 0xFF, 0xFF)),
+                new SolidColorBrush(System.Windows.Media.Color.FromArgb(0x4D, 0xFF, 0xFF, 0xFF)),
+                System.Windows.Media.Brushes.White);
+            
+            saveButton.Height = 40;
+            saveButton.Margin = new Thickness(0, 8, 0, 16);
+            
+            saveButton.MouseEnter += (s, e) =>
+            {
+                saveButton.Background = new SolidColorBrush(System.Windows.Media.Color.FromArgb(0x59, 0xFF, 0xFF, 0xFF));
+                saveButton.BorderBrush = new SolidColorBrush(System.Windows.Media.Color.FromArgb(0x66, 0xFF, 0xFF, 0xFF));
+            };
+            
+            saveButton.MouseLeave += (s, e) =>
+            {
+                saveButton.Background = new SolidColorBrush(System.Windows.Media.Color.FromArgb(0x40, 0xFF, 0xFF, 0xFF));
+                saveButton.BorderBrush = new SolidColorBrush(System.Windows.Media.Color.FromArgb(0x4D, 0xFF, 0xFF, 0xFF));
+            };
+            
+            saveButton.Click += async (s, e) =>
+            {
+                try
+                {
+                    saveButton.IsEnabled = false;
+                    saveButton.Content = "Salvando...";
+                    
+                    await SaveConfigAsync();
+                    
+                    saveButton.Content = "Salvo!";
+                    await Task.Delay(1000);
+                    
+                    // Recarregar a seção para mostrar os botões corretos
+                    LoadAgenteSection();
+                }
+                catch (Exception ex)
+                {
+                    LoggingService.LogError($"Erro ao salvar: {ex.Message}");
+                    saveButton.Content = "Erro";
+                    await Task.Delay(2000);
+                    saveButton.Content = "Salvar";
+                    saveButton.IsEnabled = true;
+                }
+            };
+            
+            ContentPanel.Children.Add(saveButton);
+        }
+        
+        /// <summary>
+        /// Adiciona botões Salvar e Redefinir lado a lado
+        /// </summary>
+        private void AddResetApiKeyButton(System.Windows.Controls.PasswordBox apiKeyBox)
+        {
+            // Container para os botões
+            var buttonsContainer = new System.Windows.Controls.Grid
+            {
+                Margin = new Thickness(0, 8, 0, 16)
+            };
+            
+            buttonsContainer.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+            buttonsContainer.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(12) }); // Espaçamento
+            buttonsContainer.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+            
+            // Botão Redefinir
+            var resetButton = CreateRoundedButton("Redefinir", 
+                new SolidColorBrush(System.Windows.Media.Color.FromArgb(0x33, 0xFF, 0x64, 0x64)),
+                new SolidColorBrush(System.Windows.Media.Color.FromArgb(0x4D, 0xFF, 0x64, 0x64)),
+                new SolidColorBrush(System.Windows.Media.Color.FromRgb(0xFF, 0x96, 0x96)));
+            
+            resetButton.MouseEnter += (s, e) =>
+            {
+                resetButton.Background = new SolidColorBrush(System.Windows.Media.Color.FromArgb(0x4D, 0xFF, 0x64, 0x64));
+                resetButton.BorderBrush = new SolidColorBrush(System.Windows.Media.Color.FromArgb(0x66, 0xFF, 0x64, 0x64));
+            };
+            
+            resetButton.MouseLeave += (s, e) =>
+            {
+                resetButton.Background = new SolidColorBrush(System.Windows.Media.Color.FromArgb(0x33, 0xFF, 0x64, 0x64));
+                resetButton.BorderBrush = new SolidColorBrush(System.Windows.Media.Color.FromArgb(0x4D, 0xFF, 0x64, 0x64));
+            };
+            
+            resetButton.Click += async (s, e) =>
+            {
+                try
+                {
+                    if (_currentConfig != null)
+                    {
+                        _currentConfig.Agent.ApiKey = string.Empty;
+                    }
+                    
+                    await SaveConfigAsync();
+                    LoadAgenteSection();
+                    
+                    LoggingService.LogInfo("API Key redefinida com sucesso!");
+                }
+                catch (Exception ex)
+                {
+                    LoggingService.LogError($"Erro ao redefinir API Key: {ex.Message}");
+                }
+            };
+            
+            Grid.SetColumn(resetButton, 0);
+            buttonsContainer.Children.Add(resetButton);
+            
+            // Botão Salvar
+            var saveButton = CreateRoundedButton("Salvar",
+                new SolidColorBrush(System.Windows.Media.Color.FromArgb(0x40, 0xFF, 0xFF, 0xFF)),
+                new SolidColorBrush(System.Windows.Media.Color.FromArgb(0x4D, 0xFF, 0xFF, 0xFF)),
+                System.Windows.Media.Brushes.White);
+            
+            saveButton.MouseEnter += (s, e) =>
+            {
+                saveButton.Background = new SolidColorBrush(System.Windows.Media.Color.FromArgb(0x59, 0xFF, 0xFF, 0xFF));
+                saveButton.BorderBrush = new SolidColorBrush(System.Windows.Media.Color.FromArgb(0x66, 0xFF, 0xFF, 0xFF));
+            };
+            
+            saveButton.MouseLeave += (s, e) =>
+            {
+                saveButton.Background = new SolidColorBrush(System.Windows.Media.Color.FromArgb(0x40, 0xFF, 0xFF, 0xFF));
+                saveButton.BorderBrush = new SolidColorBrush(System.Windows.Media.Color.FromArgb(0x4D, 0xFF, 0xFF, 0xFF));
+            };
+            
+            saveButton.Click += async (s, e) =>
+            {
+                try
+                {
+                    saveButton.IsEnabled = false;
+                    saveButton.Content = "Salvando...";
+                    
+                    await SaveConfigAsync();
+                    
+                    saveButton.Content = "Salvo!";
+                    await Task.Delay(1000);
+                    saveButton.Content = "Salvar";
+                }
+                catch (Exception ex)
+                {
+                    LoggingService.LogError($"Erro ao salvar: {ex.Message}");
+                    saveButton.Content = "Erro";
+                    await Task.Delay(2000);
+                    saveButton.Content = "Salvar";
+                }
+                finally
+                {
+                    saveButton.IsEnabled = true;
+                }
+            };
+            
+            Grid.SetColumn(saveButton, 2);
+            buttonsContainer.Children.Add(saveButton);
+            
+            ContentPanel.Children.Add(buttonsContainer);
+        }
+        
+        /// <summary>
+        /// Cria botão com bordas arredondadas e sem hover azul
+        /// </summary>
+        private System.Windows.Controls.Button CreateRoundedButton(string content, System.Windows.Media.Brush background, System.Windows.Media.Brush border, System.Windows.Media.Brush foreground)
+        {
+            var button = new System.Windows.Controls.Button
+            {
+                Content = content,
+                Height = 40,
+                FontSize = 14,
+                FontWeight = FontWeights.Medium,
+                Background = background,
+                BorderBrush = border,
+                BorderThickness = new Thickness(1),
+                Foreground = foreground,
+                Cursor = System.Windows.Input.Cursors.Hand
+            };
+            
+            // Template customizado para bordas arredondadas e sem hover azul
+            var template = new ControlTemplate(typeof(System.Windows.Controls.Button));
+            var borderFactory = new FrameworkElementFactory(typeof(Border));
+            borderFactory.Name = "border";
+            borderFactory.SetValue(Border.BackgroundProperty, new TemplateBindingExtension(System.Windows.Controls.Button.BackgroundProperty));
+            borderFactory.SetValue(Border.BorderBrushProperty, new TemplateBindingExtension(System.Windows.Controls.Button.BorderBrushProperty));
+            borderFactory.SetValue(Border.BorderThicknessProperty, new TemplateBindingExtension(System.Windows.Controls.Button.BorderThicknessProperty));
+            borderFactory.SetValue(Border.CornerRadiusProperty, new CornerRadius(8));
+            
+            var contentPresenterFactory = new FrameworkElementFactory(typeof(ContentPresenter));
+            contentPresenterFactory.SetValue(ContentPresenter.HorizontalAlignmentProperty, System.Windows.HorizontalAlignment.Center);
+            contentPresenterFactory.SetValue(ContentPresenter.VerticalAlignmentProperty, System.Windows.VerticalAlignment.Center);
+            
+            borderFactory.AppendChild(contentPresenterFactory);
+            template.VisualTree = borderFactory;
+            
+            button.Template = template;
+            
+            return button;
         }
         
         private void AddSectionTitle(string title)
@@ -920,21 +1123,17 @@ namespace OrbAgent.Frontend.Windows
         /// </summary>
         private System.Windows.Controls.Button AddSaveButton()
         {
-            var saveButton = new System.Windows.Controls.Button
-            {
-                Content = "Salvar Configurações",
-                Height = 45,
-                FontSize = 15,
-                FontWeight = FontWeights.SemiBold,
-                Margin = new Thickness(0, 0, 0, 16),
-                Background = new SolidColorBrush(System.Windows.Media.Color.FromArgb(0x40, 0xFF, 0xFF, 0xFF)),
-                BorderBrush = new SolidColorBrush(System.Windows.Media.Color.FromArgb(0x4D, 0xFF, 0xFF, 0xFF)),
-                BorderThickness = new Thickness(1),
-                Foreground = System.Windows.Media.Brushes.White,
-                Cursor = System.Windows.Input.Cursors.Hand
-            };
+            var saveButton = CreateRoundedButton("Salvar",
+                new SolidColorBrush(System.Windows.Media.Color.FromArgb(0x40, 0xFF, 0xFF, 0xFF)),
+                new SolidColorBrush(System.Windows.Media.Color.FromArgb(0x4D, 0xFF, 0xFF, 0xFF)),
+                System.Windows.Media.Brushes.White);
+            
+            saveButton.Height = 45;
+            saveButton.FontSize = 15;
+            saveButton.FontWeight = FontWeights.SemiBold;
+            saveButton.Margin = new Thickness(0, 0, 0, 16);
 
-            // Efeitos hover
+            // Efeitos hover (liquid glass - não azul)
             saveButton.MouseEnter += (s, e) =>
             {
                 saveButton.Background = new SolidColorBrush(System.Windows.Media.Color.FromArgb(0x59, 0xFF, 0xFF, 0xFF));
@@ -959,14 +1158,14 @@ namespace OrbAgent.Frontend.Windows
                     
                     saveButton.Content = "Salvo!";
                     await Task.Delay(1000);
-                    saveButton.Content = "Salvar Configurações";
+                    saveButton.Content = "Salvar";
                 }
                 catch (Exception ex)
                 {
                     System.Diagnostics.Debug.WriteLine($"Erro ao salvar: {ex.Message}");
                     saveButton.Content = "Erro ao salvar";
                     await Task.Delay(2000);
-                    saveButton.Content = "Salvar Configurações";
+                    saveButton.Content = "Salvar";
                 }
                 finally
                 {
