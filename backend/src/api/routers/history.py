@@ -37,6 +37,7 @@ class MessageResponse(BaseModel):
     role: str
     content: str
     additional_kwargs: Dict[str, Any] = {}
+    created_at: str
 
 
 class SessionWithMessagesResponse(BaseModel):
@@ -147,7 +148,8 @@ async def get_session_with_messages(session_id: str, limit: Optional[int] = None
             messages_dict.append({
                 'role': msg.role,
                 'content': msg.content,
-                'additional_kwargs': msg.additional_kwargs
+                'additional_kwargs': msg.additional_kwargs,
+                'created_at': msg.created_at
             })
         
         return {

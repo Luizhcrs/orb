@@ -1,0 +1,331 @@
+<Window x:Class="OrbAgent.Frontend.Windows.AboutWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Sobre - Orb Agent"
+        Width="480" Height="320"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        Background="Transparent"
+        WindowStartupLocation="CenterScreen"
+        ResizeMode="NoResize"
+        ShowInTaskbar="False"
+        Topmost="True"
+        Loaded="AboutWindow_Loaded">
+
+    <Window.Resources>
+        <!-- Easing Functions -->
+        <CubicEase x:Key="EaseInOut" EasingMode="EaseInOut"/>
+        
+        <!-- Estilo para Botão Fechar (igual ao chat/config) -->
+        <Style x:Key="CloseButtonStyle" TargetType="Button">
+            <Setter Property="Background">
+                <Setter.Value>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                        <GradientStop Color="#4DFF6464" Offset="0"/>
+                        <GradientStop Color="#33FF6464" Offset="1"/>
+                    </LinearGradientBrush>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="BorderBrush" Value="#66FF6464"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border"
+                               Background="{TemplateBinding Background}"
+                               BorderBrush="{TemplateBinding BorderBrush}"
+                               BorderThickness="{TemplateBinding BorderThickness}"
+                               CornerRadius="12">
+                            <Border.Effect>
+                                <DropShadowEffect Color="#FF6464" BlurRadius="16" ShadowDepth="4" Opacity="0.3"/>
+                            </Border.Effect>
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Background">
+                                    <Setter.Value>
+                                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                            <GradientStop Color="#66FF6464" Offset="0"/>
+                                            <GradientStop Color="#4DFF6464" Offset="1"/>
+                                        </LinearGradientBrush>
+                                    </Setter.Value>
+                                </Setter>
+                                <Setter TargetName="border" Property="BorderBrush" Value="#80FF6464"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="border" Property="RenderTransform">
+                                    <Setter.Value>
+                                        <ScaleTransform ScaleX="0.9" ScaleY="0.9"/>
+                                    </Setter.Value>
+                                </Setter>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        
+        <!-- Brush para reflexo do Orb -->
+        <RadialGradientBrush x:Key="ReflectionBrush" Center="0.3,0.3" RadiusX="1" RadiusY="1">
+            <GradientStop Color="#80FFFFFF" Offset="0"/>
+            <GradientStop Color="Transparent" Offset="1"/>
+        </RadialGradientBrush>
+    </Window.Resources>
+
+    <!-- Container Principal (menos transparente) -->
+    <Border x:Name="AboutContainer"
+            Background="#66141416"
+            BorderBrush="#26FFFFFF"
+            BorderThickness="1.5"
+            CornerRadius="8"
+            ClipToBounds="True">
+        
+        <Border.Effect>
+            <DropShadowEffect Color="Black" 
+                             BlurRadius="24" 
+                             ShadowDepth="8" 
+                             Opacity="0.4"/>
+        </Border.Effect>
+        
+        <Grid Background="Transparent">
+            <!-- Drag Area -->
+            <Border Height="40"
+                    VerticalAlignment="Top"
+                    Background="Transparent"
+                    MouseLeftButtonDown="TitleBar_MouseLeftButtonDown"/>
+            
+            <!-- Title Bar -->
+            <Border Height="40"
+                    VerticalAlignment="Top"
+                    Background="#1AFFFFFF"
+                    CornerRadius="8,8,0,0"
+                    BorderBrush="#26FFFFFF"
+                    BorderThickness="0,0,0,1">
+                <Grid>
+                    <TextBlock Text="Sobre o Orb Agent"
+                               Foreground="White"
+                               FontSize="14"
+                               FontWeight="SemiBold"
+                               VerticalAlignment="Center"
+                               HorizontalAlignment="Center"
+                               Opacity="0.9"/>
+                    
+                    <Button x:Name="CloseBtn"
+                            Width="24" Height="24"
+                            Margin="0,0,12,0"
+                            HorizontalAlignment="Right"
+                            VerticalAlignment="Center"
+                            Click="CloseBtn_Click"
+                            Style="{StaticResource CloseButtonStyle}"
+                            ToolTip="Fechar (ESC)">
+                        <Path Data="M0,0 L8,8 M8,0 L0,8"
+                              Stroke="#FF9696"
+                              StrokeThickness="1"
+                              Width="8" Height="8"/>
+                    </Button>
+                </Grid>
+            </Border>
+
+            <!-- Content -->
+            <Border Background="#1AFFFFFF"
+                    Margin="0,40,0,0"
+                    Padding="30,20">
+                <StackPanel>
+                    <!-- Orb Principal (igual ao OrbWindow) -->
+                    <Grid Width="80" Height="80" HorizontalAlignment="Center" Margin="0,0,0,20">
+                        <!-- Partículas animadas -->
+                        <Ellipse Width="3" Height="3"
+                                 Margin="20,15,0,0"
+                                 HorizontalAlignment="Left"
+                                 VerticalAlignment="Top"
+                                 Fill="White"
+                                 Opacity="0.3">
+                            <Ellipse.Effect>
+                                <DropShadowEffect Color="White" BlurRadius="4" ShadowDepth="0" Opacity="0.6"/>
+                            </Ellipse.Effect>
+                            <Ellipse.RenderTransform>
+                                <TranslateTransform x:Name="Particle1"/>
+                            </Ellipse.RenderTransform>
+                            <Ellipse.Triggers>
+                                <EventTrigger RoutedEvent="Loaded">
+                                    <BeginStoryboard>
+                                        <Storyboard RepeatBehavior="Forever" BeginTime="0:0:0.5">
+                                            <DoubleAnimationUsingKeyFrames Storyboard.TargetName="Particle1" Storyboard.TargetProperty="X" Duration="0:0:3">
+                                                <LinearDoubleKeyFrame KeyTime="0:0:0" Value="0"/>
+                                                <LinearDoubleKeyFrame KeyTime="0:0:1" Value="2"/>
+                                                <LinearDoubleKeyFrame KeyTime="0:0:2" Value="-1"/>
+                                                <LinearDoubleKeyFrame KeyTime="0:0:3" Value="0"/>
+                                            </DoubleAnimationUsingKeyFrames>
+                                            <DoubleAnimationUsingKeyFrames Storyboard.TargetName="Particle1" Storyboard.TargetProperty="Y" Duration="0:0:3">
+                                                <LinearDoubleKeyFrame KeyTime="0:0:0" Value="0"/>
+                                                <LinearDoubleKeyFrame KeyTime="0:0:1" Value="-2"/>
+                                                <LinearDoubleKeyFrame KeyTime="0:0:2" Value="1"/>
+                                                <LinearDoubleKeyFrame KeyTime="0:0:3" Value="0"/>
+                                            </DoubleAnimationUsingKeyFrames>
+                                            <DoubleAnimation Storyboard.TargetProperty="Opacity"
+                                                           From="0.3" To="0.8" Duration="0:0:1.5"
+                                                           AutoReverse="True" RepeatBehavior="Forever"/>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </EventTrigger>
+                            </Ellipse.Triggers>
+                        </Ellipse>
+                        
+                        <Ellipse Width="2" Height="2"
+                                 Margin="55,25,0,0"
+                                 HorizontalAlignment="Left"
+                                 VerticalAlignment="Top"
+                                 Fill="White"
+                                 Opacity="0.3">
+                            <Ellipse.Effect>
+                                <DropShadowEffect Color="White" BlurRadius="4" ShadowDepth="0" Opacity="0.6"/>
+                            </Ellipse.Effect>
+                            <Ellipse.RenderTransform>
+                                <TranslateTransform x:Name="Particle2"/>
+                            </Ellipse.RenderTransform>
+                            <Ellipse.Triggers>
+                                <EventTrigger RoutedEvent="Loaded">
+                                    <BeginStoryboard>
+                                        <Storyboard RepeatBehavior="Forever" BeginTime="0:0:1.3">
+                                            <DoubleAnimationUsingKeyFrames Storyboard.TargetName="Particle2" Storyboard.TargetProperty="X" Duration="0:0:4">
+                                                <LinearDoubleKeyFrame KeyTime="0:0:0" Value="0"/>
+                                                <LinearDoubleKeyFrame KeyTime="0:0:1" Value="3"/>
+                                                <LinearDoubleKeyFrame KeyTime="0:0:2" Value="-2"/>
+                                                <LinearDoubleKeyFrame KeyTime="0:0:3" Value="2"/>
+                                                <LinearDoubleKeyFrame KeyTime="0:0:4" Value="0"/>
+                                            </DoubleAnimationUsingKeyFrames>
+                                            <DoubleAnimationUsingKeyFrames Storyboard.TargetName="Particle2" Storyboard.TargetProperty="Y" Duration="0:0:4">
+                                                <LinearDoubleKeyFrame KeyTime="0:0:0" Value="0"/>
+                                                <LinearDoubleKeyFrame KeyTime="0:0:1" Value="-3"/>
+                                                <LinearDoubleKeyFrame KeyTime="0:0:2" Value="2"/>
+                                                <LinearDoubleKeyFrame KeyTime="0:0:3" Value="3"/>
+                                                <LinearDoubleKeyFrame KeyTime="0:0:4" Value="0"/>
+                                            </DoubleAnimationUsingKeyFrames>
+                                            <DoubleAnimation Storyboard.TargetProperty="Opacity"
+                                                           From="0.5" To="0.8" Duration="0:0:1"
+                                                           AutoReverse="True" RepeatBehavior="Forever"/>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </EventTrigger>
+                            </Ellipse.Triggers>
+                        </Ellipse>
+                        
+                        <!-- Orb Principal (Liquid Glass) -->
+                        <Ellipse x:Name="OrbCircle"
+                                 Width="48" Height="48">
+                            <!-- Background Glass Escuro -->
+                            <Ellipse.Fill>
+                                <SolidColorBrush Color="#99141416" Opacity="0.6"/>
+                            </Ellipse.Fill>
+                            
+                            <!-- Borda Sutil -->
+                            <Ellipse.Stroke>
+                                <SolidColorBrush Color="#26FFFFFF"/>
+                            </Ellipse.Stroke>
+                            <Ellipse.StrokeThickness>1.5</Ellipse.StrokeThickness>
+                            
+                            <!-- Sombras Múltiplas (Box-Shadow) -->
+                            <Ellipse.Effect>
+                                <DropShadowEffect Color="Black" 
+                                                 BlurRadius="28" 
+                                                 ShadowDepth="6" 
+                                                 Opacity="0.4"/>
+                            </Ellipse.Effect>
+                            
+                            <!-- Transform para Hover -->
+                            <Ellipse.RenderTransform>
+                                <ScaleTransform x:Name="OrbScale" ScaleX="1" ScaleY="1" CenterX="24" CenterY="24"/>
+                            </Ellipse.RenderTransform>
+                        </Ellipse>
+                        
+                        <!-- Reflexo de Vidro -->
+                        <Ellipse Width="18" Height="18"
+                                 Margin="7,4,0,0"
+                                 HorizontalAlignment="Left"
+                                 VerticalAlignment="Top"
+                                 Fill="{StaticResource ReflectionBrush}"
+                                 Opacity="0.3">
+                            <Ellipse.Effect>
+                                <BlurEffect Radius="4"/>
+                            </Ellipse.Effect>
+                            <Ellipse.Triggers>
+                                <EventTrigger RoutedEvent="Loaded">
+                                    <BeginStoryboard>
+                                        <Storyboard RepeatBehavior="Forever">
+                                            <!-- Shimmer Animation -->
+                                            <DoubleAnimation Storyboard.TargetProperty="Opacity"
+                                                           From="0.3" To="0.6" Duration="0:0:4"
+                                                           AutoReverse="True"
+                                                           EasingFunction="{StaticResource EaseInOut}"/>
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </EventTrigger>
+                            </Ellipse.Triggers>
+                        </Ellipse>
+                    </Grid>
+                    
+                    <!-- Título -->
+                    <TextBlock Text="Orb Agent"
+                               Foreground="White"
+                               FontSize="24"
+                               FontWeight="Bold"
+                               HorizontalAlignment="Center"
+                               Margin="0,0,0,8"/>
+                    
+                    <!-- Versão -->
+                    <TextBlock Text="Versão 1.0.0"
+                               Foreground="#B3FFFFFF"
+                               FontSize="14"
+                               HorizontalAlignment="Center"
+                               Margin="0,0,0,20"/>
+                    
+                    <!-- Tecnologias -->
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                        <Border Background="#1AFFFFFF" 
+                                CornerRadius="12" 
+                                Padding="12,6" 
+                                Margin="0,0,8,0">
+                            <TextBlock Text="WPF" 
+                                       Foreground="#B3FFFFFF" 
+                                       FontSize="11" 
+                                       FontWeight="Medium"/>
+                        </Border>
+                        <Border Background="#1AFFFFFF" 
+                                CornerRadius="12" 
+                                Padding="12,6" 
+                                Margin="0,0,8,0">
+                            <TextBlock Text="Python" 
+                                       Foreground="#B3FFFFFF" 
+                                       FontSize="11" 
+                                       FontWeight="Medium"/>
+                        </Border>
+                        <Border Background="#1AFFFFFF" 
+                                CornerRadius="12" 
+                                Padding="12,6">
+                            <TextBlock Text="FastAPI" 
+                                       Foreground="#B3FFFFFF" 
+                                       FontSize="11" 
+                                       FontWeight="Medium"/>
+                        </Border>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
+            <!-- Footer -->
+            <Border Height="40"
+                    VerticalAlignment="Bottom"
+                    Background="#1AFFFFFF"
+                    BorderBrush="#26FFFFFF"
+                    BorderThickness="0,1,0,0"
+                    CornerRadius="0,0,8,8"
+                    Padding="30,10">
+                <TextBlock Text="© 2025 Orb Agent. Todos os direitos reservados."
+                           Foreground="#80FFFFFF"
+                           FontSize="11"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Center"/>
+            </Border>
+        </Grid>
+    </Border>
+</Window>

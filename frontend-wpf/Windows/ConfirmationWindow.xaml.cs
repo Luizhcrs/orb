@@ -15,6 +15,8 @@ namespace OrbAgent.Frontend.Windows
         private static extern int DwmSetWindowAttribute(IntPtr hwnd, int attr, ref int attrValue, int attrSize);
         
         private const int DWMWA_USE_IMMERSIVE_DARK_MODE = 20;
+        private const int DWMWA_WINDOW_CORNER_PREFERENCE = 33;
+        private const int DWMWCP_ROUND = 2; // Cantos arredondados
         private const int DWMWA_SYSTEMBACKDROP_TYPE = 38;
         private const int DWMSBT_TRANSIENTWINDOW = 3; // Acrylic effect
 
@@ -41,6 +43,10 @@ namespace OrbAgent.Frontend.Windows
             // Ativar dark mode
             int useDarkMode = 1;
             DwmSetWindowAttribute(hwnd, DWMWA_USE_IMMERSIVE_DARK_MODE, ref useDarkMode, sizeof(int));
+
+            // Ativar cantos arredondados nativos
+            int cornerPreference = DWMWCP_ROUND;
+            DwmSetWindowAttribute(hwnd, DWMWA_WINDOW_CORNER_PREFERENCE, ref cornerPreference, sizeof(int));
 
             // Ativar Acrylic effect
             int backdropType = DWMSBT_TRANSIENTWINDOW;
