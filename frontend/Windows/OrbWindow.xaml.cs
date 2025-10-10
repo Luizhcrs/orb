@@ -63,6 +63,7 @@ namespace OrbAgent.Frontend.Windows
             };
         }
 
+
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             // Não aplicar blur aqui - o Orb já tem transparência no XAML

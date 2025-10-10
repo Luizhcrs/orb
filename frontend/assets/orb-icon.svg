@@ -1,0 +1,72 @@
+<svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <defs>
+    <!-- NOVO GRADIENTE: Para a sombra que desvanece -->
+    <radialGradient id="shadow-gradient">
+      <stop offset="50%" stop-color="rgba(0, 0, 0, 0.6)" />
+      <stop offset="100%" stop-color="rgba(0, 0, 0, 0)" />
+    </radialGradient>
+
+    <!-- Filtro de desfoque para a sombra -->
+    <filter id="background-blur">
+        <feGaussianBlur stdDeviation="10" />
+    </filter>
+
+    <!-- Filtro para o plasma interno, sincronizado -->
+    <filter id="synchronized-plasma">
+      <feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="3" seed="20" result="noise"/>
+      <feGaussianBlur in="noise" stdDeviation="6" />
+      <feComponentTransfer>
+        <feFuncA type="gamma" exponent="2.5" amplitude="1.8"/>
+      </feComponentTransfer>
+      <feComposite operator="in" in="SourceGraphic"/>
+      
+      <animate xlink:href="#synchronized-plasma > feTurbulence"
+        attributeName="seed" dur="4s" values="20; 50; 20" 
+        repeatCount="indefinite" calcMode="spline" keySplines="0.5 0 0.5 1; 0.5 0 0.5 1" />
+    </filter>
+    
+    <!-- Filtro de brilho para a borda -->
+    <filter id="edge-glow">
+        <feGaussianBlur stdDeviation="3" />
+    </filter>
+  </defs>
+
+  <!-- Grupo Mestre -->
+  <g>
+    <!-- Círculo de fundo AGORA usando o gradiente e maior -->
+    <circle cx="200" cy="200" r="140" fill="url(#shadow-gradient)" filter="url(#background-blur)"/>
+
+    <!-- O batimento cardíaco de opacidade -->
+    <g>
+        <animate attributeName="opacity" values="0.75; 1; 0.75" dur="4s"
+        repeatCount="indefinite" calcMode="spline" keySplines="0.5 0 0.5 1; 0.5 0 0.5 1" />
+
+        <!-- Camadas Internas (Plasma) -->
+        <g>
+        <circle cx="200" cy="200" r="100" fill="rgba(255, 255, 255, 0.05)" />
+        <circle cx="200" cy="200" r="100" fill="white" opacity="0.25" filter="url(#synchronized-plasma)" />
+        </g>
+
+        <!-- Camadas da Borda (Linha e Pulsos) -->
+        <g filter="url(#edge-glow)">
+        <circle cx="200" cy="200" r="100" fill="none" stroke="rgba(255, 255, 255, 0.2)" stroke-width="1.5"/>
+
+        <!-- PULSO PRINCIPAL -->
+        <g>
+            <animateTransform attributeName="transform" type="rotate" from="0 200 200" to="360 200 200"
+            dur="8s" repeatCount="indefinite" />
+            <circle cx="200" cy="200" r="100" fill="none" stroke="white" stroke-width="3.5" stroke-linecap="round"
+            stroke-dasharray="180 448" />
+        </g>
+
+        <!-- PULSO SECUNDÁRIO -->
+        <g>
+            <animateTransform attributeName="transform" type="rotate" from="0 200 200" to="-360 200 200"
+            dur="4s" repeatCount="indefinite" />
+            <circle cx="200" cy="200" r="100" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round"
+            stroke-dasharray="120 508" opacity="0.7" />
+        </g>
+        </g>
+    </g>
+  </g>
+</svg>

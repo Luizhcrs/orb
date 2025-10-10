@@ -88,3 +88,5 @@ C:\Users\luiz.rs\Documents\Projects\orb\frontend\obj\Debug\net9.0-windows\refint
 C:\Users\luiz.rs\Documents\Projects\orb\frontend\obj\Debug\net9.0-windows\Orb.pdb
 C:\Users\luiz.rs\Documents\Projects\orb\frontend\obj\Debug\net9.0-windows\OrbAgent.Frontend.genruntimeconfig.cache
 C:\Users\luiz.rs\Documents\Projects\orb\frontend\obj\Debug\net9.0-windows\ref\Orb.dll
+C:\Users\luiz.rs\Documents\Projects\orb\frontend\bin\Debug\net9.0-windows\Assets\orb-icon.svg
+C:\Users\luiz.rs\Documents\Projects\orb\frontend\bin\Debug\net9.0-windows\Assets\README.md

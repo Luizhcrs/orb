@@ -20,19 +20,6 @@
             <GradientStop Color="#1AFFFFFF" Offset="0"/>
             <GradientStop Color="Transparent" Offset="0.7"/>
         </RadialGradientBrush>
-        
-        <!-- Gradient para o Core Interno -->
-        <RadialGradientBrush x:Key="CoreBrush">
-            <GradientStop Color="#26FFFFFF" Offset="0"/>
-            <GradientStop Color="#0DFFFFFF" Offset="0.5"/>
-            <GradientStop Color="Transparent" Offset="1"/>
-        </RadialGradientBrush>
-        
-        <!-- Gradient para Reflexo de Vidro -->
-        <RadialGradientBrush x:Key="ReflectionBrush">
-            <GradientStop Color="#66FFFFFF" Offset="0"/>
-            <GradientStop Color="Transparent" Offset="0.7"/>
-        </RadialGradientBrush>
     </Window.Resources>
     
     <Grid>
@@ -77,41 +64,41 @@
                 </Ellipse.Triggers>
             </Ellipse>
             
-            <!-- Orb Principal (Liquid Glass) -->
+            <!-- Orb Principal (Circle com efeitos) -->
             <Ellipse x:Name="OrbCircle"
                      Width="48" Height="48">
                 <!-- Background Glass Escuro -->
                 <Ellipse.Fill>
-                    <SolidColorBrush Color="#99141416" Opacity="0.6"/>
+                    <SolidColorBrush Color="#99141416" Opacity="0.8"/>
                 </Ellipse.Fill>
                 
                 <!-- Borda Sutil -->
                 <Ellipse.Stroke>
-                    <SolidColorBrush Color="#26FFFFFF"/>
+                    <SolidColorBrush Color="#40FFFFFF"/>
                 </Ellipse.Stroke>
                 <Ellipse.StrokeThickness>1.5</Ellipse.StrokeThickness>
                 
-                <!-- Sombras Múltiplas (Box-Shadow) -->
+                <!-- Sombras -->
                 <Ellipse.Effect>
                     <DropShadowEffect Color="Black" 
                                      BlurRadius="28" 
                                      ShadowDepth="6" 
                                      Opacity="0.4"/>
                 </Ellipse.Effect>
-                
-                <!-- Transform para Hover -->
-                <Ellipse.RenderTransform>
-                    <ScaleTransform x:Name="OrbScale" ScaleX="1" ScaleY="1" CenterX="24" CenterY="24"/>
-                </Ellipse.RenderTransform>
             </Ellipse>
             
-            <!-- Reflexo de Vidro (::before no CSS) -->
+            <!-- Reflexo de Vidro -->
             <Ellipse Width="18" Height="18"
                      Margin="7,4,0,0"
                      HorizontalAlignment="Left"
                      VerticalAlignment="Top"
-                     Fill="{StaticResource ReflectionBrush}"
-                     Opacity="0.3">
+                     Opacity="0.4">
+                <Ellipse.Fill>
+                    <RadialGradientBrush>
+                        <GradientStop Color="#80FFFFFF" Offset="0"/>
+                        <GradientStop Color="Transparent" Offset="1"/>
+                    </RadialGradientBrush>
+                </Ellipse.Fill>
                 <Ellipse.Effect>
                     <BlurEffect Radius="4"/>
                 </Ellipse.Effect>
@@ -119,7 +106,6 @@
                     <EventTrigger RoutedEvent="Loaded">
                         <BeginStoryboard>
                             <Storyboard RepeatBehavior="Forever">
-                                <!-- Shimmer Animation -->
                                 <DoubleAnimation Storyboard.TargetProperty="Opacity"
                                                From="0.3" To="0.6" Duration="0:0:4"
                                                AutoReverse="True"
@@ -130,17 +116,22 @@
                 </Ellipse.Triggers>
             </Ellipse>
             
-            <!-- Core Interno Respirante (::after no CSS) -->
+            <!-- Core Interno Pulsante -->
             <Ellipse Width="24" Height="24"
                      HorizontalAlignment="Center"
                      VerticalAlignment="Center"
-                     Fill="{StaticResource CoreBrush}"
-                     Opacity="0.4">
+                     Opacity="0.5">
+                <Ellipse.Fill>
+                    <RadialGradientBrush>
+                        <GradientStop Color="#40FFFFFF" Offset="0"/>
+                        <GradientStop Color="#1AFFFFFF" Offset="0.5"/>
+                        <GradientStop Color="Transparent" Offset="1"/>
+                    </RadialGradientBrush>
+                </Ellipse.Fill>
                 <Ellipse.Triggers>
                     <EventTrigger RoutedEvent="Loaded">
                         <BeginStoryboard>
                             <Storyboard RepeatBehavior="Forever">
-                                <!-- Core Breath Animation -->
                                 <DoubleAnimation Storyboard.TargetProperty="Opacity"
                                                From="0.4" To="0.7" Duration="0:0:3"
                                                AutoReverse="True"
@@ -151,172 +142,6 @@
                 </Ellipse.Triggers>
             </Ellipse>
             
-            <!-- Partícula 1 -->
-            <Ellipse Width="2" Height="2"
-                     Margin="24,18,0,0"
-                     HorizontalAlignment="Left"
-                     VerticalAlignment="Top"
-                     Fill="White"
-                     Opacity="0.3">
-                <Ellipse.Effect>
-                    <DropShadowEffect Color="White" BlurRadius="4" ShadowDepth="0" Opacity="0.6"/>
-                </Ellipse.Effect>
-                <Ellipse.RenderTransform>
-                    <TranslateTransform x:Name="Particle1"/>
-                </Ellipse.RenderTransform>
-                <Ellipse.Triggers>
-                    <EventTrigger RoutedEvent="Loaded">
-                        <BeginStoryboard>
-                            <Storyboard RepeatBehavior="Forever">
-                                <DoubleAnimationUsingKeyFrames Storyboard.TargetName="Particle1" Storyboard.TargetProperty="X" Duration="0:0:4">
-                                    <LinearDoubleKeyFrame KeyTime="0:0:0" Value="0"/>
-                                    <LinearDoubleKeyFrame KeyTime="0:0:1" Value="3"/>
-                                    <LinearDoubleKeyFrame KeyTime="0:0:2" Value="-2"/>
-                                    <LinearDoubleKeyFrame KeyTime="0:0:3" Value="2"/>
-                                    <LinearDoubleKeyFrame KeyTime="0:0:4" Value="0"/>
-                                </DoubleAnimationUsingKeyFrames>
-                                <DoubleAnimationUsingKeyFrames Storyboard.TargetName="Particle1" Storyboard.TargetProperty="Y" Duration="0:0:4">
-                                    <LinearDoubleKeyFrame KeyTime="0:0:0" Value="0"/>
-                                    <LinearDoubleKeyFrame KeyTime="0:0:1" Value="-3"/>
-                                    <LinearDoubleKeyFrame KeyTime="0:0:2" Value="2"/>
-                                    <LinearDoubleKeyFrame KeyTime="0:0:3" Value="3"/>
-                                    <LinearDoubleKeyFrame KeyTime="0:0:4" Value="0"/>
-                                </DoubleAnimationUsingKeyFrames>
-                                <DoubleAnimation Storyboard.TargetProperty="Opacity"
-                                               From="0.3" To="0.8" Duration="0:0:1"
-                                               AutoReverse="True" RepeatBehavior="Forever"/>
-                            </Storyboard>
-                        </BeginStoryboard>
-                    </EventTrigger>
-                </Ellipse.Triggers>
-            </Ellipse>
-            
-            <!-- Partícula 2 -->
-            <Ellipse Width="2" Height="2"
-                     Margin="36,36,0,0"
-                     HorizontalAlignment="Left"
-                     VerticalAlignment="Top"
-                     Fill="White"
-                     Opacity="0.3">
-                <Ellipse.Effect>
-                    <DropShadowEffect Color="White" BlurRadius="4" ShadowDepth="0" Opacity="0.6"/>
-                </Ellipse.Effect>
-                <Ellipse.RenderTransform>
-                    <TranslateTransform x:Name="Particle2"/>
-                </Ellipse.RenderTransform>
-                <Ellipse.Triggers>
-                    <EventTrigger RoutedEvent="Loaded">
-                        <BeginStoryboard>
-                            <Storyboard RepeatBehavior="Forever" BeginTime="0:0:1.3">
-                                <DoubleAnimationUsingKeyFrames Storyboard.TargetName="Particle2" Storyboard.TargetProperty="X" Duration="0:0:4">
-                                    <LinearDoubleKeyFrame KeyTime="0:0:0" Value="0"/>
-                                    <LinearDoubleKeyFrame KeyTime="0:0:1" Value="3"/>
-                                    <LinearDoubleKeyFrame KeyTime="0:0:2" Value="-2"/>
-                                    <LinearDoubleKeyFrame KeyTime="0:0:3" Value="2"/>
-                                    <LinearDoubleKeyFrame KeyTime="0:0:4" Value="0"/>
-                                </DoubleAnimationUsingKeyFrames>
-                                <DoubleAnimationUsingKeyFrames Storyboard.TargetName="Particle2" Storyboard.TargetProperty="Y" Duration="0:0:4">
-                                    <LinearDoubleKeyFrame KeyTime="0:0:0" Value="0"/>
-                                    <LinearDoubleKeyFrame KeyTime="0:0:1" Value="-3"/>
-                                    <LinearDoubleKeyFrame KeyTime="0:0:2" Value="2"/>
-                                    <LinearDoubleKeyFrame KeyTime="0:0:3" Value="3"/>
-                                    <LinearDoubleKeyFrame KeyTime="0:0:4" Value="0"/>
-                                </DoubleAnimationUsingKeyFrames>
-                                <DoubleAnimation Storyboard.TargetProperty="Opacity"
-                                               From="0.5" To="0.8" Duration="0:0:1"
-                                               AutoReverse="True" RepeatBehavior="Forever"/>
-                            </Storyboard>
-                        </BeginStoryboard>
-                    </EventTrigger>
-                </Ellipse.Triggers>
-            </Ellipse>
-            
-            <!-- Partícula 3 -->
-            <Ellipse Width="2" Height="2"
-                     Margin="15,27,0,0"
-                     HorizontalAlignment="Left"
-                     VerticalAlignment="Top"
-                     Fill="White"
-                     Opacity="0.3">
-                <Ellipse.Effect>
-                    <DropShadowEffect Color="White" BlurRadius="4" ShadowDepth="0" Opacity="0.6"/>
-                </Ellipse.Effect>
-                <Ellipse.RenderTransform>
-                    <TranslateTransform x:Name="Particle3"/>
-                </Ellipse.RenderTransform>
-                <Ellipse.Triggers>
-                    <EventTrigger RoutedEvent="Loaded">
-                        <BeginStoryboard>
-                            <Storyboard RepeatBehavior="Forever" BeginTime="0:0:2.6">
-                                <DoubleAnimationUsingKeyFrames Storyboard.TargetName="Particle3" Storyboard.TargetProperty="X" Duration="0:0:4">
-                                    <LinearDoubleKeyFrame KeyTime="0:0:0" Value="0"/>
-                                    <LinearDoubleKeyFrame KeyTime="0:0:1" Value="3"/>
-                                    <LinearDoubleKeyFrame KeyTime="0:0:2" Value="-2"/>
-                                    <LinearDoubleKeyFrame KeyTime="0:0:3" Value="2"/>
-                                    <LinearDoubleKeyFrame KeyTime="0:0:4" Value="0"/>
-                                </DoubleAnimationUsingKeyFrames>
-                                <DoubleAnimationUsingKeyFrames Storyboard.TargetName="Particle3" Storyboard.TargetProperty="Y" Duration="0:0:4">
-                                    <LinearDoubleKeyFrame KeyTime="0:0:0" Value="0"/>
-                                    <LinearDoubleKeyFrame KeyTime="0:0:1" Value="-3"/>
-                                    <LinearDoubleKeyFrame KeyTime="0:0:2" Value="2"/>
-                                    <LinearDoubleKeyFrame KeyTime="0:0:3" Value="3"/>
-                                    <LinearDoubleKeyFrame KeyTime="0:0:4" Value="0"/>
-                                </DoubleAnimationUsingKeyFrames>
-                                <DoubleAnimation Storyboard.TargetProperty="Opacity"
-                                               From="0.3" To="0.8" Duration="0:0:1"
-                                               AutoReverse="True" RepeatBehavior="Forever"/>
-                            </Storyboard>
-                        </BeginStoryboard>
-                    </EventTrigger>
-                </Ellipse.Triggers>
-            </Ellipse>
-            
-            <!-- Eventos de Hover (Mouse Enter/Leave) -->
-            <Grid.Triggers>
-                <EventTrigger RoutedEvent="MouseEnter">
-                    <BeginStoryboard>
-                        <Storyboard>
-                            <!-- Escala do Orb -->
-                            <DoubleAnimation Storyboard.TargetName="OrbScale"
-                                           Storyboard.TargetProperty="ScaleX"
-                                           To="1.1" Duration="0:0:0.4"
-                                           EasingFunction="{StaticResource EaseInOut}"/>
-                            <DoubleAnimation Storyboard.TargetName="OrbScale"
-                                           Storyboard.TargetProperty="ScaleY"
-                                           To="1.1" Duration="0:0:0.4"
-                                           EasingFunction="{StaticResource EaseInOut}"/>
-                        </Storyboard>
-                    </BeginStoryboard>
-                </EventTrigger>
-                <EventTrigger RoutedEvent="MouseLeave">
-                    <BeginStoryboard>
-                        <Storyboard>
-                            <!-- Volta ao tamanho normal -->
-                            <DoubleAnimation Storyboard.TargetName="OrbScale"
-                                           Storyboard.TargetProperty="ScaleX"
-                                           To="1" Duration="0:0:0.4"
-                                           EasingFunction="{StaticResource EaseInOut}"/>
-                            <DoubleAnimation Storyboard.TargetName="OrbScale"
-                                           Storyboard.TargetProperty="ScaleY"
-                                           To="1" Duration="0:0:0.4"
-                                           EasingFunction="{StaticResource EaseInOut}"/>
-                        </Storyboard>
-                    </BeginStoryboard>
-                </EventTrigger>
-                <EventTrigger RoutedEvent="MouseLeftButtonDown">
-                    <BeginStoryboard>
-                        <Storyboard>
-                            <!-- Click effect -->
-                            <DoubleAnimation Storyboard.TargetName="OrbScale"
-                                           Storyboard.TargetProperty="ScaleX"
-                                           To="1.05" Duration="0:0:0.1"/>
-                            <DoubleAnimation Storyboard.TargetName="OrbScale"
-                                           Storyboard.TargetProperty="ScaleY"
-                                           To="1.05" Duration="0:0:0.1"/>
-                        </Storyboard>
-                    </BeginStoryboard>
-                </EventTrigger>
-            </Grid.Triggers>
         </Grid>
     </Grid>
 </Window>

@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Orb")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+4d3cca8e6905f7dd5fe52a7cf8630d4b5c867f5f")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+33dc476129c219b97f41830023782a5a8972fd52")]
 [assembly: System.Reflection.AssemblyProductAttribute("Orb Agent")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Orb")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

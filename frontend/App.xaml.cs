@@ -287,6 +287,8 @@ public partial class App : System.Windows.Application
         // Confirmação antes de sair com janela personalizada
         if (ConfirmationWindow.ShowExitConfirmation())
         {
+            // Garantir que o backend seja finalizado antes de fechar
+            _backendProcessManager?.StopBackend();
             System.Windows.Application.Current.Shutdown();
         }
     }

@@ -236,7 +236,7 @@ async def set_agent_config(provider: str, model: str, api_key: str):
     Definir configuração do agente (LLM)
     """
     try:
-        config_manager.set_llm_config(provider, model, api_key)
+        config_manager.save_llm_config(provider, api_key, model)
         return {
             "status": "success",
             "message": "Configuração do agente atualizada",

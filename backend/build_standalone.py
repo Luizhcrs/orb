@@ -17,7 +17,7 @@ args = [
     '--noconfirm',  # Sobrescrever sem perguntar
     '--clean',  # Limpar cache
     '--log-level=WARN',  # Menos verboso
-    '--noconsole',  # Sem janela de console (para serviço)
+    # NOTA: Não usar --noconsole para serviços Windows funcionarem corretamente
     
     # Adicionar todos os módulos do projeto
     f'--add-data={os.path.join(BASE_DIR, "src")};src',
@@ -63,5 +63,34 @@ if __name__ == '__main__':
     PyInstaller.__main__.run(args)
     
     print(" Build concluído!")
-    print(f" Executável: {os.path.join(BASE_DIR, 'dist', 'orb-backend.exe' if sys.platform == 'win32' else 'orb-backend')}")
+    backend_exe = os.path.join(BASE_DIR, 'dist', 'orb-backend.exe' if sys.platform == 'win32' else 'orb-backend')
+    print(f" Executável: {backend_exe}")
+    
+    # Compilar wrapper do serviço C# e copiar backend para o local correto
+    print("\n Compilando wrapper do serviço C#...")
+    import subprocess
+    try:
+        result = subprocess.run(
+            ["dotnet", "publish", "ServiceWrapper.csproj", "-c", "Release", "-r", "win-x64", "--self-contained"],
+            cwd=BASE_DIR,
+            capture_output=True,
+            text=True
+        )
+        if result.returncode == 0:
+            print(" Wrapper compilado com sucesso!")
+            
+            # Copiar backend para a pasta do wrapper
+            import shutil
+            publish_dir = os.path.join(BASE_DIR, "bin", "Release", "net9.0", "win-x64", "publish")
+            dest_dir = os.path.join(publish_dir, "dist")
+            os.makedirs(dest_dir, exist_ok=True)
+            
+            dest_file = os.path.join(dest_dir, "orb-backend.exe")
+            shutil.copy2(backend_exe, dest_file)
+            print(f" Backend copiado para: {dest_file}")
+            print(f" Wrapper: {os.path.join(publish_dir, 'OrbBackendService.exe')}")
+        else:
+            print(f" Erro ao compilar wrapper: {result.stderr}")
+    except Exception as e:
+        print(f" Aviso: Não foi possível compilar o wrapper: {e}")
 
