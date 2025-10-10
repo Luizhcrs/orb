@@ -11,7 +11,11 @@
     <!-- Nome do processo -->
     <AssemblyName>Orb</AssemblyName>
     <Product>Orb Agent</Product>
-    <!-- <ApplicationIcon>Assets\orb.ico</ApplicationIcon> --> <!-- Descomentar quando adicionar orb.ico -->
+    <ApplicationIcon>Assets\ico.ico</ApplicationIcon>
+    
+    <!-- Não incluir PDB em Release -->
+    <DebugType>None</DebugType>
+    <DebugSymbols>false</DebugSymbols>
   </PropertyGroup>
 
   <ItemGroup>
@@ -23,6 +27,13 @@
 
   <ItemGroup>
     <Resource Include="Assets\**\*" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Copiar Assets para pasta de build -->
+    <None Include="Assets\**\*">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

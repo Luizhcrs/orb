@@ -183,17 +183,19 @@ namespace OrbAgent.Frontend.Windows
             // Idioma
             AddLabel("Idioma");
             AddComboBox(new[] { "Português (BR)", "English" }, 0);
-            
-            AddSpacer();
-            
-            // Iniciar com Windows
-            AddCheckBox("Iniciar com o Windows", false);
         }
 
-        private void LoadAgenteSection()
+        private async void LoadAgenteSection()
         {
             LoggingService.LogInfo("LoadAgenteSection iniciado!");
             LoggingService.LogDebug($"_currentConfig é null? {_currentConfig == null}");
+            
+            // Garantir que a configuração está carregada do backend
+            if (_backendService != null && (_currentConfig == null || string.IsNullOrEmpty(_currentConfig.Agent?.ApiKey)))
+            {
+                LoggingService.LogInfo("Recarregando configuração do backend...");
+                await LoadConfigAsync();
+            }
             
             if (_currentConfig != null)
             {
@@ -590,10 +592,11 @@ namespace OrbAgent.Frontend.Windows
             }
             
             // Verificar se já existe API Key (backend retorna mascarada como "***XXXX")
-            var hasApiKey = _currentConfig != null && 
-                           !string.IsNullOrEmpty(_currentConfig.Agent.ApiKey) && 
-                           (_currentConfig.Agent.ApiKey.Length > 4 || _currentConfig.Agent.ApiKey.StartsWith("***"));
+            var apiKeyValue = _currentConfig?.Agent?.ApiKey ?? "";
+            var hasApiKey = !string.IsNullOrEmpty(apiKeyValue) && 
+                           (apiKeyValue.StartsWith("***") || apiKeyValue.Length > 10);
             
+            LoggingService.LogDebug($"AddApiKeyField - API Key value: '{apiKeyValue}'");
             LoggingService.LogDebug($"AddApiKeyField - hasApiKey: {hasApiKey}");
             
             string placeholder;

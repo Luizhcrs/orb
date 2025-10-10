@@ -91,8 +91,30 @@ orb-backend.log
 backend/orb-backend.log
 
 # WPF Frontend
-frontend-wpf/bin/
-frontend-wpf/obj/
-frontend-wpf/.vs/
-frontend-wpf/*.user
-frontend-wpf/*.suo
+frontend/bin/
+frontend/obj/
+frontend/.vs/
+frontend/*.user
+frontend/*.suo
+
+# Backend build artifacts
+backend/bin/
+backend/obj/
+backend/build/
+backend/dist/
+backend/*.spec
+backend/OrbBackendService.exe
+backend/*.log
+backend/data/
+
+# Encryption keys
+.encryption_key
+
+# Instalador
+release/
+
+# Arquivos temporários
+query
+qc
+delete
+stop

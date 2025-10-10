@@ -1,304 +1,178 @@
-# 🌐 ORB - Agente LLM Flutuante para Desktop
+# 🌐 ORB - Agente IA Flutuante para Desktop
 
 ![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)
 ![License](https://img.shields.io/badge/license-MIT-green.svg)
 ![Platform](https://img.shields.io/badge/platform-Windows-lightgrey.svg)
 
-ORB é um assistente de IA flutuante para desktop que utiliza modelos de linguagem (LLM) para fornecer ajuda contextual enquanto você trabalha. Com uma interface minimalista em "liquid glass" desenvolvida em WPF, o ORB fica disponível através de hot corners e atalhos globais.
+ORB é um assistente de IA flutuante para desktop Windows que utiliza modelos de linguagem (LLM) para fornecer ajuda contextual enquanto você trabalha. Com uma interface minimalista em "liquid glass" desenvolvida em WPF, o ORB fica disponível através de hot corners e atalhos globais.
 
 ## ✨ Características
 
 - 🎯 **Hot Corner**: Ative o ORB movendo o mouse para o canto superior esquerdo
-- ⌨️ **Atalhos Globais**: `Ctrl+Shift+Space` para chat, `Ctrl+Shift+O` para configurações
+- ⌨️ **Atalhos Globais**: 
+  - `Ctrl+Shift+Space`: Abrir chat
+  - `Ctrl+Shift+O`: Abrir configurações
+  - `Ctrl+Shift+S`: Capturar screenshot
 - 🔒 **Privacidade**: Todas as conversas e configurações são armazenadas localmente em SQLite
 - 🎨 **Interface Moderna**: Design "liquid glass" com glassmorphism
-- 📸 **Capturas de Tela**: Analise imagens com visão computacional
+- 📸 **Capturas de Tela**: Analise imagens com visão computacional integrada
 - 💾 **Histórico Persistente**: Acesse e retome conversas anteriores
-- 🔌 **Multi-LLM**: Suporte para OpenAI (GPT-4o, GPT-4o-mini) e Anthropic Claude
+- 🤖 **OpenAI GPT**: Suporte para modelos GPT-4o e GPT-4o-mini
+- 🚀 **Zero Dependências**: Instalador inclui .NET Runtime e Python - nada mais necessário!
 
-## 🚀 Início Rápido
+## 📥 Instalação
 
-### Para Usuários Finais
+### Usuários Finais
 
-1. **Baixe o instalador** para Windows:
-   - Windows: `OrbAgent-Setup-1.0.0.exe` ou `OrbAgent-Portable-1.0.0.exe`
+1. **Baixe o instalador** da [página de releases](https://github.com/Luizhcrs/orb/releases/latest)
+   - `OrbAgent-Setup-1.0.0.exe` (~114 MB)
 
-2. **Instale e execute**
+2. **Execute o instalador** e siga as instruções
 
-3. **Configure sua API key**:
-   - Pressione `Ctrl+Shift+O` para abrir as configurações
-   - Na seção "Agente", insira sua API key da OpenAI
-   - Salve as configurações
+3. **Configure sua API key da OpenAI**:
+   - Clique no ícone do Orb na bandeja do sistema
+   - Selecione "Configurações" ou pressione `Ctrl+Shift+O`
+   - Insira sua API key da OpenAI
+   - Clique em "Salvar"
 
 4. **Comece a usar**:
-   - Mova o mouse para o canto superior esquerdo OU
-   - Pressione `Ctrl+Shift+Space` para abrir o chat
+   - Mova o mouse para o canto superior esquerdo da tela
+   - O ORB aparecerá - clique nele para abrir o chat
 
-### Para Desenvolvedores
+### Desenvolvedores
 
 #### Requisitos
 
 - .NET 9.0 SDK
 - Python 3.11+
-- Visual Studio 2022 ou VS Code (recomendado)
+- Inno Setup 6 (para criar instaladores)
 
-#### Setup Automatizado
-
-**Windows:**
-```batch
-setup-dev.bat
-```
-
-#### Setup Manual
+#### Setup
 
 1. **Clone o repositório:**
 ```bash
-git clone https://github.com/seu-usuario/orb.git
+git clone https://github.com/Luizhcrs/orb.git
 cd orb
 ```
 
 2. **Configure o Backend:**
 ```bash
 cd backend
-
-# Criar ambiente virtual
-python3 -m venv venv
-
-# Ativar (Linux/macOS)
-source venv/bin/activate
-# Ativar (Windows)
+python -m venv venv
 venv\Scripts\activate
-
-# Instalar dependências
 pip install -r requirements.txt
-
-# Criar .env
-cp env.example .env
-
-# Gerar chave de criptografia
-python3 -c "from cryptography.fernet import Fernet; print('FERNET_KEY=' + Fernet.generate_key().decode())" >> .env
-
-cd ..
 ```
 
 3. **Configure o Frontend:**
 ```bash
 cd frontend
-
-# Restaurar dependências NuGet
 dotnet restore
-
-# Build inicial
 dotnet build
-
-cd ..
 ```
 
-4. **Inicie o projeto:**
+4. **Execute em modo desenvolvimento:**
 ```bash
-# Na raiz do projeto
-npm run dev
-# ou
-dotnet run --project frontend
+# A partir da pasta frontend
+dotnet run
 ```
+
+O backend será iniciado automaticamente junto com o frontend.
 
 ## 🏗️ Arquitetura
 
 ```
 orb/
-├── frontend/                 # Aplicação WPF (.NET)
-│   ├── Windows/             # Janelas da aplicação (Chat, Config, Orb)
-│   ├── Services/            # Serviços (Backend, Screenshot, System Tray)
-│   ├── Models/              # Modelos de dados
-│   ├── Helpers/             # Utilitários
-│   └── OrbAgent.Frontend.csproj
+├── frontend/                    # Aplicação WPF (.NET 9)
+│   ├── Windows/                # Janelas (Chat, Config, Orb, About)
+│   ├── Services/               # Serviços (Backend, Screenshot, System Tray)
+│   ├── Models/                 # Modelos de dados
+│   ├── Config/                 # Configurações
+│   └── Assets/                 # Recursos (ícones, SVG)
 │
-├── backend/                 # API FastAPI
+├── backend/                    # API FastAPI
 │   ├── src/
-│   │   ├── api/            # Routers FastAPI
-│   │   ├── agentes/        # Pipeline do agente LLM
-│   │   ├── database/       # SQLite + Managers
-│   │   └── config/         # Configurações
-│   └── main.py
+│   │   ├── api/               # Routers FastAPI
+│   │   ├── agentes/           # Pipeline do agente LLM
+│   │   ├── database/          # SQLite + Config Manager
+│   │   └── config/            # Configurações
+│   ├── backend_service.py     # Entry point do executável
+│   └── build_standalone.py    # Script de build PyInstaller
 │
-├── docs/                    # Documentação
-├── scripts/                 # Scripts de automação
-└── docker-compose.yml      # Docker para desenvolvimento
+├── docs/                       # Documentação
+├── build-installer.bat         # Script master de build
+└── installer.iss              # Configuração Inno Setup
 ```
 
-## 🛠️ Comandos Disponíveis
+## 🛠️ Build do Instalador
 
-### Desenvolvimento
+Para criar um instalador completo:
 
 ```bash
-# Iniciar modo desenvolvimento (frontend + backend)
-npm run dev
-
-# Apenas backend
-npm run dev:backend
-
-# Apenas frontend
-npm run dev:frontend
-
-# Build do .NET
-npm run build
-
-# Limpar builds
-npm run clean
+# Windows (executar como Administrador)
+.\build-installer.bat
 ```
 
-### Produção
+O instalador será criado em `release\OrbAgent-Setup-1.0.0.exe`
 
-```bash
-# Build completo
-npm run build
+## 📂 Localização dos Dados
 
-# Criar instalador Windows
-npm run pack:win
+Após a instalação, os dados do usuário são armazenados em:
 
-# Criar instalador macOS
-npm run pack:mac
-
-# Criar instalador Linux
-npm run pack:linux
-
-# Criar para todas as plataformas
-npm run pack:all
-```
-
-### Docker
-
-```bash
-# Iniciar backend com Docker
-docker-compose up
-
-# Build fresh
-docker-compose up --build
-
-# Parar serviços
-docker-compose down
-```
+- **Banco de dados**: `%APPDATA%\OrbAgent\data\orb.db`
+- **Logs**: `%APPDATA%\OrbAgent\logs\orb-backend.log`
+- **Chave de criptografia**: `%APPDATA%\OrbAgent\data\.encryption_key`
 
 ## 🔧 Configuração
 
-### Variáveis de Ambiente
+### Via Interface (Recomendado)
 
-**Backend (`backend/.env`):**
-```env
-# LLM Provider
-LLM_PROVIDER=openai
-OPENAI_API_KEY=sua-chave-aqui
+Pressione `Ctrl+Shift+O` e configure:
 
-# Servidor
-HOST=0.0.0.0
-PORT=8000
-ENVIRONMENT=development
+- **Geral**: Tema e idioma
+- **Agente**: API key da OpenAI
+- **Histórico**: Visualizar e retomar conversas anteriores
 
-# Banco de Dados
-DATABASE_PATH=orb.db
-FERNET_KEY=sua-chave-fernet-aqui
+### Via Banco de Dados
 
-# Opções
-MAX_TOKENS=1000
-TEMPERATURE=0.7
-```
-
-**Frontend (`frontend/.env`):**
-```env
-BACKEND_URL=http://localhost:8000
-VITE_APP_TITLE=Orb Agent
-```
-
-### Configuração via Interface
-
-Todas as configurações podem ser ajustadas através da interface gráfica (`Ctrl+Shift+O`):
-
-- **Geral**: Tema, idioma, iniciar com Windows
-- **Agente**: Provider LLM, API key, modelo
-- **Histórico**: Gerenciar conversas anteriores
-
-## 📦 Build e Release
-
-### Pré-requisitos para Build
-
-- **Windows**: .NET 9.0 SDK, Visual Studio 2022 ou VS Code
-
-### Processo de Build
-
-1. **Prepare o ambiente:**
-```bash
-# Instalar dependências de build
-npm install
-
-# Build do backend (se necessário)
-cd backend && pip install -r requirements.txt && cd ..
-```
-
-2. **Crie o instalador:**
-```bash
-# Windows
-npm run pack:win
-```
-
-3. **Artefatos gerados em** `frontend/release/`:
-   - Windows: `.exe` (setup) e `.exe` (portable)
-
-### Versionamento
-
-Atualize a versão em `frontend/OrbAgent.Frontend.csproj`:
-```xml
-<PropertyGroup>
-  <AssemblyVersion>1.1.0.0</AssemblyVersion>
-  <FileVersion>1.1.0.0</FileVersion>
-</PropertyGroup>
-```
-
-## 🧪 Testes
-
-```bash
-# Backend
-cd backend
-pytest
-
-# Com cobertura
-pytest --cov=src --cov-report=html
-
-# Testes específicos
-pytest backend/tests/test_agent_integration.py
-```
+O banco SQLite pode ser acessado diretamente em `%APPDATA%\OrbAgent\data\orb.db`
 
 ## 🤝 Contribuindo
 
+Contribuições são bem-vindas! Por favor:
+
 1. Fork o projeto
-2. Crie uma branch para sua feature (`git checkout -b feature/AmazingFeature`)
-3. Commit suas mudanças (`git commit -m 'Add some AmazingFeature'`)
-4. Push para a branch (`git push origin feature/AmazingFeature`)
+2. Crie uma branch para sua feature (`git checkout -b feature/MinhaFeature`)
+3. Commit suas mudanças (`git commit -m 'Adiciona MinhaFeature'`)
+4. Push para a branch (`git push origin feature/MinhaFeature`)
 5. Abra um Pull Request
+
+Veja [CONTRIBUTING.md](CONTRIBUTING.md) para mais detalhes.
 
 ## 📝 Licença
 
 Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
 
-## 🙏 Agradecimentos
+## 🙏 Créditos
 
-- [WPF](https://docs.microsoft.com/en-us/dotnet/desktop/wpf/) - Framework para aplicações desktop .NET
-- [FastAPI](https://fastapi.tiangolo.com/) - Framework web Python moderno
-- [OpenAI](https://openai.com/) - APIs de LLM
+- **Desenvolvedor**: Luiz Cavalcanti
+- **Framework Frontend**: [WPF](https://docs.microsoft.com/pt-br/dotnet/desktop/wpf/)
+- **Framework Backend**: [FastAPI](https://fastapi.tiangolo.com/)
+- **LLM**: [OpenAI](https://openai.com/)
 
 ## 📞 Suporte
 
-- 🐛 **Bugs**: Abra uma [issue](https://github.com/seu-usuario/orb/issues)
-- 💬 **Discussões**: Use [Discussions](https://github.com/seu-usuario/orb/discussions)
-- 📧 **Email**: seu-email@exemplo.com
+- 🐛 **Bugs e Issues**: [GitHub Issues](https://github.com/Luizhcrs/orb/issues)
+- 💬 **Discussões**: [GitHub Discussions](https://github.com/Luizhcrs/orb/discussions)
 
 ## 🗺️ Roadmap
 
-- [ ] Suporte para mais LLMs (Gemini, Llama)
+- [ ] Suporte para Anthropic Claude
+- [ ] Suporte para Google Gemini
 - [ ] Plugins e extensões
 - [ ] Themes customizáveis
 - [ ] Sincronização em nuvem (opcional)
 - [ ] Comandos de voz
-- [ ] Backend em C# (.NET Core)
+- [ ] Suporte para Linux e macOS
 
 ---
 
