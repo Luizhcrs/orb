@@ -1,46 +1,39 @@
 ---
-name: ✨ Feature Request
-about: Sugerir uma nova funcionalidade para o Orb
+name: Sugerir Feature
+about: Sugira uma ideia para o ORB Agent
 title: '[FEATURE] '
-labels: ['enhancement', 'needs-review']
+labels: enhancement
 assignees: ''
 ---
 
-## 🚀 Funcionalidade Sugerida
-Uma descrição clara e concisa da funcionalidade que você gostaria de ver implementada.
+## 🚀 Descrição da Feature
+Uma descrição clara e concisa da feature que você gostaria de ver.
 
-## 💡 Motivação
-Por que esta funcionalidade seria útil? Que problema ela resolveria?
+## 🎯 Problema que Resolve
+Descreva o problema que esta feature resolveria.
+Ex: "Eu sempre fico frustrado quando [...]"
 
-## 📋 Descrição Detalhada
-Descreva como você imagina que a funcionalidade funcionaria:
+## 💡 Solução Proposta
+Descreva como você imagina que a feature funcione.
 
-### Comportamento Esperado:
-- [ ] Funcionalidade 1
-- [ ] Funcionalidade 2
-- [ ] Funcionalidade 3
+## 🔄 Alternativas Consideradas
+Descreva soluções alternativas ou features que você considerou.
 
-### Interface:
-- Como o usuário interagiria com esta funcionalidade?
-- Onde ela apareceria na interface?
+## 📊 Impacto Esperado
+- [ ] Melhora experiência do usuário
+- [ ] Aumenta produtividade
+- [ ] Adiciona funcionalidade essencial
+- [ ] Melhora performance
+- [ ] Outro: _______
 
-## 🎨 Design/UX
-Se aplicável, descreva ou adicione mockups de como a funcionalidade deveria parecer.
+## 🎨 Mockups/Designs (Opcional)
+Se você tem ideias visuais, adicione aqui!
 
-## 🔧 Considerações Técnicas
-- Há alguma consideração técnica específica?
-- Dependências externas necessárias?
-- Impacto na performance?
+## 📚 Contexto Adicional
+Adicione qualquer outro contexto, screenshots, ou exemplos sobre a feature.
 
-## 📚 Alternativas Consideradas
-Descreva outras soluções ou funcionalidades que você considerou.
-
-## 📋 Critérios de Aceitação
-- [ ] Critério 1
-- [ ] Critério 2
-- [ ] Critério 3
-
-## 🔗 Links Relacionados
-- Issues relacionadas
-- Documentação relevante
-- Referências externas
+## 👥 Quem Se Beneficiaria?
+- [ ] Usuários iniciantes
+- [ ] Usuários avançados
+- [ ] Desenvolvedores
+- [ ] Todos os usuários

@@ -1,69 +1,42 @@
-## 🎯 Descrição
-Breve descrição das mudanças realizadas neste PR.
+# Descrição
 
-## 🔧 Tipo de Mudança
+Descreva suas mudanças de forma clara e concisa.
+
+## Tipo de Mudança
+
 - [ ] 🐛 Bug fix (mudança que corrige um problema)
 - [ ] ✨ Nova feature (mudança que adiciona funcionalidade)
 - [ ] 💥 Breaking change (mudança que quebra compatibilidade)
-- [ ] 📚 Documentação (mudanças apenas na documentação)
-- [ ] 🎨 Style (mudanças de formatação, sem mudança de código)
-- [ ] ♻️ Refactor (refatoração sem mudança funcional)
-- [ ] ⚡ Performance (mudanças que melhoram performance)
-- [ ] 🧪 Testes (adicionar ou corrigir testes)
+- [ ] 📚 Documentação
+- [ ] 🎨 UI/UX
+- [ ] ⚡ Performance
+- [ ] ♻️ Refatoração
 
-## 🔗 Issues Relacionadas
-- Closes #
-- Relates to #
+## Como Foi Testado?
 
-## ✅ Checklist
-- [ ] ✅ Código compila sem erros TypeScript
-- [ ] 🧪 Funcionalidade testada localmente
-- [ ] 🔄 Não quebra funcionalidades existentes
-- [ ] 📏 Segue padrões de código do projeto
-- [ ] 📝 Commits seguem padrão conventional
-- [ ] 🎨 Design mantém consistência visual
-- [ ] 📱 Testado em diferentes resoluções (se aplicável)
+Descreva os testes que você executou para verificar suas mudanças.
 
-## 🧪 Como Testar
-Descreva como testar as mudanças:
+- [ ] Testado localmente em desenvolvimento
+- [ ] Testado com instalador
+- [ ] Testado em Windows 10
+- [ ] Testado em Windows 11
+- [ ] Testado com múltiplos monitores
 
-1. **Passo 1**: 
-2. **Passo 2**: 
-3. **Passo 3**: 
+## Checklist
 
-**Resultado esperado**: 
+- [ ] Meu código segue o estilo do projeto
+- [ ] Revisei meu próprio código
+- [ ] Comentei código complexo
+- [ ] Atualizei a documentação
+- [ ] Minhas mudanças não geram novos warnings
+- [ ] Sem API keys ou dados sensíveis no código
+- [ ] Testei que o instalador funciona (se aplicável)
 
-## 📸 Screenshots/Vídeos
-(Se aplicável, adicione screenshots ou GIFs demonstrando as mudanças)
+## Screenshots (se aplicável)
 
-### Antes:
-![Antes](url-da-imagem)
+Adicione screenshots mostrando suas mudanças.
 
-### Depois:
-![Depois](url-da-imagem)
+## Issues Relacionadas
 
-## 🔧 Configurações Necessárias
-(Se aplicável, descreva configurações especiais necessárias)
-
-## 📋 Notas Adicionais
-- [ ] Requer atualização do README
-- [ ] Requer atualização da documentação
-- [ ] Requer atualização do changelog
-- [ ] Requer configuração de ambiente
-
-## 🎯 Critérios de Aceitação
-- [ ] Critério 1
-- [ ] Critério 2
-- [ ] Critério 3
-
-## 🔍 Checklist de Revisão
-- [ ] Código está limpo e bem estruturado
-- [ ] Funções têm nomes descritivos
-- [ ] Comentários explicam código complexo
-- [ ] Não há código duplicado
-- [ ] Performance foi considerada
-- [ ] Segurança foi considerada
-
----
-
-**Obrigado por contribuir para o Orb! 🚀**
+Fecha #(issue_number)
+Relacionada a #(issue_number)

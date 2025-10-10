@@ -1,39 +1,48 @@
 ---
-name: 🐛 Bug Report
-about: Reportar um problema no Orb
+name: Reportar Bug
+about: Reporte um bug para nos ajudar a melhorar
 title: '[BUG] '
-labels: ['bug', 'needs-triage']
+labels: bug
 assignees: ''
 ---
 
 ## 🐛 Descrição do Bug
-Uma descrição clara e concisa do problema.
+Uma descrição clara e concisa do bug.
 
-## 🔄 Passos para Reproduzir
-1. Vá para '...'
-2. Clique em '...'
-3. Role até '...'
+## 📋 Passos para Reproduzir
+1. Abra '...'
+2. Clique em '....'
+3. Role até '....'
 4. Veja o erro
 
 ## ✅ Comportamento Esperado
-Uma descrição clara e concisa do que você esperava que acontecesse.
+Descreva o que deveria acontecer.
 
 ## ❌ Comportamento Atual
-Uma descrição clara e concisa do que realmente aconteceu.
+Descreva o que está acontecendo.
+
+## 🖥️ Ambiente
+- **Versão do ORB**: [ex: v1.0.0]
+- **Sistema Operacional**: [ex: Windows 11 Build 22631]
+- **RAM**: [ex: 16 GB]
+- **Resolução**: [ex: 1920x1080]
+- **Múltiplos Monitores**: [Sim/Não]
 
 ## 📸 Screenshots
 Se aplicável, adicione screenshots para ajudar a explicar o problema.
 
-## 🖥️ Ambiente
-- **OS**: [ex: Windows 11, macOS 13, Ubuntu 22.04]
-- **Node.js**: [ex: v18.17.0]
-- **Electron**: [ex: v27.0.0]
-- **Versão do Orb**: [ex: v1.0.0]
+## 📝 Logs
+Cole os logs relevantes de `%APPDATA%\OrbAgent\logs\orb-backend.log`
 
-## 📋 Logs
 ```
-Cole aqui os logs relevantes
+[Cole os logs aqui]
 ```
 
-## 🔧 Informações Adicionais
-Adicione qualquer outra informação sobre o problema aqui.
+## 🔍 Informações Adicionais
+Qualquer outra informação relevante sobre o problema.
+
+## 🎯 Severidade
+- [ ] 🔴 Crítico - Aplicação não funciona
+- [ ] 🟠 Alto - Funcionalidade principal quebrada
+- [ ] 🟡 Médio - Funcionalidade secundária com problemas
+- [ ] 🟢 Baixo - Problema cosmético ou edge case

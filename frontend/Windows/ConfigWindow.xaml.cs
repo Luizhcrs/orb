@@ -199,7 +199,8 @@ namespace OrbAgent.Frontend.Windows
             
             if (_currentConfig != null)
             {
-                LoggingService.LogDebug($"API Key: {_currentConfig.Agent?.ApiKey ?? "(null)"}");
+                var hasKey = !string.IsNullOrEmpty(_currentConfig.Agent?.ApiKey);
+                LoggingService.LogDebug($"API Key: {(hasKey ? "***CONFIGURADA" : "(null)")}");
                 LoggingService.LogDebug($"Provider: {_currentConfig.Agent?.LlmProvider ?? "(null)"}");
             }
             
@@ -596,7 +597,7 @@ namespace OrbAgent.Frontend.Windows
             var hasApiKey = !string.IsNullOrEmpty(apiKeyValue) && 
                            (apiKeyValue.StartsWith("***") || apiKeyValue.Length > 10);
             
-            LoggingService.LogDebug($"AddApiKeyField - API Key value: '{apiKeyValue}'");
+            LoggingService.LogDebug($"AddApiKeyField - API Key presente: {(hasApiKey ? "SIM" : "NÃO")}");
             LoggingService.LogDebug($"AddApiKeyField - hasApiKey: {hasApiKey}");
             
             string placeholder;
@@ -1293,13 +1294,13 @@ namespace OrbAgent.Frontend.Windows
                         if (gridChild is PasswordBox passwordBox && passwordBox.Tag?.ToString() == "api_key")
                         {
                             _currentConfig.Agent.ApiKey = passwordBox.Password;
-                            System.Diagnostics.Debug.WriteLine($"API Key coletada: {passwordBox.Password.Substring(0, Math.Min(10, passwordBox.Password.Length))}...");
+                            System.Diagnostics.Debug.WriteLine($"API Key coletada: {(passwordBox.Password.Length > 0 ? $"***{passwordBox.Password.Length} chars" : "vazio")}");
                         }
                         // Caso 2: PasswordBox dentro de Border
                         else if (gridChild is Border border && border.Child is PasswordBox borderPasswordBox && borderPasswordBox.Tag?.ToString() == "api_key")
                         {
                             _currentConfig.Agent.ApiKey = borderPasswordBox.Password;
-                            System.Diagnostics.Debug.WriteLine($"API Key coletada (border): {borderPasswordBox.Password.Substring(0, Math.Min(10, borderPasswordBox.Password.Length))}...");
+                            System.Diagnostics.Debug.WriteLine($"API Key coletada (border): {(borderPasswordBox.Password.Length > 0 ? $"***{borderPasswordBox.Password.Length} chars" : "vazio")}");
                         }
                         // Caso 3: ComboBox direto (llm_provider)
                         else if (gridChild is System.Windows.Controls.ComboBox comboBox && comboBox.Tag?.ToString() == "llm_provider")
